@@ -103,6 +103,47 @@ Route::any('/azampay', function(Request $request){
     return response()->json(['id' => $azampay->id], 201);
 });
 
+
+Route::any('/saveDummyAzampPay', function(Request $request) {
+    $data = $request->all();
+    
+    $transactionId = $data['transactionId'] ?? null;
+    
+    if (!$transactionId) {
+        return response()->json(['error' => 'Transaction ID not provided'], 400);
+    }
+
+    $previousPayment = Azampay::latest()->first();
+
+    if (!$previousPayment) {
+        return response()->json(['error' => 'No previous payment found with the provided transaction ID'], 404);
+    }
+
+    $dummyPayment = Azampay::create([
+        'response' => $previousPayment->response,
+        'message' => $previousPayment->message,
+        'user' => $previousPayment->user,
+        'password' => $previousPayment->password,
+        'clientId' => $previousPayment->clientId,
+        'transactionstatus' => $previousPayment->transactionstatus,
+        'operator' => $previousPayment->operator,
+        'reference' => $previousPayment->reference,
+        'externalreference' => $previousPayment->externalreference,
+        'utilityref' => $previousPayment->utilityref,
+        'amount' => $previousPayment->amount,
+        'transid' => $transactionId,
+        'msisdn' => $previousPayment->msisdn,
+        'mnoreference' => $previousPayment->mnoreference,
+        'submerchantAcc' => $previousPayment->submerchantAcc,
+        'user_id' => $previousPayment->user_id,
+        'post_id' => $previousPayment->post_id,
+    ]);
+
+    return response()->json(['id' => $dummyPayment->id], 201);
+});
+
+
+
 Route::get('/getPaymentStatus/{transactionId}', function($transactionId){
     $payment = Azampay::where('transid', $transactionId)->where('transactionstatus', 'success')->first();
     if ($payment){
