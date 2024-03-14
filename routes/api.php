@@ -139,7 +139,7 @@ Route::any('/saveDummyAzampPay', function(Request $request) {
         'post_id' => $previousPayment->post_id,
     ]);
 
-    return response()->json(['id' => $dummyPayment->id], 201);
+    return response()->json(['id' => $dummyPayment->id], 200);
 });
 
 
