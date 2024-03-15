@@ -53,8 +53,6 @@ class Post extends Model
         return $this->hasMany(Challenge::class, 'post_id');
     }
 
-    
-
     public static function getLikeTypeForUser($userId, $postId)
     {
         $like = Like::where('user_id', $userId)
@@ -107,7 +105,5 @@ class Post extends Model
         }
         return ''; // or return a default image URL if you have one
     }
-
-
 
 }

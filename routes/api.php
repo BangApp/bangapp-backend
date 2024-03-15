@@ -473,8 +473,15 @@ Route::get('/getPost', function(Request $request) {
 
     // Get the user's ID if available (you can adjust how you get the user's ID based on your authentication system)
     $user_id = $request->input('user_id');
+    // Retrieve user's hobbies
+    $userHobbies = UserHobby::where('user_id', $user_id)->pluck('hobby_id')->toArray();
 
-    $posts = Post::unseenPosts($user_id)->latest()
+
+    $posts = Post::unseenPosts($user_id)->whereHas('user', function ($query) use ($userHobbies) {
+        $query->whereHas('hobbies', function ($hobbyQuery) use ($userHobbies) {
+            $hobbyQuery->whereIn('hobby_id', $userHobbies);
+        });
+    })->latest()
         ->with([
             'likes' => function($query) {
                 $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
@@ -485,8 +492,8 @@ Route::get('/getPost', function(Request $request) {
             }
         ])->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
 
-    $posts->getCollection()->transform(function($post) use ($appUrl, $user_id) {
 
+    $posts->getCollection()->transform(function($post) use ($appUrl, $user_id) {
 
         if ($post->type === 'image' ) {
             $post->image ? $post->image = $appUrl.'storage/app/'.$post->image : $post->image = null;
@@ -852,14 +859,17 @@ Route::get('/getPostInfo/{post_id}/{user_id}', function($post_id,$user_id)
     ])->get(); // Corrected 'orderBy' here
 
     $posts->transform(function($post) use ($appUrl,$user_id) {
-        $post->image  ? $post->image = $appUrl.'storage/app/'.$post->image : $post->image = null;
-        $post->challenge_img ? $post->challenge_img = $appUrl.'storage/app/'.$post->challenge_img : $post->challenge_img = null;
-        $post->video ? $post->video = $appUrl.'storage/app/'.$post->video : $post->video = null;
-        if ($post->type === 'image' && isset($post->media)) {
-            list($post->width, $post->height) = getimagesize($post->media);
-        } else {
+        
+        if ($post->type === 'image' ) {
+            $post->image ? $post->image = $appUrl.'storage/app/'.$post->image : $post->image = null;
+            $post->challenge_img ? $post->challenge_img = $appUrl.'storage/app/'.$post->challenge_img : $post->challenge_img = null;
+            list($post->width, $post->height) =  [300, 300];
+        } 
+        if ($post->type === 'video') {
+            $post->image=$post->image;
             list($post->width, $post->height) = [300, 300];
         }
+
         // Retrieve the like count
         $post->likeCount = 0;
         $likeCountA = 0;

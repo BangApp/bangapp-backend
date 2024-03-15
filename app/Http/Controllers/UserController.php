@@ -127,12 +127,10 @@ class UserController extends Controller
     public function getMyInfo(Request $request)
     {
         $user_id = $request->input('user_id');
-
         // Check if the user_id is provided in the request
         if (!$user_id) {
             return response()->json(['error' => 'User ID is missing in the request'], 400);
         }
-
         // Find the user based on the user_id
         $user = User::find($user_id);
 
@@ -143,4 +141,11 @@ class UserController extends Controller
         // Return user information as a JSON response
         return response()->json($user, 200);
     }
+
+    // public function addFollowersToHobby(Request $request)
+    // { 
+    //     $hobbies = $request->hobbies;
+    //     $userHobbies = UserHobby::('hobby_id', '')
+
+    // }
 }
