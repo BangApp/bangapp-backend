@@ -2,6 +2,7 @@
 
 use App\Category;
 use App\Post;
+use App\Http\Controllers\ResetPasswordController;
 use Illuminate\Support\Facades\Route;
 
 Auth::routes();
@@ -19,7 +20,8 @@ Route::get('/', function () {
 
     return view('welcome');
 })->name('welcome');
-
+Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+Route::post('/update-password', [ResetPasswordController::class, 'reset'])->name('password.update');
 Route::post('/post/bang/updates', [App\Http\Controllers\HomeController::class, 'postBangUpdates'])->name('postBangUpdates');
 
 Route::any('/post/bang/inspiration', [App\Http\Controllers\HomeController::class, 'postBangInspiration'])->name('postBangInspiration');

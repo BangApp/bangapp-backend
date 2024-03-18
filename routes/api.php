@@ -32,6 +32,8 @@ use Illuminate\Validation\Rule;
 use App\Http\Controllers\PushNotificationService;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\ChatController;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ResetPasswordMail;
 
 global $appUrl;
 $appUrl = "https://bangapp.pro/BangAppBackend/";
@@ -106,9 +108,9 @@ Route::any('/azampay', function(Request $request){
 
 Route::any('/saveDummyAzampPay', function(Request $request) {
     $data = $request->all();
-    
+
     $transactionId = $data['transactionId'] ?? null;
-    
+
     if (!$transactionId) {
         return response()->json(['error' => 'Transaction ID not provided'], 400);
     }
@@ -325,7 +327,7 @@ Route::post('imageadd', function(Request $request){
                     $image->save();
                 }
             }
-        
+
     }
 
     return response()->json(['url' => asset($image->image)], 201);
@@ -499,7 +501,7 @@ Route::get('/getPost', function(Request $request) {
             $post->image ? $post->image = $appUrl.'storage/app/'.$post->image : $post->image = null;
             $post->challenge_img ? $post->challenge_img = $appUrl.'storage/app/'.$post->challenge_img : $post->challenge_img = null;
             list($post->width, $post->height) =  [300, 300];
-        } 
+        }
         if ($post->type === 'video') {
             //$streamUrl =  "https://bangapp.pro/BangAppBackend/stream-video/";
             //$post->image = $streamUrl .str_replace("images/", "", $post->image); // Assuming the video URL is based on the 'video'
@@ -859,12 +861,12 @@ Route::get('/getPostInfo/{post_id}/{user_id}', function($post_id,$user_id)
     ])->get(); // Corrected 'orderBy' here
 
     $posts->transform(function($post) use ($appUrl,$user_id) {
-        
+
         if ($post->type === 'image' ) {
             $post->image ? $post->image = $appUrl.'storage/app/'.$post->image : $post->image = null;
             $post->challenge_img ? $post->challenge_img = $appUrl.'storage/app/'.$post->challenge_img : $post->challenge_img = null;
             list($post->width, $post->height) =  [300, 300];
-        } 
+        }
         if ($post->type === 'video') {
             $post->image=$post->image;
             list($post->width, $post->height) = [300, 300];
@@ -1131,12 +1133,12 @@ Route::get('/getBangBattle/{user_id}', function ($user_id) {
 });
 
 
-Route::get('/getNotifications/{user_id}/{page?}/{perPage?}', function ($user_id, $page = 1, $perPage = 10) 
+Route::get('/getNotifications/{user_id}/{page?}/{perPage?}', function ($user_id, $page = 1, $perPage = 10)
 {
     $notifications = Notification::where('reference_id', $user_id)
         ->with([
             'user' => function ($query) {
-                $query->select('id', 'name', 'image'); 
+                $query->select('id', 'name', 'image');
             },
             'post' => function ($query) {
                 $query->select('id', 'image', 'thumbnail_url');
@@ -1226,6 +1228,51 @@ Route::post('/sendNotification12', function(Request $request)
 });
 
 
+Route::get('/deleteAccount/{userId}', function($userId)
+{
+    $user = User::findOrFail($userId);
+    // Delete user's posts and associated images
+    $user->posts()->each(function ($post) {
+        foreach ($post->image as $img) {
+            if($img->type == 'image')
+            {
+                Storage::delete($img->image);
+            }
+            if($img->challenge_img){
+                Storage::delete($img->challenge_img);
+            }
+        }
+        // Delete post
+        $post->delete();
+    });
+    $user->comments()->delete();
+    $user->likes()->delete();
+    $user->followers()->delete();
+    $user->hobbies()->delete();
+    $user->postViews()->delete();
+    $user->bangUpdateViews()->delete();
+    // Delete user's views
+    $user->views()->delete();
+    // Delete user's account
+    $user->delete();
+
+    return response()->json(['message' => 'User account deleted successfully'], 200);
+});
+
+Route::get('/resetPassword/{email}', function($email) {
+    // Find the user by email
+    $user = User::where('email', $email)->first();
+    if ($user) {
+        $token = Str::random(60);
+        $user->reset_password_token = $token;
+        $user->save();
+        $resetLink = url('/reset-password/' . $user->reset_password_token);
+        Mail::to($user->email)->send(new ResetPasswordMail($user, $resetLink));
+        return response()->json(['message' => 'Reset password link sent successfully'], 200);
+    } else {
+        return response()->json(['message' => 'User not found'], 404);
+    }
+});
 
 Route::group(['prefix' => 'v1'], function () {
 
