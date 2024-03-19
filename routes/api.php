@@ -293,20 +293,35 @@ Route::middleware('auth:api')->group(function () {
     });
 
 
-    Route::get('/updateIsSeen/{postId}/{user_id}', function ($postId, $userId) {
-        PostView::create([
-            'user_id' => $userId,
-            'post_id' => $postId,
-        ]);
-        return response()->json(['status' => true]);
+    Route::get('/updateIsSeen/{postId}/{userId}', function ($postId, $userId) {
+        $existingRecord = PostView::where('user_id', $userId)
+            ->where('post_id', $postId)
+            ->exists();
+
+        if (!$existingRecord) {
+            PostView::create([
+                'user_id' => $userId,
+                'post_id' => $postId,
+            ]);
+            return response()->json(['status' => true, 'message' => 'Record created successfully']);
+        } else {
+            return response()->json(['status' => false, 'message' => 'Post has already been seen']);
+        }
     });
 
-    Route::get('/updateBangUpdateIsSeen/{bangUpdateId}/{user_id}', function ($bangUpdateId, $userId) {
-        BangUpdateView::create([
-            'user_id' => $userId,
-            'bang_update_id' => $bangUpdateId,
-        ]);
-        return response()->json(['status' => true]);
+    Route::get('/updateBangUpdateIsSeen/{bangUpdateId}/{userId}', function ($bangUpdateId, $userId) {
+        $existingRecord = BangUpdateView::where('user_id', $userId)
+            ->where('bang_update_id', $bangUpdateId)
+            ->exists();
+        if (!$existingRecord) {
+            BangUpdateView::create([
+                'user_id' => $userId,
+                'bang_update_id' => $bangUpdateId,
+            ]);
+            return response()->json(['status' => true, 'message' => 'Record created successfully']);
+        } else {
+            return response()->json(['status' => false, 'message' => 'Bang update has already been seen']);
+        }
     });
 
 
@@ -328,7 +343,6 @@ Route::middleware('auth:api')->group(function () {
                 }
             }
         }
-
         return response()->json(['url' => asset($image->image)], 201);
     });
 
