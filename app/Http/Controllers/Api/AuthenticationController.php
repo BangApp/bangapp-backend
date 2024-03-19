@@ -27,7 +27,7 @@ class AuthenticationController extends Controller
             'email' => [
                 'required',
                 function ($attribute, $value, $fail) {
-                   
+
                         $exists = \App\User::where(function ($query) use ($value) {
                             $query->where('email', $value)
                                 ->orWhere('phone_number', $value);
@@ -36,7 +36,7 @@ class AuthenticationController extends Controller
                             $fail('The ' . $attribute . ' has already been taken.');
                         }
                     }
-            
+
             ],
             'password' => ['required', 'string', 'min:6', 'max:30'],
         ]);
@@ -51,7 +51,7 @@ class AuthenticationController extends Controller
         $validatedData['role_id'] = 3;
 
         $user = User::create($validatedData);
-        
+
 
         $token = JWTAuth::attempt(['email' => $request->email, 'password' => $request->password]);
 
@@ -59,7 +59,7 @@ class AuthenticationController extends Controller
     }
 
     public function login(Request $request)
-    {    
+    {
        $validator = Validator::make($request->all(), [
             'email' => 'required',
             'password' => 'required',
@@ -80,7 +80,7 @@ class AuthenticationController extends Controller
             'user_id' => $user->id,
             'user_image' => env('APP_URL').'storage/app/'.$user->image,
             'name' => $user->name,
-            'role' => $user->role->name,
+            'role' => $user->role ? $user->role->name : 'user', // Set default role if null
         ]);
     }
 

@@ -35,6 +35,16 @@ class BangUpdate extends Model
         return $this->belongsTo(User::class,'user_id');
     }
 
+    public function likess()
+    {
+        return $this->hasMany(BangUpdateLike::class, 'post_id');
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(bangUpdateComment::class,'post_id');
+    }
+
     public static function unseenPosts($userId)
     {
         return static::whereDoesntHave('bangUpdateViews', function ($query) use ($userId) {
@@ -44,7 +54,7 @@ class BangUpdate extends Model
 
     public function bangUpdateViews()
     {
-        return $this->hasMany(BangUpdateView::class);
+        return $this->hasMany(BangUpdateView::class, 'bang_update_id');
     }
 
     public function getUserImageUrlAttribute()

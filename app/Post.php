@@ -19,6 +19,10 @@ class Post extends Model
         return $this->hasMany(Comment::class)->latest();
     }
 
+    public function commentsDel() {
+        return $this->hasMany(Comment::class,'user_id');
+    }
+
     public function user() {
         return $this->belongsTo(User::class,'user_id');
     }

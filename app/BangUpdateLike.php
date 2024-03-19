@@ -9,6 +9,8 @@ class BangUpdateLike extends Model
 {
     use HasFactory;
 
+    protected $table = "bang_update_likes";
+
      protected $fillable = [
         'user_id', 'post_id',
     ];

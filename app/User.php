@@ -59,9 +59,29 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Post::class);
     }
 
+    public function bangUpdates()
+    {
+        return $this->hasMany(BangUpdate::class);
+    }
+
     public function comments()
     {
         return $this->hasMany(Comment::class);
+    }
+
+    public function battleComments()
+    {
+        return $this->hasMany(BattleComment::class);
+    }
+
+    public function battleLikes()
+    {
+        return $this->hasMany(BattleLike::class);
+    }
+
+    public function azamPay()
+    {
+        return $this->hasMany(azampay::class);
     }
 
     public function likes()
@@ -77,6 +97,16 @@ class User extends Authenticatable implements JWTSubject
     public function bangUpdateViews()
     {
         return $this->hasMany(BangUpdateView::class);
+    }
+
+    public function bangUpdateComments()
+    {
+        return $this->hasMany(bangUpdateComment::class);
+    }
+
+    public function bangUpdateLikes()
+    {
+        return $this->hasMany(BangUpdateLike::class, 'user_id');
     }
 
     public function followers()

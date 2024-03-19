@@ -13,12 +13,17 @@ class ResetPasswordController extends Controller
     public function showResetForm($token)
     {
         $user = User::where('reset_password_token', $token)->first();
+        if($user){
+            return view('change_password')->with([
+                'token' => $token,
+                'imageUrl' => $user->user_image_url ,
+                'email' => $user->email,
+            ]);
+        }
+        else{
+            return 'Unknow Link Please Request a new Link';
+        }
 
-        return view('change_password')->with([
-            'token' => $token,
-            'imageUrl' => $user->user_image_url ,
-            'email' => $user->email,
-        ]);
     }
 
     public function reset(Request $request)
