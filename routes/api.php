@@ -465,7 +465,7 @@ Route::middleware('auth:api')->group(function () {
         return response()->json($video);
     });
 
-    Route::get('/editPost', function (Request $request) {
+    Route::post('/editPost', function (Request $request) {
         $post = Post::find($request->id);
         $post->body = $request->caption;
         if ($post->save()) {
