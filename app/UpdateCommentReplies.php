@@ -34,4 +34,6 @@ class UpdateCommentReplies extends Model
         $appUrl = "https://bangapp.pro/BangAppBackend/";
         return $appUrl .'storage/app/'.$this->user->image;
     }
+
+  
 }

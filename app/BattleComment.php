@@ -11,7 +11,7 @@ class BattleComment extends Model
 {
     use HasFactory;
 
-    protected $appends = ['user_image_url'];
+    protected $appends = ['user_image_url','replies_count'];
 
     protected $fillable = [
         'user_id',
@@ -30,5 +30,10 @@ class BattleComment extends Model
     {
         $appUrl = "https://bangapp.pro/BangAppBackend/";
         return $appUrl .'storage/app/'.$this->user->image;
+    }
+
+    public function getRepliesCountAttribute()
+    {
+        return BattleCommentReplies::where('comment_id', $this->id)->count();
     }
 }
