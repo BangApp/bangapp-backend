@@ -105,6 +105,12 @@ class Post extends Model
         return $this->hasMany(azampay::class, 'post_id')->count();
     }
 
+    public static function hasUserPaid($userId, $postId)
+    {
+        return azampay::where('user_id', $userId)
+            ->where('post_id', $postId)
+            ->exists();
+    }
     public function getUserImageUrlAttribute()
     {
         $appUrl = "https://bangapp.pro/BangAppBackend/";

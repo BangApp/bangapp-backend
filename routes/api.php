@@ -504,6 +504,10 @@ Route::middleware('auth:api')->group(function () {
 
         $posts->getCollection()->transform(function ($post) use ($appUrl, $user_id) {
             $post->post_views_count = $post->pinned == 1 ?  $post->payedCount() : $post->postViews->count();
+            // Update the 'pinned' attribute based on whether the user has paid or not
+            if ($post->hasUserPaid($user_id)) {
+                $post->pinned = 0;
+            }
 
             if ($post->type === 'image') {
                 $post->image ? $post->image = $appUrl . 'storage/app/' . $post->image : $post->image = null;
@@ -782,6 +786,10 @@ Route::middleware('auth:api')->group(function () {
         ])->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
 
         $posts->getCollection()->transform(function ($post) use ($appUrl, $user_id, $viewerId) {
+            // Update the 'pinned' attribute based on whether the user has paid or not
+            if ($post->hasUserPaid($user_id,$post->id)) {
+                $post->pinned = 0;
+            }
             $post->post_views_count = $post->pinned == 1 ?  $post->payedCount() : $post->postViews->count();
             $post->image  ? $post->image = $appUrl . 'storage/app/' . $post->image : $post->image = null;
             $post->challenge_img ? $post->challenge_img = $appUrl . 'storage/app/' . $post->challenge_img : $post->challenge_img = null;
