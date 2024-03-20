@@ -27,6 +27,8 @@ use App\bangUpdateComment;
 use App\UserHobby;
 use App\BangBattle;
 use App\Notification;
+use App\BattleCommentReplies;
+use App\UpdateCommentReplies;
 use App\BattleLike;
 use Illuminate\Validation\Rule;
 use App\Http\Controllers\PushNotificationService;
