@@ -14,7 +14,7 @@ class UpdateCommentReplies extends Model
     ];
     protected $appends = ['user_image_url'];
 
-    protected $with = ['comment'];
+    protected $with = ['updateComment'];
 
     public function updateComment()
     {
