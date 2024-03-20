@@ -101,6 +101,10 @@ class Post extends Model
         return $this->hasMany(PostView::class);
     }
 
+    public function payedCount(){
+        return $this->hasMany(azampay::class, 'post_id')->count();
+    }
+
     public function getUserImageUrlAttribute()
     {
         $appUrl = "https://bangapp.pro/BangAppBackend/";

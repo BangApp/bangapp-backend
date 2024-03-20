@@ -479,13 +479,10 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/getPost', function (Request $request) {
         $appUrl = "https://bangapp.pro/BangAppBackend/";
 
-        // Get the _page and _limit parameters from the request query
         $pageNumber = $request->query('_page', 1);
         $numberOfPostsPerRequest = $request->query('_limit', 10);
 
-        // Get the user's ID if available (you can adjust how you get the user's ID based on your authentication system)
         $user_id = $request->input('user_id');
-        // Retrieve user's hobbies
         $userHobbies = UserHobby::where('user_id', $user_id)->pluck('hobby_id')->toArray();
 
 
@@ -506,6 +503,7 @@ Route::middleware('auth:api')->group(function () {
 
 
         $posts->getCollection()->transform(function ($post) use ($appUrl, $user_id) {
+            $post->post_views_count = $post->pinned == 1 ?  $post->payedCount() : $post->postViews->count();
 
             if ($post->type === 'image') {
                 $post->image ? $post->image = $appUrl . 'storage/app/' . $post->image : $post->image = null;
