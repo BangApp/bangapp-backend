@@ -856,7 +856,7 @@ Route::middleware('auth:api')->group(function () {
         ])->get(); // Corrected 'orderBy' here
 
         $posts->transform(function ($post) use ($appUrl, $user_id) {
-
+            $post->post_views_count = $post->pinned == 1 ?  $post->payedCount() : $post->postViews->count();
             if ($post->type === 'image') {
                 $post->image ? $post->image = $appUrl . 'storage/app/' . $post->image : $post->image = null;
                 $post->challenge_img ? $post->challenge_img = $appUrl . 'storage/app/' . $post->challenge_img : $post->challenge_img = null;
