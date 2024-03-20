@@ -969,6 +969,54 @@ Route::middleware('auth:api')->group(function () {
         return response(['data' => $comment, 'message' => 'success'], 200);
     });
 
+    Route::post('/postUpdateCommentReply', function (request $request, Post $post) {
+        $request->validate([
+            'body' => 'string|max:6000',
+        ]);
+        $post = Post::find($request->post_id);
+        $user = User::find($request->user_id);
+        $updateComment = UpdateCommentReplies::create([
+            'user_id' => $request->user_id,
+            'comment_id' => $request->comment_id,
+            'body' => $request->body,
+        ]);
+        $updateComment = bangUpdateComment::with([
+            'user' => function ($query) {
+                $query->select('id', 'name', 'image');
+            },
+        ])->findOrFail($request->comment_id);
+        if ($post->user->id <> $request->user_id) {
+            $pushNotificationService = new PushNotificationService();
+            $pushNotificationService->sendPushNotification($post->user->device_token, $user->name, commentReplyMessage(), $request->post_id, 'commentReply');
+            saveNotification($request->user_id, commentReplyMessage(), 'commentReply', $post->user->id, $request->post_id);
+        }
+        return response(['data' => $updateComment, 'message' => 'success'], 200);
+    });
+
+    Route::post('/postBattleCommentReply', function (request $request, Post $post) {
+        $request->validate([
+            'body' => 'string|max:6000',
+        ]);
+        $post = Post::find($request->post_id);
+        $user = User::find($request->user_id);
+        $battleComment = BattleCommentReplies::create([
+            'user_id' => $request->user_id,
+            'comment_id' => $request->comment_id,
+            'body' => $request->body,
+        ]);
+        $battleComment = BattleComment::with([
+            'user' => function ($query) {
+                $query->select('id', 'name', 'image');
+            },
+        ])->findOrFail($request->comment_id);
+        if ($post->user->id <> $request->user_id) {
+            $pushNotificationService = new PushNotificationService();
+            $pushNotificationService->sendPushNotification($post->user->device_token, $user->name, commentReplyMessage(), $request->post_id, 'commentReply');
+            saveNotification($request->user_id, commentReplyMessage(), 'commentReply', $post->user->id, $request->post_id);
+        }
+        return response(['data' => $battleComment, 'message' => 'success'], 200);
+    });
+
     Route::post('/postUpdateComment', function (request $request, Post $post) {
         $request->validate([
             'body' => 'string|max:6000',
@@ -1025,6 +1073,41 @@ Route::middleware('auth:api')->group(function () {
             return response()->json(['message' => 'Notification deleted']);
         } else {
             return response()->json(['message' => 'Notification not found'], 404);
+        }
+    });
+
+    Route::get('/deleteComment/{commentId}', function ($commentId) {
+        $comment = Comment::find($commentId);
+
+        if ($comment) {
+            $comment->delete();
+
+            return response()->json(['message' => 'Notification deleted']);
+        } else {
+            return response()->json(['message' => 'Notification not found'], 404);
+        }
+    });
+
+    Route::get('/deleteUpdateComment/{updateCommentId}', function ($updateCommentId) {
+        $updateComment = bangUpdateComment::find($updateCommentId);
+
+        if ($updateComment) {
+            $updateComment->delete();
+            return response()->json(['message' => 'Notification deleted']);
+        } else {
+            return response()->json(['message' => 'Notification not found'], 404);
+        }
+    });
+
+    Route::get('/deleteBattleComment/{battleComment}', function ($battleComment) {
+        $battleComment = BattleComment::find($battleComment);
+
+        if ($battleComment) {
+            $battleComment->delete();
+
+            return response()->json(['message' => 'battle Comment deleted']);
+        } else {
+            return response()->json(['message' => 'battle Comment not found'], 404);
         }
     });
 
