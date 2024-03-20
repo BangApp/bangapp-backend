@@ -861,6 +861,15 @@ Route::middleware('auth:api')->group(function () {
         return response()->json(['commentsReplies' => $commentsReplies]);
     });
 
+    Route::get('/getUpdateCommentsReplies/{id}', function ($id) {
+        $commentsReplies = UpdateCommentReplies::where('comment_id', $id)->with([
+            'user' => function ($query) {
+                $query->select('id', 'name', 'image');
+            },
+        ])->orderBy('created_at', 'asc')->get(); // Corrected 'orderBy' here
+        return response()->json(['commentsReplies' => $commentsReplies]);
+    });
+    
 
     Route::get('/getPostInfo/{post_id}/{user_id}', function ($post_id, $user_id) {
         $appUrl = "https://bangapp.pro/BangAppBackend/";
