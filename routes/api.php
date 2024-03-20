@@ -505,7 +505,7 @@ Route::middleware('auth:api')->group(function () {
         $posts->getCollection()->transform(function ($post) use ($appUrl, $user_id) {
             $post->post_views_count = $post->pinned == 1 ?  $post->payedCount() : $post->postViews->count();
             // Update the 'pinned' attribute based on whether the user has paid or not
-            if ($post->hasUserPaid($user_id)) {
+            if ($post->hasUserPaid($user_id,$post->id)) {
                 $post->pinned = 0;
             }
 
