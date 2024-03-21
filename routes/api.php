@@ -78,6 +78,19 @@ Route::post('/videoAddServer', function (Request $request) {
     return response()->json(['url' => $request->path], 201);
 });
 
+Route::post('updateVideoAddServer', function (Request $request){
+    $bangUpdate = new BangUpdate();
+    $bangUpdate->caption = $request->caption;
+    $bangUpdate->user_id = $request->user_id;
+    $bangUpdate->filename = $request->filename;
+    $bangUpdate->type = 'video';
+    $bangUpdate->cache_url = $request->cache_url;
+    $bangUpdate->aspect_ratio = $request->aspect_ratio;
+    $bangUpdate->thumbnail_url = $request->thumbnail_url;
+    $bangUpdate->save();
+
+});
+
 Route::any('/azampay', function (Request $request) {
     $data = $request->all();
 
@@ -869,7 +882,7 @@ Route::middleware('auth:api')->group(function () {
         ])->orderBy('created_at', 'asc')->get(); // Corrected 'orderBy' here
         return response()->json(['commentsReplies' => $commentsReplies]);
     });
-    
+
 
     Route::get('/getPostInfo/{post_id}/{user_id}', function ($post_id, $user_id) {
         $appUrl = "https://bangapp.pro/BangAppBackend/";

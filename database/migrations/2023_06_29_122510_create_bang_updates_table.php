@@ -17,7 +17,11 @@ return new class extends Migration
             $table->id();
             $table->string('caption');
             $table->string('filename');
-            $table->enum('type', ['video', 'image']); 
+            $table->enum('type', ['video', 'image']);
+            $table->unsignedBigInteger('user_id');
+            $table->string('cache_url')->nullable();
+            $table->string('thumbnail_url')->nullable();
+            $table->string('aspect_ratio')->nullable();
             $table->timestamps();
         });
     }
