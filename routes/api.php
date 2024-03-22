@@ -1009,23 +1009,18 @@ Route::middleware('auth:api')->group(function () {
         $request->validate([
             'body' => 'string|max:6000',
         ]);
-        $post = Post::find($request->post_id);
         $user = User::find($request->user_id);
         $updateComment = UpdateCommentReplies::create([
             'user_id' => $request->user_id,
             'comment_id' => $request->comment_id,
             'body' => $request->body,
         ]);
-        $updateComment = bangUpdateComment::with([
+        $updateComment = UpdateCommentReplies::with([
             'user' => function ($query) {
                 $query->select('id', 'name', 'image');
             },
-        ])->findOrFail($request->comment_id);
-        if ($post->user->id <> $request->user_id) {
-            $pushNotificationService = new PushNotificationService();
-            $pushNotificationService->sendPushNotification($post->user->device_token, $user->name, commentReplyMessage(), $request->post_id, 'commentReply');
-            saveNotification($request->user_id, commentReplyMessage(), 'commentReply', $post->user->id, $request->post_id);
-        }
+        ])->findOrFail($updateComment->id);
+        
         return response(['data' => $updateComment, 'message' => 'success'], 200);
     });
 
@@ -1033,23 +1028,19 @@ Route::middleware('auth:api')->group(function () {
         $request->validate([
             'body' => 'string|max:6000',
         ]);
-        $post = Post::find($request->post_id);
+       
         $user = User::find($request->user_id);
         $battleComment = BattleCommentReplies::create([
             'user_id' => $request->user_id,
             'comment_id' => $request->comment_id,
             'body' => $request->body,
         ]);
-        $battleComment = BattleComment::with([
+        $battleComment = BattleCommentReplies::with([
             'user' => function ($query) {
                 $query->select('id', 'name', 'image');
             },
-        ])->findOrFail($request->comment_id);
-        if ($post->user->id <> $request->user_id) {
-            $pushNotificationService = new PushNotificationService();
-            $pushNotificationService->sendPushNotification($post->user->device_token, $user->name, commentReplyMessage(), $request->post_id, 'commentReply');
-            saveNotification($request->user_id, commentReplyMessage(), 'commentReply', $post->user->id, $request->post_id);
-        }
+        ])->findOrFail($battleComment->id);
+        
         return response(['data' => $battleComment, 'message' => 'success'], 200);
     });
 
