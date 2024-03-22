@@ -16,13 +16,6 @@ class CommentReplies extends Model
     ];
     protected $appends = ['user_image_url'];
 
-    protected $with = ['comment'];
-
-    public function comment()
-    {
-        return $this->belongsTo(Comment::class,'comment_id');
-    }
-
     public function getCreatedAtAttribute($value) {
         return (new Carbon($value))->diffForHumans();
     }

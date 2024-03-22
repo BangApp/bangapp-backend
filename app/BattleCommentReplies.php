@@ -16,13 +16,6 @@ class BattleCommentReplies extends Model
     ];
     protected $appends = ['user_image_url'];
 
-    protected $with = ['battleComment'];
-
-    public function battleComment()
-    {
-        return $this->belongsTo(BattleComment::class,'comment_id');
-    }
-
     public function getCreatedAtAttribute($value) {
         return (new Carbon($value))->diffForHumans();
     }

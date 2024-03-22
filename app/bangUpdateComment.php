@@ -10,12 +10,17 @@ class bangUpdateComment extends Model
     use HasFactory;
 
     protected $appends = ['user_image_url','replies_count'];
-
+protected $with = ['commentReplies'];
     protected $fillable = [
         'user_id',
         'post_id',
         'body',
     ];
+
+    public function commentReplies() {
+        return $this->belongsTo(BattleCommentReplies::class,'comment_id');
+    }
+    
     public function user() {
         return $this->belongsTo(User::class);
     }

@@ -12,14 +12,20 @@ class BattleComment extends Model
     use HasFactory;
 
     protected $appends = ['user_image_url','replies_count'];
-
+    protected $with = ['commentReplies'];
     protected $fillable = [
         'user_id',
         'battles_id',
         'body',
     ];
+
     public function user() {
         return $this->belongsTo(User::class,'user_id');
+    }
+
+    public function commentReplies()
+    {
+        return $this->belongsTo(BattleCommentReplies::class,'comment_id');
     }
 
     public function getCreatedAtAttribute($value) {

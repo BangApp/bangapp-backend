@@ -11,10 +11,14 @@ class Comment extends Model
 
     protected $guarded = [];
     protected $appends = ['favoriteCount', 'isFavorited','user_image_url','replies_count'];
-    // protected $with = ['post'];
+    protected $with = ['commentReplies'];
 
     public function post() {
         return $this->belongsTo(Post::class);
+    }
+
+    public function commentReplies() {
+        return $this->belongsTo(CommentReplies::class,'comment_id');
     }
 
     public function user() {
