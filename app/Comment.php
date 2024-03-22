@@ -18,7 +18,7 @@ class Comment extends Model
     }
 
     public function commentReplies() {
-        return $this->belongsTo(CommentReplies::class,'comment_id');
+        return $this->hasMany(CommentReplies::class, 'comment_id');
     }
 
     public function user() {

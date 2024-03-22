@@ -20,7 +20,7 @@ class UpdateCommentReplies extends Model
 
     public function updateComment()
     {
-        return $this->belongsTo(bangUpdateComment::class,'comment_id');
+        return $this->hasMany(bangUpdateComment::class,'comment_id');
     }
 
     public function getCreatedAtAttribute($value) {
