@@ -849,7 +849,7 @@ Route::middleware('auth:api')->group(function () {
 
     Route::get('/getComments/{id}', function ($id) {
         $comments = Comment::where('post_id', $id)->with([
-            'user' => function ($query) {us
+            'user' => function ($query) {
                 $query->select('id', 'name', 'image');
             },
         ])->orderBy('created_at', 'asc')->get(); // Corrected 'orderBy' here
