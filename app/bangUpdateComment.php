@@ -10,7 +10,7 @@ class bangUpdateComment extends Model
     use HasFactory;
 
     protected $appends = ['user_image_url','replies_count'];
-protected $with = ['commentReplies'];
+    protected $with = ['commentReplies'];
     protected $fillable = [
         'user_id',
         'post_id',
