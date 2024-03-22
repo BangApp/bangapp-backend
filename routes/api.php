@@ -849,7 +849,7 @@ Route::middleware('auth:api')->group(function () {
 
     Route::get('/getComments/{id}', function ($id) {
         $comments = Comment::where('post_id', $id)->with([
-            'user' => function ($query) {
+            'user' => function ($query) {us
                 $query->select('id', 'name', 'image');
             },
         ])->orderBy('created_at', 'asc')->get(); // Corrected 'orderBy' here
@@ -989,11 +989,11 @@ Route::middleware('auth:api')->group(function () {
             'comment_id' => $request->comment_id,
             'body' => $request->body,
         ]);
-        $comment = Comment::with([
+        $comment = CommentReplies::with([
             'user' => function ($query) {
                 $query->select('id', 'name', 'image');
             },
-        ])->findOrFail($request->comment_id);
+        ])->findOrFail($comment->id);
         if ($post->user->id <> $request->user_id) {
             $pushNotificationService = new PushNotificationService();
             $pushNotificationService->sendPushNotification($post->user->device_token, $user->name, commentReplyMessage(), $request->post_id, 'commentReply');

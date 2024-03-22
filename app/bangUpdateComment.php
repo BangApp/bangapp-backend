@@ -18,7 +18,7 @@ protected $with = ['commentReplies'];
     ];
 
     public function commentReplies() {
-        return $this->belongsTo(BattleCommentReplies::class,'comment_id');
+        return $this->hasMany(BattleCommentReplies::class,'comment_id');
     }
     
     public function user() {

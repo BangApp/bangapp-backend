@@ -14,6 +14,7 @@ class CommentReplies extends Model
     protected $fillable = [
         'user_id', 'comment_id','body',
     ];
+    
     protected $appends = ['user_image_url'];
 
     public function getCreatedAtAttribute($value) {

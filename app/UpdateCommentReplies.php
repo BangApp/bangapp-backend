@@ -16,11 +16,9 @@ class UpdateCommentReplies extends Model
     ];
     protected $appends = ['user_image_url'];
 
-    protected $with = ['updateComment'];
-
     public function updateComment()
     {
-        return $this->hasMany(bangUpdateComment::class,'comment_id');
+        return $this->belongsTo(bangUpdateComment::class,'comment_id');
     }
 
     public function getCreatedAtAttribute($value) {
