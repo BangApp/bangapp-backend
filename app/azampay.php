@@ -25,6 +25,7 @@ class azampay extends Model
 	    'msisdn',
 	    'mnoreference',
 	    'submerchantAcc',
+	    'type',
 	    'user_id',
 	    'post_id',
 	];

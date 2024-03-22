@@ -127,12 +127,17 @@ class UserController extends Controller
     public function getMyInfo(Request $request)
     {
         $user_id = $request->input('user_id');
+        $viewer_id = $request->input('viewer_id');
         // Check if the user_id is provided in the request
         if (!$user_id) {
             return response()->json(['error' => 'User ID is missing in the request'], 400);
         }
         // Find the user based on the user_id
         $user = User::find($user_id);
+
+        if ($user->hasUserPaid($user_id,$viewer_id)) {
+                $user->public = 0;
+            }
 
         if (!$user) {
             return response()->json(['error' => 'User not found'], 404);

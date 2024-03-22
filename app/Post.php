@@ -109,6 +109,7 @@ class Post extends Model
     {
         return azampay::where('user_id', $userId)
             ->where('post_id', $postId)
+            ->where('type', 'post')
             ->exists();
     }
     public function getUserImageUrlAttribute()

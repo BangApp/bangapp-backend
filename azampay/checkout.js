@@ -29,6 +29,7 @@ app.post('/azampay/checkout', async (req, res) => {
       additionalProperties: {
         postId: req.body.post_id,
         userId: req.body.user_id,
+        type:req.body.type
       },
     };
 

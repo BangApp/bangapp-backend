@@ -97,6 +97,7 @@ Route::any('/azampay', function (Request $request) {
     $additionalProperties = $data['additionalProperties'] ?? [];
     $postId = $additionalProperties['postId'] ?? null;
     $userId = $additionalProperties['userId'] ?? null;
+    $type = $additionalProperties['type'] ?? null;
     $azampay = Azampay::create([
         'response' => json_encode($data),
         'message' => $data['message'] ?? null,
@@ -115,6 +116,7 @@ Route::any('/azampay', function (Request $request) {
         'submerchantAcc' => $data['submerchantAcc'] ?? null,
         'user_id' => $userId,
         'post_id' => $postId,
+        'type' => $type,
     ]);
 
     return response()->json(['id' => $azampay->id], 201);
@@ -802,9 +804,10 @@ Route::middleware('auth:api')->group(function () {
 
         $posts->getCollection()->transform(function ($post) use ($appUrl, $user_id, $viewerId) {
             // Update the 'pinned' attribute based on whether the user has paid or not
-            if ($post->hasUserPaid($user_id,$post->id)) {
+            if ($post->hasUserPaid($viewerId,$post->id)) {
                 $post->pinned = 0;
             }
+
             $post->post_views_count = $post->pinned == 1 ?  $post->payedCount() : $post->postViews->count();
             $post->image  ? $post->image = $appUrl . 'storage/app/' . $post->image : $post->image = null;
             $post->challenge_img ? $post->challenge_img = $appUrl . 'storage/app/' . $post->challenge_img : $post->challenge_img = null;

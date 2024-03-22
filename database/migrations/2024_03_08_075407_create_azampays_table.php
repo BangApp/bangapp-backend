@@ -30,6 +30,7 @@ return new class extends Migration
             $table->string('msisdn')->nullable();
             $table->string('mnoreference')->nullable();
             $table->string('submerchantAcc')->nullable();
+            $table->string('type')->nullable();
             $table->foreignId('user_id')->constrained('users');
             $table->foreignId('post_id')->constrained('posts');
             $table->timestamps();

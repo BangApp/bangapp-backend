@@ -168,9 +168,17 @@ class User extends Authenticatable implements JWTSubject
     }
 
    public function hobbies()
-{
-    return $this->belongsToMany(Hobby::class, 'user_hobby');
-}
+    {
+        return $this->belongsToMany(Hobby::class, 'user_hobby');
+    }
+
+    public static function hasUserPaid($userId, $viewerId)
+    {
+        return azampay::where('user_id', $viewerId)
+            ->where('post_id', $userId)
+            ->where('type', 'message')
+            ->exists();
+    }
 
     public function role()
     {
