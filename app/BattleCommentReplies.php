@@ -10,7 +10,7 @@ use Carbon\Carbon;
 class BattleCommentReplies extends Model
 {
     use Favorable;
-    protected $table = "update_comment_replies";
+    protected $table = "battle_comment_replies";
 
     protected $fillable = [
         'user_id', 'comment_id','body',
