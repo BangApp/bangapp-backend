@@ -1103,7 +1103,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/deleteComment/{commentId}', function ($commentId) {
         $comment = Comment::find($commentId);
         if ($comment) {
-            $comment->commentsReplies()->delete();
+            $comment->commentReplies()->delete();
             $comment->delete();
             return response()->json(['message' => 'Comment deleted']);
         } else {
@@ -1114,7 +1114,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/deleteUpdateComment/{updateCommentId}', function ($updateCommentId) {
         $updateComment = bangUpdateComment::find($updateCommentId);
         if ($updateComment) {
-            $updateComment->commentsReplies()->delete();
+            $updateComment->commentReplies()->delete();
             $updateComment->delete();
             return response()->json(['message' => 'Comment deleted'],200);
         } else {
@@ -1126,7 +1126,7 @@ Route::middleware('auth:api')->group(function () {
         $battleComment = BattleComment::find($battleComment);
 
         if ($battleComment) {
-            $battleComment->commentsReplies()->delete();
+            $battleComment->commentReplies()->delete();
             $battleComment->delete();
             return response()->json(['message' => 'Comment deleted'],200);
         } else {
