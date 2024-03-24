@@ -4,6 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
+
 
 class bangUpdateComment extends Model
 {
@@ -25,6 +27,10 @@ class bangUpdateComment extends Model
     
     public function user() {
         return $this->belongsTo(User::class);
+    }
+
+    public function getCreatedAtAttribute($value) {
+        return (new Carbon($value))->diffForHumans();
     }
 
  	public function getUserImageUrlAttribute()

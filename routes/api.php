@@ -1084,7 +1084,6 @@ Route::middleware('auth:api')->group(function () {
         if ($notification) {
             $notification->is_read = true; // Assuming you have an "is_read" column
             $notification->save();
-
             return response()->json(['message' => 'Notification updated as read']);
         } else {
             return response()->json(['message' => 'Notification not found'], 404);
@@ -1093,10 +1092,8 @@ Route::middleware('auth:api')->group(function () {
 
     Route::get('/deleteNotification/{notification_id}', function ($notification_id) {
         $notification = Notification::find($notification_id);
-
         if ($notification) {
             $notification->delete();
-
             return response()->json(['message' => 'Notification deleted']);
         } else {
             return response()->json(['message' => 'Notification not found'], 404);
@@ -1105,11 +1102,10 @@ Route::middleware('auth:api')->group(function () {
 
     Route::get('/deleteComment/{commentId}', function ($commentId) {
         $comment = Comment::find($commentId);
-
         if ($comment) {
+            $coment->commentsReplies()->delete();
             $comment->delete();
-
-            return response()->json(['message' => 'Notification deleted']);
+            return response()->json(['message' => 'Comment deleted']);
         } else {
             return response()->json(['message' => 'Notification not found'], 404);
         }
@@ -1117,10 +1113,10 @@ Route::middleware('auth:api')->group(function () {
 
     Route::get('/deleteUpdateComment/{updateCommentId}', function ($updateCommentId) {
         $updateComment = bangUpdateComment::find($updateCommentId);
-
         if ($updateComment) {
+            $updateComment->commentsReplies()->delete();
             $updateComment->delete();
-            return response()->json(['message' => 'Notification deleted']);
+            return response()->json(['message' => 'Comment deleted'],200);
         } else {
             return response()->json(['message' => 'Notification not found'], 404);
         }
@@ -1130,9 +1126,9 @@ Route::middleware('auth:api')->group(function () {
         $battleComment = BattleComment::find($battleComment);
 
         if ($battleComment) {
+            $battleComment->commentsReplies()->delete();
             $battleComment->delete();
-
-            return response()->json(['message' => 'battle Comment deleted']);
+            return response()->json(['message' => 'Comment deleted'],200);
         } else {
             return response()->json(['message' => 'battle Comment not found'], 404);
         }
