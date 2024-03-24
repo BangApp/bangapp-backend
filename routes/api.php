@@ -1103,7 +1103,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/deleteComment/{commentId}', function ($commentId) {
         $comment = Comment::find($commentId);
         if ($comment) {
-            $coment->commentsReplies()->delete();
+            $comment->commentsReplies()->delete();
             $comment->delete();
             return response()->json(['message' => 'Comment deleted']);
         } else {
