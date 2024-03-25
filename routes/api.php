@@ -1301,6 +1301,7 @@ Route::middleware('auth:api')->group(function () {
     function deleteVideoApi($uid)
     {
         Log::info('uhakika naingia kwenye video');
+        Log::info($uid);
         $apiUrl = "https://video.bangapp.pro/api/v1/delete-video";
         
         $curl = curl_init();
