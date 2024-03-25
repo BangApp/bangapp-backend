@@ -21,6 +21,7 @@ use App\CommentReplies;
 use App\DeletedPost;
 use App\Hobby;
 use App\PostView;
+use App\ReportedPost;
 use App\BangUpdateView;
 use App\BattleComment;
 use App\bangUpdateComment;
@@ -1266,6 +1267,31 @@ Route::middleware('auth:api')->group(function () {
         return response()->json(['notifications' => $notifications]);
     });
 
+    Route::post('/reportPost', function(Request $request) {
+        $request->validate([
+            'post_id' => 'required|exists:posts,id', // Ensure the post_id exists in the posts table
+            'reason' => 'required|string|max:255', // Validate the reason for reporting
+            'user_id' => 'required|exists:users,id', // Ensure the user_id exists in the users table
+        ]);
+
+        // Check if the user has already reported this post
+        $existingReport = ReportedPost::where('post_id', $request->post_id)
+                                      ->where('user_id', $request->user_id) // Use user_id from request
+                                      ->first();
+
+        if ($existingReport) {
+            return response()->json(['message' => 'You have already reported this post.'], 400);
+        }
+
+        $reportedPost = new ReportedPost();
+        $reportedPost->post_id = $request->post_id;
+        $reportedPost->user_id = $request->user_id;
+        $reportedPost->reason = $request->reason;
+        $reportedPost->save();
+
+        return response()->json(['message' => 'Post reported successfully.'], 200);
+    });
+
 
     function likeMessage()
     {
@@ -1286,6 +1312,8 @@ Route::middleware('auth:api')->group(function () {
     {
         return "Has Messaged You";
     }
+
+
 
     function saveNotification($user_id, $body, $type, $reference_id, $post_id)
     {
@@ -1324,8 +1352,18 @@ Route::middleware('auth:api')->group(function () {
         return $response;
     }
 
-    // run this query to change the table so as to use this function
-    // ALTER TABLE `users` CHANGE `public_id` `public` BOOLEAN NULL DEFAULT FALSE;
+    Route::post('/subscribe', function(Request $request) {
+        $request->validate([
+            'user_id' => 'required|exists:users,id', // Ensure the user_id exists in the users table
+        ]);
+        $subscription = new Subscription();
+        $subscription->subscriber_id = $request->subscriber_id; // Assuming you're using Laravel's authentication
+        $subscription->user_id = $request->user_id;
+        $subscription->save();
+
+        return response()->json(['message' => 'Subscription saved successfully'], 200);
+    });
+
     Route::post('/pinMessage', function (Request $request) {
         $user = User::find($request->user_id);
         if (!$user) {

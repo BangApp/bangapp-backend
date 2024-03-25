@@ -20,9 +20,12 @@ class CreateUsersTable extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('image')->nullable();
             $table->string('public_id')->nullable();
+            $table->boolean('public')->default(0); 
+            $table->boolean('subscribe')->default(0); 
             $table->string('password');
             $table->string('device_token');
             $table->decimal('price')->nullable();
+            $table->decimal('subscriptionPrice')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
