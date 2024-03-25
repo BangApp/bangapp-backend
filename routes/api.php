@@ -1373,6 +1373,15 @@ Route::middleware('auth:api')->group(function () {
         return response()->json(['message' => 'Public ID toggled successfully', 'value' => $user->public]);
     });
 
+    Route::post('/pinProfile', function (Request $request) {
+        $user = User::find($request->user_id);
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+        $user->update(['subscribe' => !$user->subscribe ?? false]);
+        return response()->json(['message' => 'Public ID toggled successfully', 'value' => $user->subscribe]);
+    });
+
     Route::post('/setUserPinPrice', function (Request $request) {
         $user = User::find($request->user_id);
         if (!$user) {
@@ -1380,6 +1389,15 @@ Route::middleware('auth:api')->group(function () {
         }
         $user->update(['price' => $request->price]);
         return response()->json(['message' => 'Price set successfully', 'price' => $user->price]);
+    });
+
+    Route::post('/setUserPinProfilePrice', function (Request $request) {
+        $user = User::find($request->user_id);
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+        $user->update(['subscriptionPrice' => $request->price]);
+        return response()->json(['message' => 'Price set successfully', 'subscriptionPrice' => $user->subscriptionPrice]);
     });
 
     Route::get('/getNotificationCount/{user_id}', function ($user_id) {
