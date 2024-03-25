@@ -1370,7 +1370,7 @@ Route::middleware('auth:api')->group(function () {
             return response()->json(['error' => 'User not found'], 404);
         }
         $user->update(['public' => !$user->public ?? false]);
-        return response()->json(['message' => 'Public ID toggled successfully', 'value' => $user->public]);
+        return response()->json(['message' => 'Public toggled successfully', 'value' => $user->public]);
     });
 
     Route::post('/pinProfile', function (Request $request) {
@@ -1379,7 +1379,7 @@ Route::middleware('auth:api')->group(function () {
             return response()->json(['error' => 'User not found'], 404);
         }
         $user->update(['subscribe' => !$user->subscribe ?? false]);
-        return response()->json(['message' => 'Public ID toggled successfully', 'value' => $user->subscribe]);
+        return response()->json(['message' => 'Subscription toggled successfully', 'value' => $user->subscribe]);
     });
 
     Route::post('/setUserPinPrice', function (Request $request) {
