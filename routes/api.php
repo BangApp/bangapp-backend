@@ -36,6 +36,8 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\ChatController;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ResetPasswordMail;
+use Illuminate\Support\Facades\Log;
+
 
 global $appUrl;
 $appUrl = "https://bangapp.pro/BangAppBackend/";
@@ -634,10 +636,13 @@ Route::middleware('auth:api')->group(function () {
                 File::move(storage_path('app/' . $challengeImagePath), $deletedChallengeImagePath);
             }
         } else {
+            // Inside your function or closure
+            Log::info('naingia kwenye video');
             $url = $post->image;
             $parts = explode('/', $url);
             $uid = $parts[count($parts) - 2]; // Get the second-to-last element
             deleteVideoApi($uid);
+            Log::info('natoke kwenye video');
         }
         $post->delete();
         return response(['message' => 'Post deleted successfully'], 200);
@@ -1295,6 +1300,7 @@ Route::middleware('auth:api')->group(function () {
 
     function deleteVideoApi($uid)
     {
+        Log::info('uhakika naingia kwenye video');
         $apiUrl = "https://video.bangapp.pro/api/v1/delete-video";
         
         $curl = curl_init();
@@ -1313,7 +1319,7 @@ Route::middleware('auth:api')->group(function () {
         $response = curl_exec($curl);
 
         curl_close($curl);
-
+        Log::info(json_encode($response));
         return $response;
     }
 
