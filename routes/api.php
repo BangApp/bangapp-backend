@@ -127,6 +127,7 @@ Route::any('/saveDummyAzampPay', function (Request $request) {
     $data = $request->all();
 
     $transactionId = $data['transactionId'] ?? null;
+    $type= $data['type'] ?? null;
 
     if (!$transactionId) {
         return response()->json(['error' => 'Transaction ID not provided'], 400);
@@ -156,6 +157,7 @@ Route::any('/saveDummyAzampPay', function (Request $request) {
         'submerchantAcc' => $previousPayment->submerchantAcc,
         'user_id' => $previousPayment->user_id,
         'post_id' => $previousPayment->post_id,
+        'type'=> $type,
     ]);
 
     return response()->json(['id' => $dummyPayment->id], 200);
