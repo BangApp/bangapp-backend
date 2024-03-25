@@ -67,6 +67,7 @@ Route::post('/videoAddServer', function (Request $request) {
     $image->body = $request->body;
     $image->user_id = $request->user_id;
     $image->pinned = $request->pinned;
+    $image->price = $request->price;
     $image->image = $request->path;
     $image->type = $request->type;
     $image->thumbnail_url = $request->thumbnail_url;
