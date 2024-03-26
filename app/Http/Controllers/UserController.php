@@ -143,8 +143,22 @@ class UserController extends Controller
 
             Log::info('user ana subscription');
             $user->subscribe = 0;
-            
+
         }
+
+            // Check if there's an active subscription for the current month
+    $activeSubscription = Subscription::where('subscriber_id', $viewer_id)
+                                      ->where('user_id', $user_id)
+                                      ->whereYear('created_at', '=', date('Y'))
+                                      ->whereMonth('created_at', '=', date('m'))
+                                      ->exists();
+
+    // If the viewer has an active subscription, set the subscribe attribute to zero
+    if ($activeSubscription) {
+                    Log::info('user ana subscription nyengine');
+
+        $user->subscribe = 0;
+    }
 
         if (!$user) {
             return response()->json(['error' => 'User not found'], 404);
