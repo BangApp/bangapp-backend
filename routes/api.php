@@ -27,6 +27,7 @@ use App\BattleComment;
 use App\bangUpdateComment;
 use App\UserHobby;
 use App\BangBattle;
+use App\Subscription;
 use App\Notification;
 use App\BattleCommentReplies;
 use App\UpdateCommentReplies;
