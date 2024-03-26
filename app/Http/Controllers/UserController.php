@@ -130,6 +130,8 @@ class UserController extends Controller
     {
         $user_id = $request->input('user_id');
         $viewer_id = $request->input('viewer_id');
+        Log::info($viewer_id);
+        Log::info($user_id);
         // Check if the user_id is provided in the request
         if (!$user_id) {
             return response()->json(['error' => 'User ID is missing in the request'], 400);
