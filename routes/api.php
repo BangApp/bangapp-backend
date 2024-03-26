@@ -1353,17 +1353,31 @@ Route::middleware('auth:api')->group(function () {
         return $response;
     }
 
-    Route::post('/subscribe', function(Request $request) {
-        $request->validate([
-            'user_id' => 'required|exists:users,id', // Ensure the user_id exists in the users table
-        ]);
-        $subscription = new Subscription();
-        $subscription->subscriber_id = $request->subscriber_id; // Assuming you're using Laravel's authentication
-        $subscription->user_id = $request->user_id;
-        $subscription->save();
+Route::post('/subscribe', function(Request $request) {
+    $request->validate([
+        'user_id' => 'required|exists:users,id', // Ensure the user_id exists in the users table
+    ]);
 
-        return response()->json(['message' => 'Subscription saved successfully'], 200);
-    });
+    $currentMonth = date('Y-m');
+
+    $existingSubscription = Subscription::where('subscriber_id', $request->subscriber_id)
+                                        ->where('user_id', $request->user_id)
+                                        ->whereYear('created_at', '=', date('Y'))
+                                        ->whereMonth('created_at', '=', date('m'))
+                                        ->first();
+
+    if ($existingSubscription) {
+        return response()->json(['message' => 'Subscription already exists for this month'], 400);
+    }
+
+    $subscription = new Subscription();
+    $subscription->subscriber_id = $request->subscriber_id; // Assuming you're using Laravel's authentication
+    $subscription->user_id = $request->user_id;
+    $subscription->save();
+
+    return response()->json(['message' => 'Subscription saved successfully'], 200);
+});
+
 
     Route::post('/pinMessage', function (Request $request) {
         $user = User::find($request->user_id);
