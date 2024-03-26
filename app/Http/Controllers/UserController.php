@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
@@ -138,9 +139,11 @@ class UserController extends Controller
         if ($user->hasUserPaid($user_id,$viewer_id)) {
                 $user->public = 0;
             }
-        // If the viewer has an active subscription, set the subscribe attribute to zero
         if ($user->hasActiveSubscription($viewer_id)) {
+
+            Log::info('user ana subscription');
             $user->subscribe = 0;
+            
         }
 
         if (!$user) {

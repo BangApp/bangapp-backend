@@ -179,7 +179,6 @@ class User extends Authenticatable implements JWTSubject
 
     public function hasActiveSubscription($viewerId)
     {
-        $currentMonth = now()->format('Y-m');
         return $this->subscriptions()
                     ->where('subscriber_id', $viewerId)
                     ->whereYear('created_at', '=', now()->year)
