@@ -181,8 +181,7 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->subscriptions()
                     ->where('subscriber_id', $viewerId)
-                    ->whereYear('created_at', '=', now()->year)
-                    ->whereMonth('created_at', '=', now()->month)
+                    ->whereDate('created_at', '>=', now()->subDays(30))
                     ->exists();
     }
 

@@ -1353,30 +1353,57 @@ Route::middleware('auth:api')->group(function () {
         return $response;
     }
 
-Route::post('/subscribe', function(Request $request) {
-    $request->validate([
-        'user_id' => 'required|exists:users,id', // Ensure the user_id exists in the users table
-    ]);
+    Route::post('/subscribe', function(Request $request) {
+        $request->validate([
+            'user_id' => 'required|exists:users,id', // Ensure the user_id exists in the users table
+        ]);
 
-    $currentMonth = date('Y-m');
+        $currentMonth = date('Y-m');
 
-    $existingSubscription = Subscription::where('subscriber_id', $request->subscriber_id)
+       $existingSubscription = Subscription::where('subscriber_id', $request->subscriber_id)
                                         ->where('user_id', $request->user_id)
-                                        ->whereYear('created_at', '=', date('Y'))
-                                        ->whereMonth('created_at', '=', date('m'))
+                                        ->whereDate('created_at', '>=', now()->subDays(30))
                                         ->first();
 
-    if ($existingSubscription) {
-        return response()->json(['message' => 'Subscription already exists for this month'], 400);
-    }
+        if ($existingSubscription) {
+            return response()->json(['message' => 'Subscription already exists for this month'], 400);
+        }
 
-    $subscription = new Subscription();
-    $subscription->subscriber_id = $request->subscriber_id; // Assuming you're using Laravel's authentication
-    $subscription->user_id = $request->user_id;
-    $subscription->save();
+        $subscription = new Subscription();
+        $subscription->subscriber_id = $request->subscriber_id; // Assuming you're using Laravel's authentication
+        $subscription->user_id = $request->user_id;
+        $subscription->save();
 
-    return response()->json(['message' => 'Subscription saved successfully'], 200);
-});
+        return response()->json(['message' => 'Subscription saved successfully'], 200);
+    });
+
+    Route::get('/insights/{user_id}', function($user_id){
+        $userPosts = DB::table('azampays')
+                        ->join('posts', 'azampays.post_id', '=', 'posts.id')
+                        ->select('azampays.amount')
+                        ->where('posts.user_id', $user_id)
+                        ->where('azampays.type', 'post')
+                        ->get();
+
+        $userSubscriptions = DB::table('azampays')
+                                ->select('amount')
+                                ->where('user_id', $user_id)
+                                ->where('type', 'subscription')
+                                ->get();
+        $userMessages = DB::table('azampays')
+                            ->select('amount')
+                            ->where('user_id', $user_id)
+                            ->where('type', 'message')
+                            ->get();
+
+        // Calculating total amount earned from user's posts
+        $totalAmountPost = $userPosts->sum('amount');
+        $totalAmountSubscription = $userPosts->sum('amount');
+        $totalAmountMessages = $userPosts->sum('amount');
+        $totalAmount = $totalAmountPost + $totalAmountSubscription + $totalAmountMessages;
+
+        return response()->json(['total_earned' => $totalAmount, 'total_post'=>$totalAmountPost, 'total_subscription'=>$totalAmountSubscription, 'total_messages'=>$totalAmountMessages]);
+    });
 
 
     Route::post('/pinMessage', function (Request $request) {
