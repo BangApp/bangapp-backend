@@ -1387,12 +1387,12 @@ Route::middleware('auth:api')->group(function () {
 
         $userSubscriptions = DB::table('azampays')
                                 ->select('amount')
-                                ->where('user_id', $user_id)
+                                ->where('post_id', $user_id)
                                 ->where('type', 'subscription')
                                 ->get();
         $userMessages = DB::table('azampays')
                             ->select('amount')
-                            ->where('user_id', $user_id)
+                            ->where('post_id', $user_id)
                             ->where('type', 'message')
                             ->get();
 
