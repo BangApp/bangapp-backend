@@ -1398,11 +1398,11 @@ Route::middleware('auth:api')->group(function () {
 
         // Calculating total amount earned from user's posts
         $totalAmountPost = $userPosts->sum('amount');
-        $totalAmountSubscription = $userPosts->sum('amount');
-        $totalAmountMessages = $userPosts->sum('amount');
+        $totalAmountSubscription = $userSubscriptions->sum('amount');
+        $totalAmountMessages = $userMessages->sum('amount');
         $totalAmount = $totalAmountPost + $totalAmountSubscription + $totalAmountMessages;
 
-        return response()->json(['total_earned' => $totalAmount, 'total_post'=>$totalAmountPost, 'total_subscription'=>$totalAmountSubscription, 'total_messages'=>$totalAmountMessages]);
+        return response()->json(['total_earned' => $totalAmount, 'total_post'=>$totalAmountPost, 'total_subscription'=>$totalAmountSubscription, 'total_messages'=>$totalAmountMessages] , 200);
     });
 
 
