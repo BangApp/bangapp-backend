@@ -64,12 +64,10 @@ class AuthenticationController extends Controller
             'user_email' => 'required|email|unique:users,email',
             // Add additional validation rules as needed
         ]);
-
         // Check if validation fails
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 400);
         }
-
         // Create user if validation passes
         $user = User::create([
             'email'=> $request->user_email,
@@ -77,11 +75,13 @@ class AuthenticationController extends Controller
             'image'=> $request->user_picture,
             'name' => $request->user_name,
             'role_id'=>3,
+            'password' => bcrypt($request->uid)
         ]);
 
         // Check if the user was created successfully
         if ($user->wasRecentlyCreated) {
-            return response()->json(['user' => $user], 200);
+            $token = JWTAuth::attempt(['email' => $user->email, 'password' => $user->password]);
+            return response(['name'=>$user->name,'access_token'=>$token,'id'=>$user->id,'email'=>$user->email,'image'=>$user->image]);
         } else {
             return response()->json(['message' => 'Failed to create user'], 400);
         }
