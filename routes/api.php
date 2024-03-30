@@ -66,6 +66,34 @@ Route::post('imageAddServer', function (Request $request) {
     return response()->json(['url' => asset($image->image)], 201);
 });
 
+Route::post('registerGoogleUser', function(Request $request) {
+    $request->validate([
+        'user_email' => 'required|email|exists:users,email', // Add required and email format validation
+        'user_phone' => 'required|exists:users,phone_number', // Add required validation
+    ]);
+
+    // Check if the validation passes before creating the user
+    if ($request->validated()) {
+        $user = User::create([
+            'email'=> $request->user_email,
+            'phone_number' => $request->user_phone,
+            'image'=> $request->user_picture,
+            'name' => $request->user_name,
+            'role_id'=>3,
+        ]);
+
+        // Check if the user was created successfully
+        if ($user->wasRecentlyCreated) {
+            return response()->json(['user' => $user], 200);
+        } else {
+            return response()->json(['message' => 'Failed to create user'], 400);
+        }
+    } else {
+        // If validation fails, return validation errors
+        return response()->json(['errors' => $request->errors()], 400);
+    }
+});
+
 Route::post('/videoAddServer', function (Request $request) {
     $image = new Post;
     $image->body = $request->body;
@@ -1007,7 +1035,7 @@ Route::middleware('auth:api')->group(function () {
                 $query->select('id', 'name', 'image');
             },
         ])->findOrFail($comment->id);
-        if ($post->user->id <> $request->user_id) {
+        if ($post->user->id <> $request->user_id) { 
             $pushNotificationService = new PushNotificationService();
             $pushNotificationService->sendPushNotification($post->user->device_token, $user->name, commentReplyMessage(), $request->post_id, 'commentReply');
             saveNotification($request->user_id, commentReplyMessage(), 'commentReply', $post->user->id, $request->post_id);
