@@ -66,7 +66,7 @@ Route::post('imageAddServer', function (Request $request) {
     return response()->json(['url' => asset($image->image)], 201);
 });
 
-Route::post('registerGoogleUser', function(Request $request) {
+Route::post('/registerGoogleUser', function(Request $request) {
     $request->validate([
         'user_email' => 'required|email|exists:users,email', // Add required and email format validation
         'user_phone' => 'required|exists:users,phone_number', // Add required validation
