@@ -34,6 +34,8 @@ Route::post('/post/bang/thumbnail', [App\Http\Controllers\HomeController::class,
 
 Route::get('/bangInspirationWeb', [App\Http\Controllers\HomeController::class, 'bangInspiration'])->name('bangInspirationWeb');
 
+Route::get('/deleteAccount', [App\Http\Controllers\HomeController::class, 'deleteAccount'])->name('deleteAccount');
+
 
 Route::get('/bangBattleWeb', [App\Http\Controllers\HomeController::class, 'bangBattleWeb'])->name('bangBattleWeb');
 
