@@ -80,7 +80,7 @@ class AuthenticationController extends Controller
 
         // Check if the user was created successfully
         if ($user->wasRecentlyCreated) {
-            $token = JWTAuth::attempt(['email' => $user->email, 'password' => $user->password]);
+            $token = JWTAuth::attempt(['email' => $user->email, 'password' => $request->uid]);
             return response(['name'=>$user->name,'access_token'=>$token,'id'=>$user->id,'email'=>$user->email,'image'=>$user->image]);
         } else {
             return response()->json(['message' => 'Failed to create user'], 400);
