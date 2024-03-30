@@ -509,14 +509,10 @@ Route::middleware('auth:api')->group(function () {
         $numberOfPostsPerRequest = $request->query('_limit', 10);
 
         $user_id = $request->input('user_id');
-        $userHobbies = UserHobby::where('user_id', $user_id)->pluck('hobby_id')->toArray();
+        //$userHobbies = UserHobby::where('user_id', $user_id)->pluck('hobby_id')->toArray();
 
 
-        $posts = Post::unseenPosts($user_id)->whereHas('user', function ($query) use ($userHobbies) {
-            $query->whereHas('hobbies', function ($hobbyQuery) use ($userHobbies) {
-                $hobbyQuery->whereIn('hobby_id', $userHobbies);
-            });
-        })->latest()
+        $posts = Post::unseenPosts($user_id)->latest()
             ->with([
                 'likes' => function ($query) {
                     $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
@@ -1584,7 +1580,7 @@ Route::get('/resetPassword/{email}', function ($email) {
 Route::group(['prefix' => 'v1'], function () {
 
     Route::post('/register', 'Api\AuthenticationController@register');
-    
+
     Route::post('/registerGoogleUser', 'Api\AuthenticationController@registerGoogleUser');
 
     Route::get('/users/getCurrentUser', 'Api\AuthenticationController@getCurrentUser');
