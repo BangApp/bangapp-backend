@@ -58,6 +58,36 @@ class AuthenticationController extends Controller
         return response(['name'=>$user->name,'access_token'=>$token,'id'=>$user->id,'email'=>$user->email,'image'=>env('APP_URL').'storage/app/'.$user->image]);
     }
 
+    public function registerGoogleUser(Request $request) {
+        // Perform validation
+        $validator = Validator::make($request->all(), [
+            'user_email' => 'required|email|unique:users,email',
+            // Add additional validation rules as needed
+        ]);
+
+        // Check if validation fails
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 400);
+        }
+
+        // Create user if validation passes
+        $user = User::create([
+            'email'=> $request->user_email,
+            'phone_number' => $request->user_phone,
+            'image'=> $request->user_picture,
+            'name' => $request->user_name,
+            'role_id'=>3,
+        ]);
+
+        // Check if the user was created successfully
+        if ($user->wasRecentlyCreated) {
+            return response()->json(['user' => $user], 200);
+        } else {
+            return response()->json(['message' => 'Failed to create user'], 400);
+        }
+    }
+
+
     public function login(Request $request)
     {
        $validator = Validator::make($request->all(), [
