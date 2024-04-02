@@ -215,10 +215,17 @@ Route::middleware('auth:api')->group(function () {
         return response()->json($paginatedResponse);
     });
 
+
     Route::get('/bang-updates', function (Request $request) {
         $userId = $request->input('user_id');
         $appUrl = "https://bangapp.pro/BangAppBackend/";
-        $bangUpdates = BangUpdate::unseenPosts($userId)->orderBy('created_at', 'desc')
+
+        $perPage = $request->input('per_page', 10);
+
+        $page = $request->input('page', 1);
+
+        $bangUpdates = BangUpdate::unseenPosts($userId)
+            ->orderBy('created_at', 'desc')
             ->with([
                 'bang_update_likes' => function ($query) {
                     $query->select('post_id', DB::raw('count(*) as like_count'))
@@ -228,7 +235,8 @@ Route::middleware('auth:api')->group(function () {
                     $query->select('post_id', DB::raw('count(*) as comment_count'))
                         ->groupBy('post_id');
                 },
-            ])->get();
+            ])->paginate($perPage, ['*'], 'page', $page);
+
         $formattedUpdates = $bangUpdates->map(function ($update) use ($appUrl) {
             $update->filename = $appUrl . 'storage/app/bangUpdates/' . $update->filename;
             return $update;
@@ -236,6 +244,7 @@ Route::middleware('auth:api')->group(function () {
 
         return response()->json($formattedUpdates);
     });
+
 
     Route::get('/bang-updates/{userId}', function ($userId) {
 
