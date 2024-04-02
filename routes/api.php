@@ -235,7 +235,7 @@ Route::middleware('auth:api')->group(function () {
                     $query->select('post_id', DB::raw('count(*) as comment_count'))
                         ->groupBy('post_id');
                 },
-            ])->paginate($perPage, ['*'], 'page', $page);
+            ])->paginate($per_page, ['*'], 'page', $page);
 
         // Format the updates and add the isLiked variable
         $formattedUpdates = $bangUpdates->map(function ($update) use ($appUrl, $userId) {
