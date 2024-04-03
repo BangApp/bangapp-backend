@@ -516,8 +516,6 @@ Route::middleware('auth:api')->group(function () {
                 list($post->width, $post->height) =  [300, 300];
             }
             if ($post->type === 'video') {
-                //$streamUrl =  "https://bangapp.pro/BangAppBackend/stream-video/";
-                //$post->image = $streamUrl .str_replace("images/", "", $post->image); // Assuming the video URL is based on the 'video'
                 $post->image = $post->image;
                 list($post->width, $post->height) = [300, 300];
             }
@@ -796,12 +794,13 @@ Route::middleware('auth:api')->group(function () {
             }
 
             $post->post_views_count = $post->pinned == 1 ?  $post->payedCount() : $post->postViews->count();
-            $post->image  ? $post->image = $appUrl . 'storage/app/' . $post->image : $post->image = null;
-            $post->challenge_img ? $post->challenge_img = $appUrl . 'storage/app/' . $post->challenge_img : $post->challenge_img = null;
-            $post->video ? $post->video = $appUrl . 'storage/app/' . $post->video : $post->video = null;
-            if ($post->type === 'image' && isset($post->media)) {
-                list($post->width, $post->height) = getimagesize($post->media);
-            } else {
+             if ($post->type === 'image') {
+                $post->image ? $post->image = $appUrl . 'storage/app/' . $post->image : $post->image = null;
+                $post->challenge_img ? $post->challenge_img = $appUrl . 'storage/app/' . $post->challenge_img : $post->challenge_img = null;
+                list($post->width, $post->height) =  [300, 300];
+            }
+            if ($post->type === 'video') {
+                $post->image = $post->image;
                 list($post->width, $post->height) = [300, 300];
             }
             $post->isLikedA = false;
