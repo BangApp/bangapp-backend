@@ -983,11 +983,11 @@ Route::middleware('auth:api')->group(function () {
                 $query->select('id', 'name', 'image');
             },
         ])->findOrFail($comment->id);
-        //if ($post->user->id <> $request->user_id) { 
+        if ($comment->user->id <> $request->user_id) { 
             $pushNotificationService = new PushNotificationService();
             $pushNotificationService->sendPushNotification($user->device_token, $comment->user->name, commentReplyMessage(), $request->post_id, 'comment',$comment->user->name,$comment->user->id);
             saveNotification($request->user_id, commentReplyMessage(), 'commentReply', $post->user->id, $request->post_id,);
-         //}
+         }
         return response(['data' => $comment, 'message' => 'success'], 200);
     });
 
