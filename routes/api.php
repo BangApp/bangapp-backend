@@ -984,7 +984,7 @@ Route::middleware('auth:api')->group(function () {
                 $query->select('id', 'name', 'image');
             },
         ])->findOrFail($comment->id);
-        if ($post->user->id <> $request->user_id) { 
+        if ($post->user->id <> $commentUser->user->id) { 
              Log::info('uhakika naingia kwenye video');
         
             $pushNotificationService = new PushNotificationService();
