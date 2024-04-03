@@ -961,7 +961,7 @@ Route::middleware('auth:api')->group(function () {
         ])->findOrFail($comment->id);
         if ($post->user->id <> $request->user_id) {
             $pushNotificationService = new PushNotificationService();
-            $pushNotificationService->sendPushNotification($post->user->device_token, $user->name, commentMessage(), $request->post_id, 'comment');
+            $pushNotificationService->sendPushNotification($post->user->device_token, $user->name, commentMessage(), $request->post_id, 'comment',$comment->user->name,$comment->user->id);
             saveNotification($request->user_id, commentMessage(), 'comment', $post->user->id, $request->post_id);
         }
         return response(['data' => $comment, 'message' => 'success'], 200);
