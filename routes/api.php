@@ -985,6 +985,8 @@ Route::middleware('auth:api')->group(function () {
             },
         ])->findOrFail($comment->id);
         if ($post->user->id <> $request->user_id) { 
+             Log::info('uhakika naingia kwenye video');
+        
             $pushNotificationService = new PushNotificationService();
             $pushNotificationService->sendPushNotification($commentUser->user->device_token, $comment->user->name, commentReplyMessage(), $request->post_id, 'comment',$comment->user->name,$comment->user->id);
             saveNotification($request->user_id, commentReplyMessage(), 'commentReply', $post->user->id, $request->post_id,);
