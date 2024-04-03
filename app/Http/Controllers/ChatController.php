@@ -255,10 +255,6 @@ Log::info($request->all());
 }
 
 
-
-
-
-
 public function markMessageAsRead(Request $request)
     {
         $message_id = $request->get('message_id');
