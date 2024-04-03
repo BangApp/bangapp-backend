@@ -10,9 +10,7 @@ const port = 3001;
 app.use(express.json());
 
 app.post('/azampay/checkout', async (req, res) => {
-  console.log(req.body.phone_number);
-  console.log('martin')
-  console.log(req)
+
   try {
     const phoneNumber = req.body.phone_number;
     const amount = req.body.amount;
