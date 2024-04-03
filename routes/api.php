@@ -973,6 +973,7 @@ Route::middleware('auth:api')->group(function () {
         ]);
         $post = Post::find($request->post_id);
         $user = User::find($request->user_id);
+        $commentUser = Comment::find($request->comment_id);
         $comment = CommentReplies::create([
             'user_id' => $request->user_id,
             'comment_id' => $request->comment_id,
@@ -983,9 +984,9 @@ Route::middleware('auth:api')->group(function () {
                 $query->select('id', 'name', 'image');
             },
         ])->findOrFail($comment->id);
-        if ($comment->user->id <> $request->user_id) { 
+        if ($post->user->id <> $request->user_id) { 
             $pushNotificationService = new PushNotificationService();
-            $pushNotificationService->sendPushNotification($user->device_token, $comment->user->name, commentReplyMessage(), $request->post_id, 'comment',$comment->user->name,$comment->user->id);
+            $pushNotificationService->sendPushNotification($commentUser->user->device_token, $comment->user->name, commentReplyMessage(), $request->post_id, 'comment',$comment->user->name,$comment->user->id);
             saveNotification($request->user_id, commentReplyMessage(), 'commentReply', $post->user->id, $request->post_id,);
          }
         return response(['data' => $comment, 'message' => 'success'], 200);
