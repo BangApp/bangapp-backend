@@ -1589,18 +1589,15 @@ Route::post('/buyFollowers', function (Request $request) {
 Route::post('/getSuggestedFriends', function(Request $request){
     $user_id = $request->user_id;
     $contacts = $request->contacts;
-
-   
-
     $userHobbies = UserHobby::where('user_id', $user_id)->pluck('hobby_id');
 
     $usersByHobbies = UserHobby::whereIn('hobby_id', $userHobbies)
                                 ->where('user_id', '!=', $user_id)
                                 ->pluck('user_id');
 
-    $suggestedFriends = User::whereIn('id', $usersByHobbies)
-                            ->select('id', 'name')
-                            ->orWhereIn('phone_number', $contacts)
+    $suggestedFriends = User::select('id', 'name')
+                            ->whereIn('phone_number', $contacts)
+                            ->orWhereIn('id', $usersByHobbies)
                             ->get();
     return response()->json(['suggested_friends' => $suggestedFriends]);
 });
