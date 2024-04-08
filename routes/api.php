@@ -1557,6 +1557,13 @@ Route::get('/resetPassword/{email}', function ($email) {
     }
 });
 
+Route::post('/buyFollowers', function (Request $request) {
+    $user = User::find($request->user_id);
+    $selectedHobbyList = json_decode($request->hobbies);
+     Log::info("selectedHobbyList");
+     Log::info($request->hobbies);
+});
+
 Route::group(['prefix' => 'v1'], function () {
 
     Route::post('/register', 'Api\AuthenticationController@register');
