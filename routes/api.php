@@ -1558,11 +1558,33 @@ Route::get('/resetPassword/{email}', function ($email) {
 });
 
 Route::post('/buyFollowers', function (Request $request) {
-    $user = User::find($request->user_id);
-    $selectedHobbyList = json_decode($request->hobbies);
-     Log::info("selectedHobbyList");
-     Log::info($request->hobbies);
+    $user_id = $request->user_id;
+    $count = $request->count;
+    $selectedHobbyIds = $request->hobbies;
+
+    if ($user_id && $selectedHobbyIds && $count > 0) {
+        $users = UserHobby::whereIn('hobby_id', $selectedHobbyIds)
+            ->limit($count)
+            ->pluck('user_id')
+            ->toArray();
+        
+        $followersAdded = 0;
+
+        foreach ($users as $followerUserId) {
+            if (!Follower::where('following_id', $user_id)->where('follower_id', $followerUserId)->exists()) {
+                $follower = new Follower();
+                $follower->following_id = $user_id;
+                $follower->follower_id = $followerUserId;
+                $follower->save();
+                $followersAdded++; 
+            }
+        }
+        return response()->json(['message' => 'Followers added successfully', 'followers_added' => $followersAdded]);
+    } else {
+        return response()->json(['error' => 'Invalid user ID, selected hobbies, or count'], 400);
+    }
 });
+
 
 Route::group(['prefix' => 'v1'], function () {
 
