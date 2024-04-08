@@ -25,7 +25,7 @@ class CommentReplies extends Model
         return $this->belongsTo(User::class,'user_id');
     }
 
-     public function getUserImageUrlAttribute()
+    public function getUserImageUrlAttribute()
     {
         $appUrl = "https://bangapp.pro/BangAppBackend/";
         return $appUrl .'storage/app/'.$this->user->image;
