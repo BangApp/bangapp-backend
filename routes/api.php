@@ -1599,6 +1599,7 @@ Route::post('/getSuggestedFriends', function(Request $request){
                                 ->pluck('user_id');
 
     $suggestedFriends = User::whereIn('id', $usersByHobbies)
+                            ->select('id', 'name', 'user_image_url')
                             ->orWhereIn('id', $usersByPhoneNumber)
                             ->get();
     return response()->json(['suggested_friends' => $suggestedFriends]);
