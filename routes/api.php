@@ -1590,7 +1590,7 @@ Route::post('/getSuggestedFriends', function(Request $request){
     $user_id = $request->user_id;
     $contacts = $request->contacts;
 
-    $usersByPhoneNumber = User::whereIn('phone_number', $contacts)->get();
+   
 
     $userHobbies = UserHobby::where('user_id', $user_id)->pluck('hobby_id');
 
@@ -1600,7 +1600,7 @@ Route::post('/getSuggestedFriends', function(Request $request){
 
     $suggestedFriends = User::whereIn('id', $usersByHobbies)
                             ->select('id', 'name')
-                            ->orWhereIn('id', $usersByPhoneNumber)
+                            ->orWhereIn('phone_number', $contacts)
                             ->get();
     return response()->json(['suggested_friends' => $suggestedFriends]);
 });
