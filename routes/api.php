@@ -1561,7 +1561,6 @@ Route::post('/buyFollowers', function (Request $request) {
     $user_id = $request->user_id;
     $count = $request->count;
     $selectedHobbyIds = $request->hobbies;
-
     if ($user_id && $selectedHobbyIds && $count > 0) {
         $users = UserHobby::whereIn('hobby_id', $selectedHobbyIds)
             ->limit($count)
@@ -1585,6 +1584,25 @@ Route::post('/buyFollowers', function (Request $request) {
     }
 });
 
+
+
+Route::post('/getSuggestedFriends', function(Request $request){
+    $user_id = $request->user_id;
+    $contacts = $request->contacts;
+
+    $usersByPhoneNumber = User::whereIn('phone_number', $contacts)->get();
+
+    $userHobbies = UserHobby::where('user_id', $user_id)->pluck('hobby_id');
+
+    $usersByHobbies = UserHobby::whereIn('hobby_id', $userHobbies)
+                                ->where('user_id', '!=', $user_id)
+                                ->pluck('user_id');
+
+    $suggestedFriends = User::whereIn('id', $usersByHobbies)
+                            ->orWhereIn('id', $usersByPhoneNumber)
+                            ->get();
+    return response()->json(['suggested_friends' => $suggestedFriends]);
+});
 
 Route::group(['prefix' => 'v1'], function () {
 
