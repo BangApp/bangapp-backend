@@ -185,6 +185,24 @@ class User extends Authenticatable implements JWTSubject
                     ->exists();
     }
 
+    public function subscriptionDaysRemaining($viewerId)
+    {
+        $subscription = $this->subscriptions()
+                            ->where('subscriber_id', $viewerId)
+                            ->whereDate('created_at', '>=', now()->subDays(30))
+                            ->latest()
+                            ->first();
+
+        if ($subscription) {
+            $startDate = $subscription->created_at;
+            $endDate = $startDate->addDays(30);
+            $remainingDays = now()->diffInDays($endDate);
+            return $remainingDays;
+        }
+
+        return 0; // No active subscription found
+    }
+
     public static function hasUserPaid($userId, $viewerId)
     {
         return azampay::where('user_id', $viewerId)

@@ -141,6 +141,7 @@ class UserController extends Controller
         if ($user->hasActiveSubscription($viewer_id)) {
             $user->subscribe = 0;
         }
+        $user->subscriptionDays = $user->subscriptionDaysRemaining($viewer_id);
 
         if (!$user) {
             return response()->json(['error' => 'User not found'], 404);
