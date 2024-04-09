@@ -1277,6 +1277,11 @@ Route::middleware('auth:api')->group(function () {
         return "Has Liked Your Post";
     }
 
+    function friendRequestMessage()
+    {
+        return "Has Requested to Be Your Friend";
+    }
+
     function commentMessage()
     {
         return "Has Commented on Your Post";
@@ -1600,6 +1605,29 @@ Route::post('/getSuggestedFriends', function(Request $request){
                             ->orWhereIn('id', $usersByHobbies)
                             ->get();
     return response()->json(['suggested_friends' => $suggestedFriends]);
+});
+
+Route::post('/requestFriendship', function(Request $request){
+    $user_id = $request->user_id;
+    $friend_id = $request->friend_id;
+    $friend = User::find($friend_id);
+    $user = User::find($user_id);
+    $existingFriendship = Friend::where('user_id', $user_id)
+                                ->where('friend_id', $friend_id)
+                                ->exists();
+    if (!$existingFriendship && $user_id != $friend_id) {
+        $friend = new Friend();
+        $friend->user_id = $user_id;
+        $friend->friend_id = $friend_id;
+        $friend->confirmed = false;
+        $friend->save();
+        $pushNotificationService = new PushNotificationService();
+        $pushNotificationService->sendPushNotification($friend->device_token, $user->name, friendRequestMessage(), 0, 'friend');
+        saveNotification($user_id, friendRequestMessage(), 'friend', $friend_id, 0);
+        return response()->json(['message' => 'Friend added successfully'], 200);
+    } else {
+        return response()->json(['error' => 'Friendship already exists or invalid request'], 400);
+    }
 });
 
 Route::group(['prefix' => 'v1'], function () {
