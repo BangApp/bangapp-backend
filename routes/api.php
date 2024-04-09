@@ -20,6 +20,7 @@ use App\azampay;
 use App\CommentReplies;
 use App\DeletedPost;
 use App\Hobby;
+use App\Friend;
 use App\PostView;
 use App\ReportedPost;
 use App\BangUpdateView;
