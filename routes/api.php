@@ -1634,7 +1634,7 @@ Route::post('/requestFriendship', function(Request $request){
 
 Route::post('/acceptFriendship', function(Request $request){
     $friendship_id = $request->friendship_id;
-    $friendship = Friend::where('id', $friendship_id)
+    $friendship = friends::where('id', $friendship_id)
                         ->where('confirmed', false)
                         ->first();
     if (!$friendship) {
@@ -1647,7 +1647,7 @@ Route::post('/acceptFriendship', function(Request $request){
 
 Route::post('/declineFriendship', function(Request $request){
     $friendship_id = $request->friendship_id;
-    $friendship = Friend::where('id', $friendship_id)
+    $friendship = friends::where('id', $friendship_id)
                         ->where('confirmed', false)
                         ->first();
     if (!$friendship) {
