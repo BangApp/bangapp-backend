@@ -1611,7 +1611,7 @@ Route::post('/getSuggestedFriends', function(Request $request){
 Route::post('/requestFriendship', function(Request $request){
     $user_id = $request->user_id;
     $friend_id = $request->friend_id;
-    $friend = User::find($friend_id);
+    $requestFriend = User::find($friend_id);
     $user = User::find($user_id);
     $existingFriendship = friends::where('user_id', $user_id)
                                 ->where('friend_id', $friend_id)
@@ -1623,7 +1623,7 @@ Route::post('/requestFriendship', function(Request $request){
         $friend->confirmed = false;
         $friend->save();
         $pushNotificationService = new PushNotificationService();
-        $pushNotificationService->sendPushNotification($friend->device_token, $user->name, friendRequestMessage(), 0, 'friend');
+        $pushNotificationService->sendPushNotification($requestFriend->device_token, $user->name, friendRequestMessage(), 0, 'friend');
         saveNotification($user_id, friendRequestMessage(), 'friend', $friend_id, 0);
         return response()->json(['message' => 'Friend added successfully'], 200);
     } else {
