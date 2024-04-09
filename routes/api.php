@@ -20,7 +20,7 @@ use App\azampay;
 use App\CommentReplies;
 use App\DeletedPost;
 use App\Hobby;
-use App\Friend;
+use App\friends;
 use App\PostView;
 use App\ReportedPost;
 use App\BangUpdateView;
@@ -1613,11 +1613,11 @@ Route::post('/requestFriendship', function(Request $request){
     $friend_id = $request->friend_id;
     $friend = User::find($friend_id);
     $user = User::find($user_id);
-    $existingFriendship = Friend::where('user_id', $user_id)
+    $existingFriendship = friends::where('user_id', $user_id)
                                 ->where('friend_id', $friend_id)
                                 ->exists();
     if (!$existingFriendship && $user_id != $friend_id) {
-        $friend = new Friend();
+        $friend = new friends();
         $friend->user_id = $user_id;
         $friend->friend_id = $friend_id;
         $friend->confirmed = false;
