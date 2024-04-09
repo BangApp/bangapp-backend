@@ -1657,6 +1657,17 @@ Route::post('/declineFriendship', function(Request $request){
     return response()->json(['message' => 'Friendship request declined successfully']);
 });
 
+
+Route::get('/add5HobbiesToUsers', function(){
+    $users = User::all();
+    $hobbies = Hobby::all();
+    foreach ($users as $user) {
+        $randomHobbyIds = $hobbies->random(5)->pluck('id');
+        $user->hobbies()->attach($randomHobbyIds);
+    }
+    return response()->json(['message' => '5 random hobbies added to users successfully']);
+});
+
 Route::group(['prefix' => 'v1'], function () {
 
     Route::post('/register', 'Api\AuthenticationController@register');
