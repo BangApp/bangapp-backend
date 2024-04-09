@@ -1623,12 +1623,29 @@ Route::post('/requestFriendship', function(Request $request){
         $friend->confirmed = false;
         $friend->save();
         $pushNotificationService = new PushNotificationService();
-        $pushNotificationService->sendPushNotification($requestFriend->device_token, $user->name, friendRequestMessage(), 0, 'friend');
-        saveNotification($user_id, friendRequestMessage(), 'friend', $friend_id, 0);
+        $pushNotificationService->sendPushNotification($requestFriend->device_token, $user->name, friendRequestMessage(), $friend->id, 'friend');
+        saveNotification($user_id, friendRequestMessage(), 'friend', $friend_id, $friend->id);
         return response()->json(['message' => 'Friend added successfully'], 200);
     } else {
         return response()->json(['error' => 'Friendship already exists or invalid request'], 400);
     }
+});
+
+Route::post('/acceptFriendship', function(Request $request){
+    $frienship_id = $request->frienship_id;
+
+    friends::where('id', $frienship_id)->update(['confirmed' => true]);
+
+    return response()->json(['message' => 'Friendship request accepted successfully']);
+});
+
+
+Route::post('/declineFriendship', function(Request $request){
+    $frienship_id = $request->frienship_id;
+
+    friends::where('frienship_id', $frienship_id)->delete();
+
+    return response()->json(['message' => 'Friendship request declined successfully']);
 });
 
 Route::group(['prefix' => 'v1'], function () {
