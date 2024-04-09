@@ -1631,20 +1631,29 @@ Route::post('/requestFriendship', function(Request $request){
     }
 });
 
+
 Route::post('/acceptFriendship', function(Request $request){
-    $frienship_id = $request->frienship_id;
-
-    friends::where('id', $frienship_id)->update(['confirmed' => true]);
-
+    $friendship_id = $request->friendship_id;
+    $friendship = Friend::where('id', $friendship_id)
+                        ->where('confirmed', false)
+                        ->first();
+    if (!$friendship) {
+        return response()->json(['error' => 'Friendship request not found or already confirmed'], 404);
+    }
+    $friendship->update(['confirmed' => true]);
     return response()->json(['message' => 'Friendship request accepted successfully']);
 });
 
 
 Route::post('/declineFriendship', function(Request $request){
-    $frienship_id = $request->frienship_id;
-
-    friends::where('frienship_id', $frienship_id)->delete();
-
+    $friendship_id = $request->friendship_id;
+    $friendship = Friend::where('id', $friendship_id)
+                        ->where('confirmed', false)
+                        ->first();
+    if (!$friendship) {
+        return response()->json(['error' => 'Friendship request not found or already confirmed'], 404);
+    }
+    $friendship->delete();
     return response()->json(['message' => 'Friendship request declined successfully']);
 });
 
