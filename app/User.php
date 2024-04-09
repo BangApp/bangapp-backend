@@ -121,9 +121,13 @@ class User extends Authenticatable implements JWTSubject
 
     public function friends()
     {
-        return $this->belongsToMany(friends::class, 'friends', 'friend_id', 'user_id');
+        return $this->belongsToMany(User::class, 'friends', 'user_id', 'friend_id');
     }
 
+    public function getFriendsCountAttribute()
+    {
+        return $this->friends()->count();
+    }
     public function follow(User $user)
     {
         if ($this->following()->where('following_id', $user->id)->count() > 0) {
@@ -152,11 +156,6 @@ class User extends Authenticatable implements JWTSubject
     public function getFollowingCountAttribute()
     {
         return $this->following()->count();
-    }
-
-    public function getFriendsCountAttribute()
-    {
-        return $this->friends()->count();
     }
 
     public function getFollowingMeAttribute()
