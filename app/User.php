@@ -52,7 +52,7 @@ class User extends Authenticatable implements JWTSubject
         'email_verified_at' => 'datetime',
     ];
 
-    protected $appends = ['followerCount', 'followingCount', 'followingMe', 'followed','user_image_url','postCount'];
+    protected $appends = ['followerCount', 'followingCount', 'followingMe', 'followed','user_image_url','postCount','friendsCount'];
 
     public function posts()
     {
@@ -119,6 +119,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsToMany(User::class, 'followers', 'follower_id', 'following_id');
     }
 
+    public function friends()
+    {
+        return $this->belongsToMany(friends::class, 'friends', 'friend_id', 'user_id');
+    }
+
     public function follow(User $user)
     {
         if ($this->following()->where('following_id', $user->id)->count() > 0) {
@@ -147,6 +152,11 @@ class User extends Authenticatable implements JWTSubject
     public function getFollowingCountAttribute()
     {
         return $this->following()->count();
+    }
+
+    public function getFriendsCountAttribute()
+    {
+        return $this->friends()->count();
     }
 
     public function getFollowingMeAttribute()
