@@ -1061,12 +1061,11 @@ Route::middleware('auth:api')->group(function () {
         }
     });
 
-    Route::get('/hobbies', function (request $request) {
-        $hobbies = Hobby::all('id', 'name');
-
+    Route::get('/hobbies', function (Request $request) {
+        $hobbies = Hobby::withCount('users')->orderByDesc('users_count')->get(['id', 'name']);
+        
         return response()->json($hobbies);
     });
-
     Route::get('/notificationIsRead/{notification_id}', function ($notification_id) {
         $notification = Notification::find($notification_id);
 
