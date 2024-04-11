@@ -1664,11 +1664,13 @@ Route::get('/allFriends/{user_id}', function($user_id){
                 ->where('confirmed', true)
                 ->get();
 
-    $friendIds = $friends->pluck('user_id', 'friend_id')->collapse()->unique();
+    $friendIds = $friends->pluck('user_id')->merge($friends->pluck('friend_id'))->filter(function ($id) use ($user_id) {
+            return $id != $user_id;
+        })->unique();
 
     $friendUsers = User::whereIn('id', $friendIds)->get();
 
-    return $friendUsers;
+    return response()->json(['friends' =>$friendUsers]);
 });
 
 
