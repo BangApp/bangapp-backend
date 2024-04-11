@@ -1657,12 +1657,20 @@ Route::post('/acceptFriendship', function(Request $request){
 });
 
 Route::get('/allFriends/{user_id}', function($user_id){
-    $user = User::findOrFail($user_id);
-    $friends = $user->friends()
-                    ->where('confirmed', true)
-                    ->get();
-    return response()->json(['friends'=>$friends]);
+    $friends = Friend::where(function ($query) use ($user_id) {
+                    $query->where('user_id', $user_id)
+                          ->orWhere('friend_id', $user_id);
+                })
+                ->where('confirmed', true)
+                ->get();
+
+    $friendIds = $friends->pluck('user_id', 'friend_id')->collapse()->unique();
+
+    $friendUsers = User::whereIn('id', $friendIds)->get();
+
+    return $friendUsers;
 });
+
 
 
 Route::post('/declineFriendship', function(Request $request){
