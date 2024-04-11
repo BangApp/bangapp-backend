@@ -14,4 +14,15 @@ class friends extends Model
     	'friend_id',
     	'confirmed',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function friend_user()
+    {
+        return $this->belongsTo(User::class,'friend_id');
+    }
+
 }

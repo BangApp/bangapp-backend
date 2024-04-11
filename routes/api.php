@@ -1285,7 +1285,12 @@ Route::middleware('auth:api')->group(function () {
 
     function friendRequestMessage()
     {
-        return "Has Requested to Be Your Friend";
+        return "Has Requested to be Your Friend";
+    }
+
+    function friendAcceptMessage($friendName)
+    {
+        return "You are now friends with "+$friendName;
     }
 
     function commentMessage()
@@ -1646,6 +1651,8 @@ Route::post('/acceptFriendship', function(Request $request){
         return response()->json(['error' => 'Friendship request not found or already confirmed'], 404);
     }
     $friendship->update(['confirmed' => true]);
+    $pushNotificationService = new PushNotificationService();
+    $pushNotificationService->sendPushNotification($friendship->user->device_token, $friendship->user->name, friendAcceptMessage($friendship->friend_user->name), $friendship_id, 'friend');
     return response()->json(['message' => 'Friendship request accepted successfully']);
 });
 
