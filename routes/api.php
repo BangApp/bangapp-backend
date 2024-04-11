@@ -1656,6 +1656,14 @@ Route::post('/acceptFriendship', function(Request $request){
     return response()->json(['message' => 'Confirmed']);
 });
 
+Route::get('/allFriends/{user_id}', function($user_id){
+    $user = User::findOrFail($user_id);
+    $friends = $user->friends()
+                    ->where('confirmed', true)
+                    ->get();
+    return response()->json(['friends'=>$friends]);
+});
+
 
 Route::post('/declineFriendship', function(Request $request){
     $friendship_id = $request->friendship_id;
