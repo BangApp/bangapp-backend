@@ -1653,7 +1653,7 @@ Route::post('/acceptFriendship', function(Request $request){
     $friendship->update(['confirmed' => true]);
     $pushNotificationService = new PushNotificationService();
     $pushNotificationService->sendPushNotification($friendship->user->device_token, $friendship->user->name, friendAcceptMessage($friendship->friend_user->name), $friendship_id, 'friend');
-    return response()->json(['message' => 'Friendship request accepted successfully']);
+    return response()->json(['message' => 'Confirmed']);
 });
 
 
@@ -1666,7 +1666,7 @@ Route::post('/declineFriendship', function(Request $request){
         return response()->json(['error' => 'Friendship request not found or already confirmed'], 404);
     }
     $friendship->delete();
-    return response()->json(['message' => 'Friendship request declined successfully']);
+    return response()->json(['message' => 'Declined']);
 });
 
 
