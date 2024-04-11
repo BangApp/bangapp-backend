@@ -1290,7 +1290,7 @@ Route::middleware('auth:api')->group(function () {
 
     function friendAcceptMessage($friendName)
     {
-        return "You are now friends with "$friendName;
+        return "You are now friends with ".$friendName;
     }
 
     function commentMessage()
