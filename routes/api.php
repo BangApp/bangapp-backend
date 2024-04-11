@@ -1673,6 +1673,15 @@ Route::get('/allFriends/{user_id}', function($user_id){
     return response()->json(['friends' =>$friendUsers]);
 });
 
+Route::get('/allFollowers/{user_id}', function($user_id){
+    $user = User::findOrFail($user_id);
+    
+    $followers = $user->followers()->get();
+    
+    return response()->json(['followers' =>$followers]);
+});
+
+
 
 
 Route::post('/declineFriendship', function(Request $request){
