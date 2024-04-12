@@ -127,6 +127,7 @@ class UserController extends Controller
     public function getMyInfo(Request $request)
     {
         $user_id = $request->input('user_id');
+
         $viewer_id = $request->input('viewer_id');
         // Check if the user_id is provided in the request
         if (!$user_id) {
@@ -141,11 +142,29 @@ class UserController extends Controller
         if ($user->hasActiveSubscription($viewer_id)) {
             $user->subscribe = 0;
         }
+
+
         $user->subscriptionDays = $user->subscriptionDaysRemaining($viewer_id);
+        // Check if the viewer is a friend of the user
+        $isFriend = $user->friends()
+                    ->where(function($query) use ($viewer_id) {
+                        $query->where('friend_id', $viewer_id)
+                              ->orWhere('user_id', $viewer_id);
+                    })
+                    ->where('confirmed', true)
+                    ->exists();
+        
+        $isFriendRequest = $user->friendRequests()->where('friend_id', $user_id)->where('user_id', $viewer_id)->exists();
+
+        $user->isFriend = $isFriend;
+        $user->isFriendRequest = $isFriendRequest;
+
 
         if (!$user) {
             return response()->json(['error' => 'User not found'], 404);
         }
+
+
 
         // Return user information as a JSON response
         return response()->json($user, 200);
