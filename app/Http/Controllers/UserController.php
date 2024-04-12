@@ -154,7 +154,7 @@ class UserController extends Controller
                     ->where('confirmed', true)
                     ->exists();
         
-        $isFriendRequest = $user->friendRequests()->where('friend_id', $user_id)->where('user_id', $viewer_id)->exists();
+        $isFriendRequest = $user->friends()->where('friend_id', $viewer_id)->where('user_id', $user_id)->exists();
 
         $user->isFriend = $isFriend;
         $user->isFriendRequest = $isFriendRequest;
