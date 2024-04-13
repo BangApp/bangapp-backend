@@ -71,19 +71,34 @@ Route::post('imageAddServer', function (Request $request) {
 
 
 Route::post('/videoAddServer', function (Request $request) {
-    $image = new Post;
-    $image->body = $request->body;
-    $image->user_id = $request->user_id;
-    $image->pinned = $request->pinned;
-    $image->price = $request->price;
-    $image->image = $request->path;
-    $image->type = $request->type;
-    $image->thumbnail_url = $request->thumbnail_url;
-    $image->aspect_ratio = $request->aspect_ratio;
-    $image->cache_url = $request->cache_url;
-    if ($request->path) {
-        $image->save();
+    if($request->location == "post")
+    {
+        $image = new Post;
+        $image->body = $request->body;
+        $image->user_id = $request->user_id;
+        $image->pinned = $request->pinned;
+        $image->price = $request->price;
+        $image->image = $request->path;
+        $image->type = $request->type;
+        $image->thumbnail_url = $request->thumbnail_url;
+        $image->aspect_ratio = $request->aspect_ratio;
+        $image->cache_url = $request->cache_url;
+        if ($request->path) {
+            $image->save();
+        }
     }
+    else{
+        $bangUpdate = new BangUpdate();
+        $bangUpdate->caption = $request->body;
+        $bangUpdate->user_id = $request->user_id;
+        $bangUpdate->filename = $request->path;
+        $bangUpdate->type = 'video';
+        $bangUpdate->cache_url = $request->cache_url;
+        $bangUpdate->aspect_ratio = $request->aspect_ratio;
+        $bangUpdate->thumbnail_url = $request->thumbnail_url;
+        $bangUpdate->save();
+    }
+  
     return response()->json(['url' => $request->path], 201);
 });
 
