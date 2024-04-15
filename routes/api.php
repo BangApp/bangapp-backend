@@ -354,6 +354,7 @@ Route::middleware('auth:api')->group(function () {
         $image = new Post;
         $image->body = $request->body;
         $image->user_id = $request->user_id;
+        $image->aspect_ratio = $request->aspect_ratio;
         if ($request->pinned) {
             $image->pinned = $request->pinned;
             $image->price = $request->price;
