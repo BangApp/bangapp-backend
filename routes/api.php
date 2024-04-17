@@ -299,7 +299,10 @@ Route::middleware('auth:api')->group(function () {
 
         // Format the updates and add the isLiked variable
         $formattedUpdates = $bangUpdates->map(function ($update) use ($appUrl, $userId) {
-            $update->filename = $appUrl . 'storage/app/bangUpdates/' . $update->filename;
+
+            if ($update->type == "image") {
+                $update->filename = $appUrl . 'storage/app/bangUpdates/' . $update->filename;
+            }
 
             $update->isLiked = $update->bang_update_likes->isNotEmpty(); // Check if there are likes
 
