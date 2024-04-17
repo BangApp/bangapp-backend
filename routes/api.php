@@ -953,6 +953,41 @@ Route::middleware('auth:api')->group(function () {
         return response()->json($posts);
     });
 
+    Route::get('/getUpdateInfo/{post_id}/{user_id}', function ($post_id, $user_id) {
+        $appUrl = "https://bangapp.pro/BangAppBackend/";
+        // Get the bang update and include like information for the given user
+        $bangUpdate = BangUpdate::where('id', $post_id)
+            ->with([
+                'bang_update_likes' => function ($query) use ($user_id) {
+                    $query->select('post_id', DB::raw('count(*) as like_count'))
+                        ->groupBy('post_id'); // Filter likes by user ID
+                },
+                'bang_update_like_count' => function ($query) {
+                    $query->select('post_id', DB::raw('count(*) as like_count'))
+                        ->groupBy('post_id');
+                },
+                'bang_update_comments' => function ($query) {
+                    $query->select('post_id', DB::raw('count(*) as comment_count'))
+                        ->groupBy('post_id');
+                },
+            ])->first();
+
+        if (!$bangUpdate) {
+            return response()->json(['message' => 'Update not found'], 404);
+        }
+        // Format the update and add the isLiked variable
+        if ($bangUpdate->type == "image") {
+            $bangUpdate->filename = $appUrl . 'storage/app/bangUpdates/' . $bangUpdate->filename;
+        }
+        // Check if the user has liked the post
+        $bangUpdate->isLiked = DB::table('bang_update_likes')
+            ->where('user_id', $user_id)
+            ->where('post_id', $bangUpdate->id)
+            ->exists();
+        return response()->json($bangUpdate);
+    });
+
+
 
 
     Route::get('/bangUpdateComment/{id}', function ($id) {
