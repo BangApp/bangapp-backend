@@ -32,6 +32,7 @@ class ChatController extends Controller
     {
         $appUrl = "https://bangapp.pro/BangAppBackend/";
         $user_id = $request->get('user_id');
+        $viewer_id = $request->get('viewer_id');
         $user = User::find($user_id);
 
         // This will retrieve conversations where the authenticated user is either participant
@@ -57,7 +58,7 @@ class ChatController extends Controller
                 'image' => $appUrl.'storage/app/'.$receiver->image,
                 'time' => $lastMessage ? $lastMessage->created_at->diffForHumans() : '',
                 'unreadCount' => $unreadCount, // Include count of unread messages
-                'isActive' => false,
+                'isActive' => $user->hasUserPaid($user_id,$viewer_id),
                 'public'=> $receiver->public,
                 'price' => $receiver->price ?? "0",
             ];
