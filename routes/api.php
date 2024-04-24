@@ -1772,14 +1772,14 @@ Route::post('/declineFriendship', function(Request $request){
 Route::post('/blockUser', function(Request $request){
     $user_id = $request->user_id;
     $blocked_user_id = $request->blocked_user_id;
-    if(BlockedUser::where('user_id',$user_id)->where('blocked_user_id',$blocked_user_id)->exists())
+    if(BlockedUser::where('user_id',$user_id)->where('user_blocked_id',$blocked_user_id)->exists())
     {
         return response()->json(["message" => "User already blocked"]);
     }
     else{
         $block = new BlockedUser();
         $block->user_id = $user_id;
-        $block->blocked_user_id = $blocked_user_id;
+        $block->user_blocked_id = $blocked_user_id;
         if($block->save()){
             return response()->json(["message" => "User blocked successfully"]);
         }
@@ -1792,7 +1792,7 @@ Route::post('/blockUser', function(Request $request){
 Route::post('/deleteFriendship', function(Request $request){
     $user_id = $request->user_id;
     $friend_id = $request->friend_id;
-    $friendship = Friend::where('user_id', $user_id)
+    $friendship = friends::where('user_id', $user_id)
                         ->where('friend_id', $friend_id)
                         ->first();
     if($friendship){
