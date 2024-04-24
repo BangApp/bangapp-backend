@@ -13,11 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('friends', function (Blueprint $table) {
+        Schema::create('blocked_users', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_blocked_id')->constrained('users');
             $table->foreignId('user_id')->constrained('users');
-            $table->foreignId('friend_id')->constrained('users');
-            $table->boolean('confirmed');
             $table->timestamps();
         });
     }
@@ -29,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('friends');
+        Schema::dropIfExists('blocked_users');
     }
 };

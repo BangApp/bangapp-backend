@@ -48,3 +48,5 @@ Route::get('/delete_bang_battle/{id}', [App\Http\Controllers\HomeController::cla
 Route::post('/update_bang_battle',[App\Http\Controllers\HomeController::class, 'updateBangBattle'])->name('updateBangBattle');
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+Route::get('/reportedPost', [App\Http\Controllers\HomeController::class, 'reportedPost'])->name('reportedPost');

@@ -411,6 +411,14 @@
                                 </span>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="{{ route('reportedPost') }}" class="nav-link ">
+                                <i class="ph-house"></i>
+                                <span>
+                                    Reported Posts
+                                </span>
+                            </a>
+                        </li>
                         <!-- /layout -->
 
 

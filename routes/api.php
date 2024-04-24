@@ -34,6 +34,8 @@ use App\Notification;
 use App\BattleCommentReplies;
 use App\UpdateCommentReplies;
 use App\BattleLike;
+use App\BlockedUser;
+use App\FewerPost;
 use Illuminate\Validation\Rule;
 use App\Http\Controllers\PushNotificationService;
 use Illuminate\Support\Facades\DB;
@@ -1668,10 +1670,24 @@ Route::post('/getSuggestedFriends', function(Request $request){
                                 ->where('user_id', '!=', $user_id)
                                 ->pluck('user_id');
 
+     // Fetch friends IDs where the user is a friend or has been added as a friend
+    $friendIds = friends::where(function ($query) use ($user_id) {
+                            $query->where('user_id', $user_id)
+                                  ->orWhere('friend_id', $user_id);
+                        })
+                        ->pluck('user_id', 'friend_id','confirmed')
+                        ->toArray();
+
     $suggestedFriends = User::select('id', 'name')
                             ->whereIn('phone_number', $contacts)
                             ->orWhereIn('id', $usersByHobbies)
                             ->get();
+     // Iterate through suggested friends and check if they are friends or added as friends
+    $suggestedFriends->each(function ($friend) use ($user_id, $friendIds) {
+        $friend->is_friend = isset($friendIds[$friend->id]);
+        $friend->friend_added = isset($friendIds[$friend->id]) ? true : false;
+    });
+
     return response()->json(['suggested_friends' => $suggestedFriends]);
 });
 
@@ -1751,6 +1767,62 @@ Route::post('/declineFriendship', function(Request $request){
     }
     $friendship->delete();
     return response()->json(['message' => 'Declined']);
+});
+
+Route::post('/blockUser', function(Request $request){
+    $user_id = $request->user_id;
+    $blocked_user_id = $request->blocked_user_id;
+    if(BlockedUser::where('user_id',$user_id)->where('blocked_user_id',$blocked_user_id)->exists())
+    {
+        return response()->json(["message" => "User already blocked"]);
+    }
+    else{
+        $block = new BlockedUser();
+        $block->user_id = $user_id;
+        $block->blocked_user_id = $blocked_user_id;
+        if($block->save()){
+            return response()->json(["message" => "User blocked successfully"]);
+        }
+        else{
+            return response()->json(["message" => "Something went wrong"]);
+        }
+    }
+});
+
+Route::post('/deleteFriendship', function(Request $request){
+    $user_id = $request->user_id;
+    $friend_id = $request->friend_id;
+    $friendship = Friend::where('user_id', $user_id)
+                        ->where('friend_id', $friend_id)
+                        ->first();
+    if($friendship){
+        $friendship->delete();
+        return response()->json(["message" => "Friendship Deleted Successfully"]);
+    }
+    else{
+        return response()->json(["message" => "Friendship not Found"]);
+    }
+});
+
+Route::post('/fewerPosts', function(Request $request){
+    $user_id = $request->user_id;
+    $post_id = $request->post_id;
+    $user_post_id = $request->user_post_id;
+    if(FewerPost::where('user_id',$user_id)->where('post_id',$post_id)->where('user_post_id',$user_post_id)->exists()){
+        return response()->json(["message" => "Submission Exists"]);
+    }
+    else{
+        $fewer = new FewerPost();
+        $fewer->user_id = $user_id;
+        $fewer->post_id = $post_id;
+        $fewer->user_post_id = $user_post_id;
+        if($fewer->save()){
+            return response()->json(["message" => "We Will Show You Fewer Posts Like This"]);
+        }
+        else{
+            return response()->json(["message" => "Something Went Wrong"]);
+        }
+    }
 });
 
 

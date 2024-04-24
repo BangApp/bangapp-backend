@@ -13,7 +13,7 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 use App\BangBattle;
 use Illuminate\Support\Facades\Auth;
-
+use App\ReportedPost;
 
 class HomeController extends Controller
 {
@@ -227,6 +227,12 @@ class HomeController extends Controller
         }
         $battle->delete();
         return redirect()->route('bangBattleWeb')->with('success', 'Battle deleted successfully.');
+    }
+
+    public function reportedPost()
+    {
+        $reportedPosts = ReportedPost::all();
+        return view('posts.report_posts', compact('reportedPosts'));
     }
 
 
