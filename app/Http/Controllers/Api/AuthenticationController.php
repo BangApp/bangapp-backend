@@ -23,7 +23,7 @@ class AuthenticationController extends Controller
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => ['required', 'string', 'regex:/^[A-Za-z][A-Za-z0-9]{4,31}$/', 'max:20', 'min:1', 'alpha_num', 'unique:users,name'],
+            'name' => ['required', 'string', 'regex:/^[A-Za-z]+(?:\s[A-Za-z]+)*$/', 'max:20', 'min:1', 'unique:users,name'],
             'email' => [
                 'required',
                 function ($attribute, $value, $fail) {
