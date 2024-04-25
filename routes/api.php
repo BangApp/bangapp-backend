@@ -1802,10 +1802,12 @@ Route::post('/unblockUser', function(Request $request){
     }
 });
 
+
 Route::get('/getBlockedUsers/{userId}', function($user_id){
-    $users_blocked = BlockedUser::where('user_id', $user_id)->all();
+    $users_blocked = BlockedUser::where('user_id', $user_id)->get();
     return response()->json(["users_blocked" => $users_blocked]);
 });
+
 
 Route::post('/deleteFriendship', function(Request $request){
     $user_id = $request->user_id;
