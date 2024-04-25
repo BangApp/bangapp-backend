@@ -1777,14 +1777,16 @@ Route::post('/blockUser', function(Request $request){
         return response()->json(["message" => "User already blocked"]);
     }
     else{
-        $block = new BlockedUser();
-        $block->user_id = $user_id;
-        $block->user_blocked_id = $blocked_user_id;
-        if($block->save()){
-            return response()->json(["message" => "User blocked successfully"]);
-        }
-        else{
-            return response()->json(["message" => "Something went wrong"]);
+        if($user_id <> $blocked_user_id) {
+            $block = new BlockedUser();
+            $block->user_id = $user_id;
+            $block->user_blocked_id = $blocked_user_id;
+            if($block->save()){
+                return response()->json(["message" => "User blocked successfully"]);
+            }
+            else{
+                return response()->json(["message" => "Something went wrong"]);
+            }
         }
     }
 });
@@ -1803,7 +1805,7 @@ Route::post('/unblockUser', function(Request $request){
 });
 
 
-Route::get('/getBlockedUsers/{userId}', function($user_id){
+Route::get('/getBlockedUsers/{userId}', function($user_id) {
     $users_blocked = BlockedUser::where('user_id', $user_id)->get();
     return response()->json(["users_blocked" => $users_blocked]);
 });

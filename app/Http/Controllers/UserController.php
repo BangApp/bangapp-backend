@@ -136,6 +136,9 @@ class UserController extends Controller
         // Find the user based on the user_id
         $user = User::find($user_id);
 
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
         if ($user->hasUserPaid($user_id,$viewer_id)) {
                 $user->public = 0;
             }
@@ -158,13 +161,6 @@ class UserController extends Controller
 
         $user->isFriend = $isFriend;
         $user->isFriendRequest = $isFriendRequest;
-
-
-        if (!$user) {
-            return response()->json(['error' => 'User not found'], 404);
-        }
-
-
 
         // Return user information as a JSON response
         return response()->json($user, 200);
