@@ -112,13 +112,22 @@ class Post extends Model
             ->where('type', 'post')
             ->exists();
     }
+    
     public function getUserImageUrlAttribute()
     {
         $appUrl = "https://bangapp.pro/BangAppBackend/";
-        if ($this->user) {
-            return $appUrl . 'storage/app/' . $this->user->image;
+
+        // Check if the image URL starts with "https"
+        if (strpos($this->image, 'https') === 0) {
+            return $this->image; // Return the image URL as it is
         }
-        return ''; // or return a default image URL if you have one
+        else if($this->image==null){
+            return "https://bangapp.pro/BangAppBackend/storage/app/bang_logo.jpg";
+        }
+         else {
+            // If not, append the appUrl to the image URL
+            return $appUrl . 'storage/app/' . $this->image;
+        }
     }
 
 }
