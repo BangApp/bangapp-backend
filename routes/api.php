@@ -1789,6 +1789,24 @@ Route::post('/blockUser', function(Request $request){
     }
 });
 
+Route::post('/unblockUser', function(Request $request){
+    $user_id = $request->user_id;
+    $blocked_user_id = $request->blocked_user_id;
+    $block = BlockedUser::where('user_id',$user_id)->where('user_blocked_id',$blocked_user_id)->first();
+    if($block){
+        $block->delete();
+        return response()->json(["message" => "User Unblocked Successfully"]);
+    }
+    else{
+        return response()->json(["message" => "User Not Blocked"]);
+    }
+});
+
+Route::get('/getBlockedUsers/{userId}', function($user_id){
+    $users_blocked = BlockedUser::where('user_id', $user_id)->all();
+    return response()->json(["users_blocked" => $users_blocked]);
+});
+
 Route::post('/deleteFriendship', function(Request $request){
     $user_id = $request->user_id;
     $friend_id = $request->friend_id;
