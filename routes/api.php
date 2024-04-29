@@ -506,39 +506,29 @@ Route::middleware('auth:api')->group(function () {
         }
     });
 
+   Route::get('/getPost', function (Request $request) {
+        $appUrl = "https://bangapp.pro/BangAppBackend/";
 
-  Route::get('/getPost', function (Request $request) {
-    $appUrl = "https://bangapp.pro/BangAppBackend/";
+        $pageNumber = $request->query('_page', 1);
+        $numberOfPostsPerRequest = $request->query('_limit', 10);
 
-    $pageNumber = $request->query('_page', 1);
-    $numberOfPostsPerRequest = $request->query('_limit', 10);
+        $user_id = $request->input('user_id');
+        //$userHobbies = UserHobby::where('user_id', $user_id)->pluck('hobby_id')->toArray();
 
-    $user_id = $request->input('user_id');
-    //$userHobbies = UserHobby::where('user_id', $user_id)->pluck('hobby_id')->toArray();
 
-    $latestPosts = Post::unseenPosts($user_id)
-        ->latest() // Get the latest posts
-        ->with([
-            'likes' => function ($query) {
-                $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
-                    ->groupBy('post_id', 'like_type');
-            },
-            'challenges' => function ($query) {
-                $query->select('*')->where('confirmed', 1);
-            }
-        ])
-        ->get();
+        $posts = Post::unseenPosts($user_id)->latest()
+            ->with([
+                'likes' => function ($query) {
+                    $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
+                        ->groupBy('post_id', 'like_type');
+                },
+                'challenges' => function ($query) {
+                    $query->select('*')->where('confirmed', 1);
+                }
+            ])->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
 
-    // Shuffle the latest posts excluding the first post
-    $firstPost = $latestPosts->shift(); // Remove the first post
-    $shuffledPosts = $latestPosts->shuffle(); // Shuffle the remaining posts
-    $shuffledPosts->prepend($firstPost); // Prepend the first post back
 
-    $totalPosts = $shuffledPosts->count();
-
-    $paginatedPosts = $shuffledPosts->slice(($pageNumber - 1) * $numberOfPostsPerRequest, $numberOfPostsPerRequest);
-
-    $paginatedPosts->transform(function ($post) use ($appUrl, $user_id) {
+        $posts->getCollection()->transform(function ($post) use ($appUrl, $user_id) {
             $post->post_views_count = $post->pinned == 1 ?  $post->payedCount() : $post->postViews->count();
             // Update the 'pinned' attribute based on whether the user has paid or not
             if ($post->hasUserPaid($user_id,$post->id)) {
@@ -609,11 +599,11 @@ Route::middleware('auth:api')->group(function () {
             $post->like_count_B = $likeCountB;
 
             return $post;
-        }); 
-    $paginatedPosts = array_values($paginatedPosts->toArray());
+        });
 
-        return response(['data' => $paginatedPosts, 'message' => 'success'], 200);
+        return response(['data' => $posts, 'message' => 'success'], 200);
     });
+
 
     
 
