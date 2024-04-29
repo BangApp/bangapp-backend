@@ -610,7 +610,7 @@ Route::middleware('auth:api')->group(function () {
             return $post;
         });
 
-        return response(['data' => $posts, 'message' => 'success'], 200);
+        return response(['data' => $paginatedPosts, 'message' => 'success'], 200);
     });
 
     
