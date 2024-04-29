@@ -229,12 +229,12 @@ class User extends Authenticatable implements JWTSubject
     {
         $appUrl = "https://bangapp.pro/BangAppBackend/";
 
-        // Check if the image URL starts with "https"
-        if (strpos($this->image, 'https') === 0) {
-            return $this->image; // Return the image URL as it is
-        }
-        else if($this->image==null){
+        if($this->image==null){
             return "https://bangapp.pro/BangAppBackend/storage/app/bang_logo.jpg";
+        }
+        // Check if the image URL starts with "https"
+        else if (strpos($this->image, 'https') === 0) {
+            return $this->image; // Return the image URL as it is
         }
          else {
             // If not, append the appUrl to the image URL

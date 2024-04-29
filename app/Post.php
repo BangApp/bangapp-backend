@@ -117,12 +117,12 @@ class Post extends Model
     {
         $appUrl = "https://bangapp.pro/BangAppBackend/";
 
-        // Check if the image URL starts with "https"
-        if (strpos($this->user->image, 'https') === 0) {
-            return $this->user->image; // Return the image URL as it is
-        }
-        else if($this->user->image==null){
+        if($this->user->image==null){
             return "https://bangapp.pro/BangAppBackend/storage/app/bang_logo.jpg";
+        }
+        // Check if the image URL starts with "https"
+        else if (strpos($this->user->image, 'https') === 0) {
+            return $this->user->image; // Return the image URL as it is
         }
          else {
             // If not, append the appUrl to the image URL
