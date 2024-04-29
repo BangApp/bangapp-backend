@@ -117,17 +117,20 @@ class Post extends Model
     {
         $appUrl = "https://bangapp.pro/BangAppBackend/";
 
-        if($this->user->image==null){
-            return "https://bangapp.pro/BangAppBackend/storage/app/bang_logo.jpg";
+        // Check if the user relationship exists and is not null
+        if ($this->user && $this->user->image !== null) {
+            // Check if the image URL starts with "https"
+            if (strpos($this->user->image, 'https') === 0) {
+                return $this->user->image; // Return the image URL as it is
+            } else {
+                // If not, append the appUrl to the image URL
+                return $appUrl . 'storage/app/' . $this->user->image;
+            }
         }
-        // Check if the image URL starts with "https"
-        else if (strpos($this->user->image, 'https') === 0) {
-            return $this->user->image; // Return the image URL as it is
-        }
-         else {
-            // If not, append the appUrl to the image URL
-            return $appUrl . 'storage/app/' . $this->user->image;
-        }
+
+        // If user or image is null, return a default image URL
+        return "https://bangapp.pro/BangAppBackend/storage/app/bang_logo.jpg";
     }
+
 
 }
