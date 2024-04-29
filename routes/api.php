@@ -515,9 +515,10 @@ Route::middleware('auth:api')->group(function () {
 
         $user_id = $request->input('user_id');
         //$userHobbies = UserHobby::where('user_id', $user_id)->pluck('hobby_id')->toArray();
-        
 
-        $posts = Post::unseenPosts($user_id)->inRandomOrder()
+        $latestPosts = Post::unseenPosts($user_id)
+            ->latest() // Get the latest posts
+            ->take($numberOfPostsPerRequest) // Limit the number of posts
             ->with([
                 'likes' => function ($query) {
                     $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
@@ -526,10 +527,17 @@ Route::middleware('auth:api')->group(function () {
                 'challenges' => function ($query) {
                     $query->select('*')->where('confirmed', 1);
                 }
-            ])->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
+            ])
+            ->get();
 
+        // Shuffle the latest posts excluding the first post
+        $firstPost = $latestPosts->shift(); // Remove the first post
+        $shuffledPosts = $latestPosts->shuffle(); // Shuffle the remaining posts
+        $shuffledPosts->prepend($firstPost); // Prepend the first post back
 
-        $posts->getCollection()->transform(function ($post) use ($appUrl, $user_id) {
+        $paginatedPosts = $shuffledPosts->forPage($pageNumber, $numberOfPostsPerRequest);
+
+        $paginatedPosts->getCollection()->transform(function ($post) use ($appUrl, $user_id) {
             $post->post_views_count = $post->pinned == 1 ?  $post->payedCount() : $post->postViews->count();
             // Update the 'pinned' attribute based on whether the user has paid or not
             if ($post->hasUserPaid($user_id,$post->id)) {
