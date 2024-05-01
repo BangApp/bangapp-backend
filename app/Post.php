@@ -19,6 +19,11 @@ class Post extends Model
         return $this->hasMany(Comment::class)->latest();
     }
 
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class,'post_id');
+    }
+
     public function commentsDel() {
         return $this->hasMany(Comment::class,'user_id');
     }

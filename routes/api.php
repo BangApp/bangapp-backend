@@ -513,7 +513,13 @@ Route::middleware('auth:api')->group(function () {
         $numberOfPostsPerRequest = $request->query('_limit', 10);
 
         $user_id = $request->input('user_id');
+       
         //$userHobbies = UserHobby::where('user_id', $user_id)->pluck('hobby_id')->toArray();
+        $user_friends_id = friends::where('user_id', $user_id)->orWhere('friend_id',$user_id)->where('confirmed',1)->pluck('user_id', 'friend_id')->toArray();
+        $user_follow_id =  Follower::where('follower_id', $user_id)->pluck('following_id')->toArray();
+        $user_subscribe_id = Azampay::where('type', 'message')->whereDate('created_at', '>=', now()->subDays(30))->where('user_id',$user_id)->pluck('post_id')->toArray();
+
+        dd([$user_friends_id,$user_follow_id,$user_subscribe_id]);
 
 
         $posts = Post::unseenPosts($user_id)->latest()
@@ -614,6 +620,7 @@ Route::middleware('auth:api')->group(function () {
         $post->postViews()->delete();
         $post->comments()->delete();
         $post->likess()->delete();
+        $post->notifications()->delete();
         $deletedPostData = $post->toArray();
         unset($deletedPostData['id']);
         DeletedPost::create(['user_id' => $deletedPostData['user_id'], 'body' => $deletedPostData['user_id'], 'type' => $deletedPostData['type'], 'image' => $deletedPostData['image'], 'challenge_img' => $deletedPostData['challenge_img'], 'pinned' => $deletedPostData['pinned']]);
