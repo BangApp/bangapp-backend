@@ -513,28 +513,8 @@ Route::middleware('auth:api')->group(function () {
         $numberOfPostsPerRequest = $request->query('_limit', 10);
 
         $user_id = $request->input('user_id');
-       
-        //$userHobbies = UserHobby::where('user_id', $user_id)->pluck('hobby_id')->toArray();
-        $user_friends_id = friends::where('user_id', $user_id)->orWhere('friend_id',$user_id)->where('confirmed',1)->pluck('user_id', 'friend_id')->toArray();
-        $user_follow_id =  Follower::where('follower_id', $user_id)->pluck('following_id')->toArray();
-        $user_subscribe_id = azampay::where('type', 'message')->whereDate('created_at', '<=', now()->subDays(30))->where('user_id',$user_id)->pluck('post_id')->toArray();
 
-        $user_friends_values = array_values($user_friends_id);
-        $user_friends_keys = array_keys($user_friends_id);
-        $user_follow_values = array_values($user_follow_id);
-        $user_subscribe_values = array_values($user_subscribe_id);
-        $mergedArray = array_merge(
-            array_map('strval', $user_friends_values),
-            array_map('strval', $user_follow_values),
-            array_map('strval', $user_subscribe_values),
-            array_map('strval', $user_friends_keys)
-        );
-
-        $uniqueValues = array_unique($mergedArray);
-
-        dd([$user_friends_id,$user_follow_id,$user_subscribe_id,$uniqueValues]);
-
-        $posts = Post::unseenPosts($user_id)->latest()
+        $posts = Post::unseenPosts($user_id)->latest()->whereIn('user_id',getUniqueValues($user_id))
             ->with([
                 'likes' => function ($query) {
                     $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
@@ -1395,6 +1375,40 @@ Route::middleware('auth:api')->group(function () {
         $notification->post_id = $post_id;
         $notification->save();
     }
+
+    function getUniqueValues($user_id) 
+    {
+        // Fetch data from different tables
+        $user_friends_id = friends::where('user_id', $user_id)
+            ->orWhere('friend_id', $user_id)
+            ->where('confirmed', 1)
+            ->pluck('user_id', 'friend_id')
+            ->toArray();
+        $user_follow_id = Follower::where('follower_id', $user_id)
+            ->pluck('following_id')
+            ->toArray();
+        $user_subscribe_id = azampay::where('type', 'message')
+            ->whereDate('created_at', '<=', now()->subDays(30))
+            ->where('user_id', $user_id)
+            ->pluck('post_id')
+            ->toArray();
+
+        // Extract values and keys from the friends array
+        $user_friends_values = array_values($user_friends_id);
+        $user_friends_keys = array_keys($user_friends_id);
+        
+        // Merge all arrays and convert keys to strings
+        $mergedArray = array_merge(
+            array_map('strval', $user_friends_values),
+            array_map('strval', $user_follow_id),
+            array_map('strval', $user_subscribe_id),
+            array_map('strval', $user_friends_keys)
+        );
+
+        // Return unique values
+        return array_unique($mergedArray);
+    }
+
 
     function deleteVideoApi($uid)
     {
