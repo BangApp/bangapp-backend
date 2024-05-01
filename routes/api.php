@@ -519,8 +519,17 @@ Route::middleware('auth:api')->group(function () {
         $user_follow_id =  Follower::where('follower_id', $user_id)->pluck('following_id')->toArray();
         $user_subscribe_id = azampay::where('type', 'message')->whereDate('created_at', '<=', now()->subDays(30))->where('user_id',$user_id)->pluck('post_id')->toArray();
 
-       
-        $mergedArray = array_merge(array_values($user_friends_id),array_values($user_friends_id), array_values($user_follow_id), array_values($user_subscribe_id));
+        $user_friends_values = array_values($user_friends_id);
+        $user_friends_keys = array_keys($user_friends_id);
+        $user_follow_values = array_values($user_follow_id);
+        $user_subscribe_values = array_values($user_subscribe_id);
+        $mergedArray = array_merge(
+            array_map('strval', $user_friends_values),
+            array_map('strval', $user_follow_values),
+            array_map('strval', $user_subscribe_values),
+            array_map('strval', $user_friends_keys)
+        );
+
         $uniqueValues = array_unique($mergedArray);
 
         dd([$user_friends_id,$user_follow_id,$user_subscribe_id,$uniqueValues]);
