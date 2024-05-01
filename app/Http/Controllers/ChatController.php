@@ -14,7 +14,7 @@ class ChatController extends Controller
 {
 
 
-    public function associateOneSignalPlayerId(Request $request)
+public function associateOneSignalPlayerId(Request $request)
 {
     $userId = $request->input('user_id');
     $playerId = $request->input('onesignal_player_id');
@@ -107,7 +107,7 @@ class ChatController extends Controller
 
 
     // Send a message in a specific conversation
-    public function sendMessage(Request $request)
+public function sendMessage(Request $request)
 {
     $sender_id = $request->sender_id;
     $user2_id = $request->user2_id;
@@ -257,48 +257,48 @@ Log::info($request->all());
 
 
 public function markMessageAsRead(Request $request)
-    {
-        $message_id = $request->get('message_id');
-        $message = Message::find($message_id);
+{
+    $message_id = $request->get('message_id');
+    $message = Message::find($message_id);
 
-        if (!$message) {
-            return response()->json(['message' => 'Message not found'], 404);
-        }
-
-        $message->is_read = true;
-        $message->save();
-
-        return response()->json(['message' => 'Message marked as read'], 200);
+    if (!$message) {
+        return response()->json(['message' => 'Message not found'], 404);
     }
-    // Start a new conversation
-    public function startConversation(Request $request)
-    {
-        $user_id =  $request->user_id;
-        $recipient_id = $request->recipient_id;
-        $data['user_1'] = $user_id;
-        $data['user_2'] = $recipient_id;
 
-        $con = Conversation::firstOrCreate([
+    $message->is_read = true;
+    $message->save();
+
+    return response()->json(['message' => 'Message marked as read'], 200);
+}
+    // Start a new conversation
+public function startConversation(Request $request)
+{
+    $user_id =  $request->user_id;
+    $recipient_id = $request->recipient_id;
+    $data['user_1'] = $user_id;
+    $data['user_2'] = $recipient_id;
+
+    $con = Conversation::firstOrCreate([
+        'user1_id' => $user_id,
+        'user2_id' => $recipient_id
+    ]);
+    
+    // Check if conversation already exists
+    $conversation = Conversation::where(function ($query) use ($recipient_id, $user_id) {
+        $query->where('user1_id', $user_id)
+            ->where('user2_id', $recipient_id);
+    })->orWhere(function ($query) use ($recipient_id, $user_id) {
+        $query->where('user1_id', $recipient_id)
+            ->where('user2_id', $user_id);
+    })->first();
+
+    if (!$conversation) {
+        $conversation = Conversation::create([
             'user1_id' => $user_id,
             'user2_id' => $recipient_id
         ]);
-        
-        // Check if conversation already exists
-        $conversation = Conversation::where(function ($query) use ($recipient_id, $user_id) {
-            $query->where('user1_id', $user_id)
-                ->where('user2_id', $recipient_id);
-        })->orWhere(function ($query) use ($recipient_id, $user_id) {
-            $query->where('user1_id', $recipient_id)
-                ->where('user2_id', $user_id);
-        })->first();
-
-        if (!$conversation) {
-            $conversation = Conversation::create([
-                'user1_id' => $user_id,
-                'user2_id' => $recipient_id
-            ]);
-        }
-
-        return response()->json($conversation, 201);
     }
+
+    return response()->json($conversation, 201);
+}
 }
