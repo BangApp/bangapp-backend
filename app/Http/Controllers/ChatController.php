@@ -46,9 +46,7 @@ class ChatController extends Controller
             $receiver = User::find($receiver_id);
             $lastMessage = $conversation->messages()->orderBy('created_at', 'desc')->first();
             $unreadCount = $conversation->messages()->where('is_read', false)->where('sender_id', '!=', $user_id)->count(); // Count of unread messages
-            if ($user->hasUserPaid($user_id,$viewer_id)) {
-                $user->public = 0;
-            }
+        
             $chats[] = [
                 'conversation_id' => $conversation->id,
                 'receiver_name' => $receiver->name,
