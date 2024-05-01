@@ -46,7 +46,12 @@ class ChatController extends Controller
             $receiver = User::find($receiver_id);
             $lastMessage = $conversation->messages()->orderBy('created_at', 'desc')->first();
             $unreadCount = $conversation->messages()->where('is_read', false)->where('sender_id', '!=', $user_id)->count(); // Count of unread messages
-
+            if ($receiver->hasActiveSubscription($user_id)) {
+                $isActive = 0;
+            }
+            else {
+                $isActive = $receiver->subcribe;
+            }
             $chats[] = [
                 'conversation_id' => $conversation->id,
                 'receiver_name' => $receiver->name,
@@ -57,7 +62,7 @@ class ChatController extends Controller
                 'image' => $appUrl.'storage/app/'.$receiver->image,
                 'time' => $lastMessage ? $lastMessage->created_at->diffForHumans() : '',
                 'unreadCount' => $unreadCount, // Include count of unread messages
-                'isActive' => $user->hasUserPaid($receiver->id,$user_id),
+                'isActive' => $isActive,
                 'public'=> $receiver->public,
                 'price' => $receiver->price ?? "0",
             ];
