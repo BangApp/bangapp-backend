@@ -60,7 +60,7 @@ class ChatController extends Controller
                 'time' => $lastMessage ? $lastMessage->created_at->diffForHumans() : '',
                 'unreadCount' => $unreadCount, // Include count of unread messages
                 //'isActive' => $receiver->hasActiveSubscription($user_id),
-                isActive => $receiver->hasUserPaid($receiver->id,$user_id)
+                'isActive' => $receiver->hasUserPaid($receiver->id,$user_id),
                 'public'=> $receiver->public,
                 'price' => $receiver->price ?? "0",
             ];
