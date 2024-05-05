@@ -127,13 +127,13 @@ class User extends Authenticatable implements JWTSubject
     public function getFriendsCountAttribute()
     {
         // return $this->friends()->where('user_id',$this->id)->orWhere('friend_id',$this->id)->where('confirmed', true)->count();
-
+        
         return friends::where(function($query) use ($this->id) {
-                        $query->where('friend_id', $this->id)
-                              ->orWhere('user_id', $this->id);
-                    })
-                    ->where('confirmed', true)
-                    ->count();
+                    $query->where('friend_id', $this->id)
+                          ->orWhere('user_id', $this->id);
+                })
+                ->where('confirmed', true)
+                ->count();
     }
     public function follow(User $user)
     {
