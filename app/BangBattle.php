@@ -35,6 +35,10 @@ class BangBattle extends Model
         return $this->belongsToMany(User::class, 'battle_comments', 'battles_id', 'user_id');
     }
 
+    public function battleComment(){
+        return $this->hasMany(BattleComment::class, 'battles_id');
+    }
+
     public static function getCommentCount($battleId){
         $comment_count = BattleComment::where('battles_id', $battleId)->count();
         if ($comment_count){
