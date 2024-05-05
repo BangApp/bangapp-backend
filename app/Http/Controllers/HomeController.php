@@ -225,6 +225,8 @@ class HomeController extends Controller
         if (!empty($battle->battle2)) {
             Storage::delete('bangbattle/' . $battle->battle2);
         }
+        $battle->likes()->delete();
+        $battle->battle_comments()->delete();
         $battle->delete();
         return redirect()->route('bangBattleWeb')->with('success', 'Battle deleted successfully.');
     }
