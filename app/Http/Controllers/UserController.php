@@ -150,8 +150,7 @@ class UserController extends Controller
 
         $user->subscriptionDays = $user->subscriptionDaysRemaining($viewer_id);
         // Check if the viewer is a friend of the user
-        $isFriend = $user->friends()
-                    ->where(function($query) use ($viewer_id) {
+        $isFriend = friends::where(function($query) use ($viewer_id) {
                         $query->where('friend_id', $viewer_id)
                               ->orWhere('user_id', $viewer_id);
                     })
