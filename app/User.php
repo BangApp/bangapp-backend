@@ -133,7 +133,7 @@ class User extends Authenticatable implements JWTSubject
                               ->orWhere('user_id', $this->id);
                     })
                     ->where('confirmed', true)
-                    ->count()
+                    ->count();
     }
     public function follow(User $user)
     {
