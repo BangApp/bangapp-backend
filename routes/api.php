@@ -470,6 +470,8 @@ Route::middleware('auth:api')->group(function () {
      * The urls are formatted with the app url and returned as a json response.
      *
      */
+
+
     Route::get('/get/bangInspirations', function () {
         $appUrl = "https://bangapp.pro/BangAppBackend/";
         $bangInspirations = bangInspiration::all();
@@ -482,6 +484,8 @@ Route::middleware('auth:api')->group(function () {
 
         return response()->json($formattedInspirations);
     });
+
+    
     Route::get('/get/bangInspirations/{videoId}', function ($videoId) {
         $appUrl = "https://bangapp.pro/BangAppBackend/";
         // Retrieve the Video model instance by its ID
@@ -514,7 +518,7 @@ Route::middleware('auth:api')->group(function () {
 
         $user_id = $request->input('user_id');
 
-        $posts = Post::unseenPosts($user_id)->latest()->whereIn('user_id',getUniqueValues($user_id))
+        $posts = Post::unseenPosts($user_id)->latest()->where('type', 'image')->whereIn('user_id',getUniqueValues($user_id))
             ->with([
                 'likes' => function ($query) {
                     $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
@@ -603,6 +607,102 @@ Route::middleware('auth:api')->group(function () {
     });
 
 
+   Route::get('/getPostWithoutVideo', function (Request $request) {
+        $appUrl = "https://bangapp.pro/BangAppBackend/";
+
+        $pageNumber = $request->query('_page', 1);
+        $numberOfPostsPerRequest = $request->query('_limit', 10);
+
+        $user_id = $request->input('user_id');
+
+        $posts = Post::unseenPosts($user_id)->latest()->where('type','image')->whereIn('user_id',getUniqueValues($user_id))
+            ->with([
+                'likes' => function ($query) {
+                    $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
+                        ->groupBy('post_id', 'like_type');
+                },
+                'challenges' => function ($query) {
+                    $query->select('*')->where('confirmed', 1);
+                }
+            ])->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
+
+
+        $posts->getCollection()->transform(function ($post) use ($appUrl, $user_id) {
+            $post->post_views_count = $post->pinned == 1 ?  $post->payedCount() : $post->postViews->count();
+            // Update the 'pinned' attribute based on whether the user has paid or not
+            if ($post->hasUserPaid($user_id,$post->id)) {
+                $post->pinned = 0;
+            }
+
+            if ($post->type === 'image') {
+                $post->image ? $post->image = $appUrl . 'storage/app/' . $post->image : $post->image = null;
+                $post->challenge_img ? $post->challenge_img = $appUrl . 'storage/app/' . $post->challenge_img : $post->challenge_img = null;
+                list($post->width, $post->height) =  [300, 300];
+            }
+            if ($post->type === 'video') {
+                $post->image = $post->image;
+                list($post->width, $post->height) = [300, 300];
+            }
+
+            foreach ($post->challenges as $challenge) {
+                $challenge->challenge_img ? $challenge->challenge_img = $appUrl . 'storage/app/' . $challenge->challenge_img : $challenge->challenge_img = null;
+            }
+            if ($post->challenges->isNotEmpty()) {
+                // Create a new Challenge object to add at the top of the challenges array
+                $newChallenge = new Challenge([
+                    'id' => $post->id, // replace with appropriate values
+                    'post_id' => $post->id,
+                    'user_id' => $post->user_id,
+                    'challenge_img' => $post->image, // replace with appropriate values
+                    'body' => $post->body, // replace with appropriate values
+                    'type' => $post->type,
+                    'confirmed' => 1,
+                    'created_at' => $post->created_at,
+                    'updated_at' => $post->updated_at,
+                    // add other properties as needed
+                ]);
+                // Convert the challenges collection to an array, add the new challenge at the top, and reindex the array
+                $challengesArray = $post->challenges->prepend($newChallenge)->values()->toArray();
+
+                // Set the challenges property with the modified array
+                $post->challenges = $challengesArray;
+            }
+
+            $post->isLikedA = false;
+            $post->isLikedB = false;
+            $post->isLiked = false;
+            // Check if the user has liked the post and update isLikedA and isLikedB accordingly
+            $likeType = Post::getLikeTypeForUser($user_id, $post->id);
+            if ($likeType == "A") {
+                $post->isLikedA = true;
+                $post->isLiked = true;
+            } elseif ($likeType == "B") {
+                $post->isLikedB = true;
+                //$post->isLiked = true;
+            }
+
+            // Retrieve the like counts for both A and B challenge images
+            // $likeCount
+            $likeCountA = 0;
+            $likeCountB = 0;
+            if ($post->likes->isNotEmpty()) {
+                foreach ($post->likes as $like) {
+                    if ($like->like_type === 'A') {
+                        $likeCountA = $like->like_count;
+                    } elseif ($like->like_type === 'B') {
+                        $likeCountB = $like->like_count;
+                    }
+                }
+            }
+            $post->like_count_A = $likeCountA;
+            $post->like_count_B = $likeCountB;
+
+            return $post;
+        });
+
+        return response(['data' => $posts, 'message' => 'success'], 200);
+    });
+
     
 
     Route::delete('/deletePost/{id}', function ($id) {
@@ -673,7 +773,7 @@ Route::middleware('auth:api')->group(function () {
             Like::create([
                 'user_id' => $userId,
                 'like_type' => $likeType,
-                'post_id' => $postId
+                'post_id' => $postIdw
             ]);
             if ($post->user->id <> $userId) {
                 $pushNotificationService = new PushNotificationService();
