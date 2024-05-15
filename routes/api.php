@@ -518,17 +518,41 @@ Route::middleware('auth:api')->group(function () {
 
         $user_id = $request->input('user_id');
 
-        $posts = Post::unseenPosts($user_id)->latest()->where('type', 'image')->whereIn('user_id',getUniqueValues($user_id))
-            ->with([
-                'likes' => function ($query) {
-                    $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
-                        ->groupBy('post_id', 'like_type');
-                },
-                'challenges' => function ($query) {
-                    $query->select('*')->where('confirmed', 1);
-                }
-            ])->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
+        $getUniqueValues = getUniqueValues($user_id);
 
+        if (empty($getUniqueValues)){
+           $userHobbies = UserHobby::where('user_id', $user_id)->pluck('hobby_id')->toArray();
+
+            $posts = Post::unseenPosts($user_id)
+                ->where('type', 'image')
+                ->whereHas('user.hobbies', function ($query) use ($userHobbies) {
+                    $query->whereIn('hobby_id', $userHobbies);
+                })
+                ->with([
+                    'likes' => function ($query) {
+                        $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
+                            ->groupBy('post_id', 'like_type');
+                    },
+                    'challenges' => function ($query) {
+                        $query->select('*')->where('confirmed', 1);
+                    }
+                ])
+                ->latest()
+                ->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
+
+        }
+        else{
+            $posts = Post::unseenPosts($user_id)->latest()->where('type', 'image')->whereIn('user_id',getUniqueValues($user_id))
+                ->with([
+                    'likes' => function ($query) {
+                        $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
+                            ->groupBy('post_id', 'like_type');
+                    },
+                    'challenges' => function ($query) {
+                        $query->select('*')->where('confirmed', 1);
+                    }
+                ])->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
+        }
 
         $posts->getCollection()->transform(function ($post) use ($appUrl, $user_id) {
             $post->post_views_count = $post->pinned == 1 ?  $post->payedCount() : $post->postViews->count();
