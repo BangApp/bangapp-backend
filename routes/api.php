@@ -281,9 +281,7 @@ Route::middleware('auth:api')->group(function () {
         $pageNumber = $request->query('_page', 1);
         $numberOfPostsPerRequest = $request->query('_limit', 10);
 
-        // Get the user's ID if available (you can adjust how you get the user's ID based on your authentication system)
         $userId = $request->input('user_id');
-        // Get the bang updates and include like information for the given user
         $bangUpdates = BangUpdate::where('user_id', $userId)->orderBy('created_at', 'desc')
             ->with([
                 'bang_update_likes' => function ($query) use ($userId) {
@@ -2003,7 +2001,7 @@ Route::get('/add5HobbiesToUsers', function(){
     $users = User::all();
     $hobbies = Hobby::all();
     foreach ($users as $user) {
-        $randomHobbyIds = $hobbies->random(5)->pluck('id');
+        $randomHobbyIds = $hobbies->random(5)->pluck('id')->unique();
         $user->hobbies()->attach($randomHobbyIds);
     }
     return response()->json(['message' => '5 random hobbies added to users successfully']);
