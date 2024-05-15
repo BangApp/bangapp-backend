@@ -240,7 +240,7 @@ Route::middleware('auth:api')->group(function () {
 
         $appUrl = "https://bangapp.pro/BangAppBackend/";
         // Get the bang updates and include like information for the given user
-        $bangUpdates = BangUpdate::unseenPosts($userId)->orderBy('created_at', 'desc')
+        $bangUpdates = BangUpdate::unseenPosts($userId)->where('type','image')->orderBy('created_at', 'desc')
             ->with([
                 'bang_update_likes' => function ($query) use ($userId) {
                     $query->select('post_id', DB::raw('count(*) as like_count'))
