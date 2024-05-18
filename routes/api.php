@@ -522,7 +522,7 @@ Route::middleware('auth:api')->group(function () {
 
            $userHobbies = UserHobby::where('user_id', $user_id)->pluck('hobby_id')->toArray();
 
-           $pinnedUserIds = User::where('subscribe', true)->pluck('user_id')->toArray();
+           $pinnedUserIds = User::where('subscribe', true)->pluck('id')->toArray();
 
            $subscribeUserIds = azampay::where('type', 'message')->whereDate('created_at', '<=', now()->subDays(30))->where('user_id', $user_id)->pluck('post_id')->toArray();
 
