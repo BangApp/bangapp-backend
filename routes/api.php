@@ -519,10 +519,21 @@ Route::middleware('auth:api')->group(function () {
         $getUniqueValues = getUniqueValues($user_id);
 
         if (empty($getUniqueValues)){
+
            $userHobbies = UserHobby::where('user_id', $user_id)->pluck('hobby_id')->toArray();
 
-            $posts = Post::unseenPosts($user_id)
+           $pinnedUserIds = User::where('subscribe', true)->pluck('user_id')->toArray();
+
+           $subscribeUserIds = azampay::where('type', 'message')->whereDate('created_at', '<=', now()->subDays(30))->where('user_id', $user_id)->pluck('post_id')->toArray();
+
+           $uniqueArray = array_diff($pinnedUserIds, $subscribeUserIds);
+
+           // Optional: Reset the array keys to have a continuous sequence (if needed)
+           $uniqueArray = array_values($uniqueArray);
+
+           $posts = Post::unseenPosts($user_id)
                 ->where('type', 'image')
+                ->whereNotIn('user_id', $uniqueArray)
                 ->whereHas('user.hobbies', function ($query) use ($userHobbies) {
                     $query->whereIn('hobby_id', $userHobbies);
                 })
@@ -537,7 +548,6 @@ Route::middleware('auth:api')->group(function () {
                 ])
                 ->latest()
                 ->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
-
         }
         else{
             $posts = Post::unseenPosts($user_id)->latest()->where('type', 'image')->whereIn('user_id',getUniqueValues($user_id))
@@ -2001,7 +2011,7 @@ Route::get('/add5HobbiesToUsers', function(){
     $users = User::all();
     $hobbies = Hobby::all();
     foreach ($users as $user) {
-        $randomHobbyIds = $hobbies->random(5)->pluck('id')->unique();
+        $randomHobbyIds = $hobbies->random(5)->pluck('id');
         $user->hobbies()->attach($randomHobbyIds);
     }
     return response()->json(['message' => '5 random hobbies added to users successfully']);
