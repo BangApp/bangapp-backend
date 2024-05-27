@@ -9,7 +9,7 @@ class ChecksumCalculator {
 
   calculateChecksum(inputString) {
     // Step 1: Calculate SHA-512 hash
-    const sha512Hash = crypto.createHash('sha512').update(inputString).digest();
+    const sha512Hash = crypto.createHash('sha512').update(inputString, 'utf8').digest();
 
     // Step 2: Encrypt with RSA using PKCS1 padding
     const encryptedData = crypto.publicEncrypt({

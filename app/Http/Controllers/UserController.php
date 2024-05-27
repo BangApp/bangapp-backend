@@ -142,11 +142,10 @@ class UserController extends Controller
         }
         if ($user->hasUserPaid($user_id,$viewer_id)) {
                 $user->public = 0;
-            }
+        }
         if ($user->hasActiveSubscription($viewer_id)) {
             $user->subscribe = 0;
         }
-
 
         $user->subscriptionDays = $user->subscriptionDaysRemaining($viewer_id);
         // Check if the viewer is a friend of the user

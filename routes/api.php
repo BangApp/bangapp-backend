@@ -805,7 +805,7 @@ Route::middleware('auth:api')->group(function () {
             Like::create([
                 'user_id' => $userId,
                 'like_type' => $likeType,
-                'post_id' => $postIdw
+                'post_id' => $postId
             ]);
             if ($post->user->id <> $userId) {
                 $pushNotificationService = new PushNotificationService();
@@ -856,9 +856,7 @@ Route::middleware('auth:api')->group(function () {
         } else if (isset($isLiked) && isset($isLikedChallenge)) {
             // User hasn't liked the battle yet, so like it
             // // Remove the opposite like if it exists
-
             BattleLike::where('user_id', $user->id)->where('battle_id', $battleId)->where('like_type', $oppositeLikeType)->delete();
-
             BattleLike::create([
                 'user_id' => $userId,
                 'like_type' => $likeType,
@@ -1695,7 +1693,6 @@ Route::get('/deleteAccount/{userId}', function ($userId) {
             }
         }
     });
-
     // Delete user's posts and associated images
     $user->bangUpdates->each(function ($update) {
         $update->comments()->delete();
@@ -1703,13 +1700,10 @@ Route::get('/deleteAccount/{userId}', function ($userId) {
         $update->bangUpdateViews()->delete();
         Storage::delete($update->filename);
     });
-
-
     // Delete user's comments if exist
     if ($user->comments()->exists()) {
         $user->comments()->delete();
     }
-
     // Delete user's likes if exist
     if ($user->likes()->exists()) {
         $user->likes()->delete();

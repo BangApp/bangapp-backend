@@ -12,13 +12,17 @@ import TokenFetcher from '../azampay/TokenFetcher.js'; // Import the TokenFetche
     const token = await TokenFetcher.fetchToken();
     const publicKeyPath = '../azampay/public_key.pem'; // Replace with your actual public key file path
     const calculator = new ChecksumCalculator(publicKeyPath);
-  const inputString = "1672245629"+"1710446004"+"TZS"+"1000"+currentEpochTimeInSeconds+currentTimestamp;
+
+    const inputString = "Azampesa" + "1710446004";
+
+  // const inputString = "Azampesa"+"1710446004"+"TZS"+"1000"+currentEpochTimeInSeconds+currentTimestamp;
+
     const base64Checksum = calculator.calculateChecksum(inputString);
 
 
 
     const options = {
-      hostname: 'api-disbursement-sandbox.azampay.co.tz',
+      hostname: 'api-disbursement-test.azampay.co.tz',
       path: '/api/v1/azampay/namelookup',
       method: 'POST',
       headers: {
@@ -28,7 +32,7 @@ import TokenFetcher from '../azampay/TokenFetcher.js'; // Import the TokenFetche
     };
 
     const req = https.request(options, (res) => {
-      console.log(`statusCode: ${res.statusCode}`);
+      
 
       res.on('data', (d) => {
         process.stdout.write(d);
@@ -40,8 +44,8 @@ import TokenFetcher from '../azampay/TokenFetcher.js'; // Import the TokenFetche
     });
 
     const data = JSON.stringify({
-      bankName: "azampesa",
-      accountNumber: "1672245629",
+      bankName: "Azampesa",
+      accountNumber: "1710446004",
       checksum: base64Checksum
     });
 
