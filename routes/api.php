@@ -532,7 +532,6 @@ Route::middleware('auth:api')->group(function () {
            $uniqueArray = array_values($uniqueArray);
 
            $posts = Post::unseenPosts($user_id)
-                ->where('type', 'image')
                 ->whereNotIn('user_id', $uniqueArray)
                 ->whereHas('user.hobbies', function ($query) use ($userHobbies) {
                     $query->whereIn('hobby_id', $userHobbies);
