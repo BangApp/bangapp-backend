@@ -171,4 +171,10 @@ class UserController extends Controller
     //     $userHobbies = UserHobby::('hobby_id', '')
 
     // }
+
+    public function usersManage()
+    {
+        $users = User::all();
+        return view('user.user_manage', compact('users'));
+    }
 }

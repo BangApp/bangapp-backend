@@ -237,6 +237,11 @@ class HomeController extends Controller
         return view('posts.report_posts', compact('reportedPosts'));
     }
 
+    public function dashboard() 
+    {
+        return view('home.dashboard');
+    }
+
 
 
 
