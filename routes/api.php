@@ -518,48 +518,63 @@ Route::middleware('auth:api')->group(function () {
 
         $getUniqueValues = getUniqueValues($user_id);
 
-        if (empty($getUniqueValues)){
+        // if (empty($getUniqueValues)){
 
-           $userHobbies = UserHobby::where('user_id', $user_id)->pluck('hobby_id')->toArray();
+        //    $userHobbies = UserHobby::where('user_id', $user_id)->pluck('hobby_id')->toArray();
 
-           $pinnedUserIds = User::where('subscribe', true)->pluck('id')->toArray();
+        //    $pinnedUserIds = User::where('subscribe', true)->pluck('id')->toArray();
 
-           $subscribeUserIds = azampay::where('type', 'message')->whereDate('created_at', '<=', now()->subDays(30))->where('user_id', $user_id)->pluck('post_id')->toArray();
+        //    $subscribeUserIds = azampay::where('type', 'message')->whereDate('created_at', '<=', now()->subDays(30))->where('user_id', $user_id)->pluck('post_id')->toArray();
 
-           $uniqueArray = array_diff($pinnedUserIds, $subscribeUserIds);
+        //    $uniqueArray = array_diff($pinnedUserIds, $subscribeUserIds);
 
-           // Optional: Reset the array keys to have a continuous sequence (if needed)
-           $uniqueArray = array_values($uniqueArray);
+        //    // Optional: Reset the array keys to have a continuous sequence (if needed)
+        //    $uniqueArray = array_values($uniqueArray);
 
-           $posts = Post::unseenPosts($user_id)
-                ->whereNotIn('user_id', $uniqueArray)
-                ->whereHas('user.hobbies', function ($query) use ($userHobbies) {
-                    $query->whereIn('hobby_id', $userHobbies);
-                })
-                ->with([
-                    'likes' => function ($query) {
-                        $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
-                            ->groupBy('post_id', 'like_type');
-                    },
-                    'challenges' => function ($query) {
-                        $query->select('*')->where('confirmed', 1);
-                    }
-                ])
-                ->latest()
-                ->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
-        }
-        else{
-            $posts = Post::unseenPosts($user_id)->latest()->where('type', 'image')->whereIn('user_id',getUniqueValues($user_id))
-                ->with([
-                    'likes' => function ($query) {
-                        $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
-                            ->groupBy('post_id', 'like_type');
-                    },
-                    'challenges' => function ($query) {
-                        $query->select('*')->where('confirmed', 1);
-                    }
-                ])->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
-        }
+        //    $posts = Post::unseenPosts($user_id)
+        //         ->whereNotIn('user_id', $uniqueArray)
+        //         ->whereHas('user.hobbies', function ($query) use ($userHobbies) {
+        //             $query->whereIn('hobby_id', $userHobbies);
+        //         })
+        //         ->with([
+        //             'likes' => function ($query) {
+        //                 $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
+        //                     ->groupBy('post_id', 'like_type');
+        //             },
+        //             'challenges' => function ($query) {
+        //                 $query->select('*')->where('confirmed', 1);
+        //             }
+        //         ])
+        //         ->latest()
+        //         ->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
+        // }
+        // else{
+        //     $posts = Post::unseenPosts($user_id)->latest()->where('type', 'image')->whereIn('user_id',getUniqueValues($user_id))
+        //         ->with([
+        //             'likes' => function ($query) {
+        //                 $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
+        //                     ->groupBy('post_id', 'like_type');
+        //             },
+        //             'challenges' => function ($query) {
+        //                 $query->select('*')->where('confirmed', 1);
+        //             }
+        //         ])->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
+        // }
+
+        $posts = Post::latest()
+        ->with([
+            'category' => function($query) {
+                $query->select('id', 'name');
+            },
+            'likes' => function($query) {
+                $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
+                    ->groupBy('post_id', 'like_type');
+            },
+            'challenges' => function($query) {
+                $query->select('*')->where('confirmed', 1);
+            }
+        ])->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
+
 
         $posts->getCollection()->transform(function ($post) use ($appUrl, $user_id) {
             $post->post_views_count = $post->pinned == 1 ?  $post->payedCount() : $post->postViews->count();
