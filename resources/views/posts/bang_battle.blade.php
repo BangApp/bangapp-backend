@@ -24,7 +24,7 @@
         <div class="card my-3">
 
         <div class="col-12">
-            <div class="col-12">
+            
                 <table class="table table-bordered scrollable-table-container">
                     <thead>
                         <tr>
@@ -49,7 +49,7 @@
                         @endforeach
                     </tbody>
                 </table>
-            </div>
+        
         </div>
 
     </div>

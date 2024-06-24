@@ -52,9 +52,9 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'https://bangapp.pro/BangAppBackend/'),
+    'url' => env('APP_URL', 'http://localhost/BangAppBackend/'),
 
-    'asset_url' => env('ASSET_URL', 'https://bangapp.pro/BangAppBackend/public'),
+    'asset_url' => env('ASSET_URL', 'http://localhost/BangAppBackend/public'),
 
     /*
     |--------------------------------------------------------------------------

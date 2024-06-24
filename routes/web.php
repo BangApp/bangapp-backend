@@ -50,3 +50,7 @@ Route::post('/update_bang_battle',[App\Http\Controllers\HomeController::class, '
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::get('/reportedPost', [App\Http\Controllers\HomeController::class, 'reportedPost'])->name('reportedPost');
+
+Route::get('/dashboard', [App\Http\Controllers\HomeController::class, 'dashboard'])->name('dashboard');
+
+Route::get('/users',[App\Http\Controllers\UserController::class, 'usersManage'] )->name('users');

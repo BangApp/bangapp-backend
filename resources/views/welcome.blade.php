@@ -30,8 +30,10 @@
         <div class="container-fluid">
             <div class="navbar-brand">
                 <a href="index.html" class="d-inline-flex align-items-center">
-                    <img src="../../../assets/images/logo_icon.svg" alt="">
-                    <img src="../../../assets/images/logo_text_light.svg" class="d-none d-sm-inline-block h-16px ms-3" alt="">
+                BangApp Backend
+                    <!-- <img src="../../../assets/images/logo_icon.svg" alt="">
+                    BangApp Backend
+                    <img src="../../../assets/images/logo_text_light.svg" class="d-none d-sm-inline-block h-16px ms-3" alt=""> -->
                 </a>
             </div>
 
@@ -73,10 +75,10 @@
                             <div class="card-body">
                                 <div class="text-center mb-3">
                                     <div class="d-inline-flex align-items-center justify-content-center mb-4 mt-2">
-                                        <img src="../../../assets/images/logo_icon.svg" class="h-48px" alt="">
+                                        <!-- <img src="../../../assets/images/logo_icon.svg" class="h-48px" alt=""> -->
                                     </div>
                                     <h5 class="mb-0">Login to your account</h5>
-                                    <span class="d-block text-muted">Enter your credentials belowww</span>
+                                    <span class="d-block text-muted">Enter your credentials below</span>
                                 </div>
 
                                 <div class="mb-3">
