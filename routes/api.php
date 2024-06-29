@@ -561,7 +561,7 @@ Route::middleware('auth:api')->group(function () {
         //         ])->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
         // }
 
-        $posts = Post::latest()
+        $posts = Post::unseenPosts($user_id)->latest()
         ->with([
             'category' => function($query) {
                 $query->select('id', 'name');
