@@ -823,8 +823,8 @@ Route::middleware('auth:api')->group(function () {
             ]);
             if ($post->user->id <> $userId) {
                 $pushNotificationService = new PushNotificationService();
-                $pushNotificationService->sendPushNotification($post->user->device_token, $user->name, likeMessage(), $postId, 'like');
-                saveNotification($userId, likeMessage(), 'like', $post->user->id, $postId);
+                $pushNotificationService->sendPushNotification($post->user->device_token, $user->name, likeMessageNotification(), $postId, 'like');
+                saveNotification($userId, likeMessageNotification(), 'like', $post->user->id, $postId);
             }
 
             $message = 'Post liked successfully';
@@ -838,7 +838,7 @@ Route::middleware('auth:api')->group(function () {
             ]);
             if ($post->user->id <> $userId) {
                 $pushNotificationService = new PushNotificationService();
-                saveNotification($userId, likeMessage(), 'like', $post->user->id, $postId);
+                saveNotification($userId, likeMessageNotification(), 'like', $post->user->id, $postId);
                 $message = 'Post liked successfully';
             }
         }
@@ -1476,83 +1476,91 @@ Route::middleware('auth:api')->group(function () {
         return response()->json(['message' => 'Post reported successfully.'], 200);
     });
 
-
-    function likeMessage()
-    {
-        return "Has Liked Your Post";
+    if (!function_exists('likeMessageNotification')) {
+        function likeMessageNotification()
+        {
+            return "Has Liked Your Post";
+        }
     }
-
-    function friendRequestMessage()
-    {
-        return "Has Requested to be Your Friend";
+    if (!function_exists('friendRequestMessage')) {
+        function friendRequestMessage()
+        {
+            return "Has Requested to be Your Friend";
+        }
     }
-
-    function friendAcceptMessage($friendName)
-    {
-        return "You are now friends with ".$friendName;
+    if (!function_exists('friendAcceptMessage')) {
+        function friendAcceptMessage($friendName)
+        {
+            return "You are now friends with ".$friendName;
+        }
     }
-
-    function commentMessage()
+    if (!function_exists('commentMessage')) {
+        function commentMessage()
     {
         return "Has Commented on Your Post";
     }
-
-    function commentReplyMessage()
-    {
-        return "Has Replied to Your Comment";
     }
-
+    if (!function_exists('commentReplyMessage')) {
+        function commentReplyMessage()
+        {
+            return "Has Replied to Your Comment";
+        }
+    }
+    if (!function_exists('chatMessage')) {
     function chatMessage()
     {
         return "Has Messaged You";
     }
-
-
-
-    function saveNotification($user_id, $body, $type, $reference_id, $post_id)
-    {
-        $notification = new Notification;
-        $notification->user_id = $user_id;
-        $notification->message = $body;
-        $notification->type = $type;
-        $notification->reference_id = $reference_id;
-        $notification->post_id = $post_id;
-        $notification->save();
     }
+    if (!function_exists('saveNotification')) {function saveNotification($user_id, $body, $type, $reference_id, $post_id)
+        {
+            $notification = new Notification;
+            $notification->user_id = $user_id;
+            $notification->message = $body;
+            $notification->type = $type;
+            $notification->reference_id = $reference_id;
+            $notification->post_id = $post_id;
+            $notification->save();
+        }}
 
-    function getUniqueValues($user_id) 
-    {
-        // Fetch data from different tables
-        $user_friends_id = friends::where('user_id', $user_id)
-            ->orWhere('friend_id', $user_id)
-            ->where('confirmed', 1)
-            ->pluck('user_id', 'friend_id')
-            ->toArray();
-        $user_follow_id = Follower::where('follower_id', $user_id)
-            ->pluck('following_id')
-            ->toArray();
-        $user_subscribe_id = azampay::where('type', 'message')
-            ->whereDate('created_at', '<=', now()->subDays(30))
-            ->where('user_id', $user_id)
-            ->pluck('post_id')
-            ->toArray();
+        if (!function_exists('getUniqueValues')) {
 
-        // Extract values and keys from the friends array
-        $user_friends_values = array_values($user_friends_id);
-        $user_friends_keys = array_keys($user_friends_id);
+            function getUniqueValues($user_id) 
+            {
+                // Fetch data from different tables
+                $user_friends_id = friends::where('user_id', $user_id)
+                    ->orWhere('friend_id', $user_id)
+                    ->where('confirmed', 1)
+                    ->pluck('user_id', 'friend_id')
+                    ->toArray();
+                $user_follow_id = Follower::where('follower_id', $user_id)
+                    ->pluck('following_id')
+                    ->toArray();
+                $user_subscribe_id = azampay::where('type', 'message')
+                    ->whereDate('created_at', '<=', now()->subDays(30))
+                    ->where('user_id', $user_id)
+                    ->pluck('post_id')
+                    ->toArray();
         
-        // Merge all arrays and convert keys to strings
-        $mergedArray = array_merge(
-            array_map('strval', $user_friends_values),
-            array_map('strval', $user_follow_id),
-            array_map('strval', $user_subscribe_id),
-            array_map('strval', $user_friends_keys)
-        );
+                // Extract values and keys from the friends array
+                $user_friends_values = array_values($user_friends_id);
+                $user_friends_keys = array_keys($user_friends_id);
+                
+                // Merge all arrays and convert keys to strings
+                $mergedArray = array_merge(
+                    array_map('strval', $user_friends_values),
+                    array_map('strval', $user_follow_id),
+                    array_map('strval', $user_subscribe_id),
+                    array_map('strval', $user_friends_keys)
+                );
+        
+                // Return unique values
+                return array_unique($mergedArray);
+            }
+        
+        }
 
-        // Return unique values
-        return array_unique($mergedArray);
-    }
-
+        if (!function_exists('deleteVideoApi')) {
 
     function deleteVideoApi($uid)
     {
@@ -1579,6 +1587,8 @@ Route::middleware('auth:api')->group(function () {
         Log::info(json_encode($response));
         return $response;
     }
+
+        }
 
     Route::post('/subscribe', function(Request $request) {
         $request->validate([
