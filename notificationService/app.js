@@ -14,12 +14,18 @@ app.use(express.json());
 
 // Send notification function
 app.post('/send-notification', async (req, res) => {
-  const { token, title, body } = req.body;
+  const { token, title, body, notificationId, type, userName, userId } = req.body;
 
   const message = {
     notification: {
       title: title,
       body: body,
+    },
+    data: {
+      notification_id: notificationId,
+      type: type,
+      user_name: userName || '',
+      user_id: userId || '',
     },
     token: token,
   };
@@ -35,7 +41,7 @@ app.post('/send-notification', async (req, res) => {
 });
 
 // Start the server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3005;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
