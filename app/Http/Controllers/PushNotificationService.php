@@ -17,7 +17,7 @@ class PushNotificationService extends Controller
         $client = new Client();
     
         try {
-            $response = $client->post('https://bangapp.pro:3005/send-notification', [
+            $response = $client->post('http://bangapp.pro:3005/send-notification', [
                 'json' => [
                     'token' => $deviceToken,
                     'title' => $title,
