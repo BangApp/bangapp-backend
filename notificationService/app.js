@@ -26,7 +26,7 @@ app.post('/send-notification', async (req, res) => {
       notification_id: notificationId,
       type: type,
       user_name: userName || '',
-      user_id: userId || '',
+      user_id: userId.toString() || '',
     },
     token: token,
   };
