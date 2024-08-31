@@ -16,7 +16,7 @@ app.use(express.json());
 app.post('/send-notification', async (req, res) => {
   const { token, title, body, notificationId, type, userName, userId } = req.body;
   console.log("this is token");
-  console.log([token,body,title]);
+  console.log([token,body,title,body,notificationId,type,userName,userId]);
   const message = {
     notification: {
       title: title,
