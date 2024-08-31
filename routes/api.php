@@ -518,62 +518,62 @@ Route::middleware('auth:api')->group(function () {
 
         $getUniqueValues = getUniqueValues($user_id);
 
-        // if (empty($getUniqueValues)){
+         if (empty($getUniqueValues)){
 
-        //    $userHobbies = UserHobby::where('user_id', $user_id)->pluck('hobby_id')->toArray();
+            $userHobbies = UserHobby::where('user_id', $user_id)->pluck('hobby_id')->toArray();
 
-        //    $pinnedUserIds = User::where('subscribe', true)->pluck('id')->toArray();
+            $pinnedUserIds = User::where('subscribe', true)->pluck('id')->toArray();
 
-        //    $subscribeUserIds = azampay::where('type', 'message')->whereDate('created_at', '<=', now()->subDays(30))->where('user_id', $user_id)->pluck('post_id')->toArray();
+            $subscribeUserIds = azampay::where('type', 'message')->whereDate('created_at', '<=', now()->subDays(30))->where('user_id', $user_id)->pluck('post_id')->toArray();
 
-        //    $uniqueArray = array_diff($pinnedUserIds, $subscribeUserIds);
+           $uniqueArray = array_diff($pinnedUserIds, $subscribeUserIds);
 
         //    // Optional: Reset the array keys to have a continuous sequence (if needed)
-        //    $uniqueArray = array_values($uniqueArray);
+            $uniqueArray = array_values($uniqueArray);
 
-        //    $posts = Post::unseenPosts($user_id)
-        //         ->whereNotIn('user_id', $uniqueArray)
-        //         ->whereHas('user.hobbies', function ($query) use ($userHobbies) {
-        //             $query->whereIn('hobby_id', $userHobbies);
-        //         })
-        //         ->with([
-        //             'likes' => function ($query) {
-        //                 $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
-        //                     ->groupBy('post_id', 'like_type');
-        //             },
-        //             'challenges' => function ($query) {
-        //                 $query->select('*')->where('confirmed', 1);
-        //             }
-        //         ])
-        //         ->latest()
-        //         ->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
-        // }
-        // else{
-        //     $posts = Post::unseenPosts($user_id)->latest()->where('type', 'image')->whereIn('user_id',getUniqueValues($user_id))
-        //         ->with([
-        //             'likes' => function ($query) {
-        //                 $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
-        //                     ->groupBy('post_id', 'like_type');
-        //             },
-        //             'challenges' => function ($query) {
-        //                 $query->select('*')->where('confirmed', 1);
-        //             }
-        //         ])->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
-        // }
+            $posts = Post::unseenPosts($user_id)
+                 ->whereNotIn('user_id', $uniqueArray)
+                 ->whereHas('user.hobbies', function ($query) use ($userHobbies) {
+                     $query->whereIn('hobby_id', $userHobbies);
+                 })
+                 ->with([
+                     'likes' => function ($query) {
+                         $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
+                             ->groupBy('post_id', 'like_type');
+                     },
+                     'challenges' => function ($query) {
+                         $query->select('*')->where('confirmed', 1);
+                     }
+                 ])
+                 ->latest()
+                 ->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
+         }
+         else{
+             $posts = Post::unseenPosts($user_id)->latest()->where('type', 'image')->whereIn('user_id',getUniqueValues($user_id))
+                 ->with([
+                     'likes' => function ($query) {
+                         $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
+                             ->groupBy('post_id', 'like_type');
+                     },
+                     'challenges' => function ($query) {
+                         $query->select('*')->where('confirmed', 1);
+                     }
+                 ])->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
+         }
 
-        $posts = Post::unseenPosts($user_id)->latest()->where('type', 'image')
-        ->with([
-            'category' => function($query) {
-                $query->select('id', 'name');
-            },
-            'likes' => function($query) {
-                $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
-                    ->groupBy('post_id', 'like_type');
-            },
-            'challenges' => function($query) {
-                $query->select('*')->where('confirmed', 1);
-            }
-        ])->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
+        //$posts = Post::unseenPosts($user_id)->latest()->where('type', 'image')
+        //->with([
+          //  'category' => function($query) {
+            //    $query->select('id', 'name');
+           // },
+           // 'likes' => function($query) {
+            //    $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
+              //      ->groupBy('post_id', 'like_type');
+           // },
+           // 'challenges' => function($query) {
+             //   $query->select('*')->where('confirmed', 1);
+           // }
+       // ])->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
 
 
         $posts->getCollection()->transform(function ($post) use ($appUrl, $user_id) {
@@ -1160,11 +1160,31 @@ Route::middleware('auth:api')->group(function () {
                 $query->select('id', 'name', 'image');
             },
         ])->findOrFail($comment->id);
-        if ($post->user->id <> $request->user_id) {
-            $pushNotificationService = new PushNotificationService();
-            $pushNotificationService->sendPushNotification($post->user->device_token, $user->name, commentMessage(), $request->post_id, 'comment',$comment->user->name,$comment->user->id);
-            saveNotification($request->user_id, commentMessage(), 'comment', $post->user->id, $request->post_id);
-        }
+       try {
+    if ($post->user->id <> $request->user_id) {
+        $pushNotificationService = new PushNotificationService();
+        $pushNotificationService->sendPushNotification(
+            $post->user->device_token, 
+            $user->name, 
+            commentMessage(), 
+            $request->post_id, 
+            'comment',
+            $comment->user->name,
+            $comment->user->id
+        );
+        saveNotification(
+            $request->user_id, 
+            commentMessage(), 
+            'comment', 
+            $post->user->id, 
+            $request->post_id
+        );
+    }
+} catch (Exception $e) {
+    // Handle the exception, e.g., log the error or notify the user
+    error_log('Error occurred: ' . $e->getMessage());
+    // Optionally, you can return a response or take further action
+}
         return response(['data' => $comment, 'message' => 'success'], 200);
     });
 
