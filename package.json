@@ -20,5 +20,8 @@
         "sass": "^1.56.1",
         "sass-loader": "^8.0.0",
         "vue-template-compiler": "^2.7.14"
+    },
+    "dependencies": {
+        "firebase-admin": "^12.4.0"
     }
 }
