@@ -825,7 +825,8 @@ Route::middleware('auth:api')->group(function () {
             ]);
             if ($post->user->id <> $userId) {
                 $pushNotificationService = new PushNotificationService();
-                $pushNotificationService->sendPushNotification($post->user->device_token, $user->name, likeMessageNotification(), $postId, 'like');
+                // $pushNotificationService->sendPushNotification($post->user->device_token, $user->name, commentMessage(), $request->post_id, 'comment',$comment->user->name,$comment->user->id);
+                $pushNotificationService->sendPushNotification($post->user->device_token, $user->name, likeMessageNotification(), $postId, 'like',$post->user->name,$post->user->id);
                 saveNotification($userId, likeMessageNotification(), 'like', $post->user->id, $postId);
             }
 
