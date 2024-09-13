@@ -1388,7 +1388,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/getBangBattle/{user_id}', function ($user_id) {
 
         $appUrl = "https://bangapp.pro/BangAppBackend/";
-        $battles = BangBattle::latest()->with([
+        $battles = BangBattle::with([
             'likes' => function ($query) {
                 $query->select('battle_id', 'like_type', DB::raw('count(*) as like_count'))
                     ->groupBy('battle_id', 'like_type');
