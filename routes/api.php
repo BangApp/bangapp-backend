@@ -533,7 +533,7 @@ Route::middleware('auth:api')->group(function () {
            // Optional: Reset the array keys to have a continuous sequence (if needed)
            $uniqueArray = array_values($uniqueArray);
 
-           $posts = Post::unseenPosts($user_id)
+           $posts = Post::unseenPosts($user_id)->where('type', 'image')
                 ->whereNotIn('user_id', $uniqueArray)
                 ->whereHas('user.hobbies', function ($query) use ($userHobbies) {
                     $query->whereIn('hobby_id', $userHobbies);
