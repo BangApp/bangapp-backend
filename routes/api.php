@@ -1706,7 +1706,6 @@ Route::post('/sendNotification12', function (Request $request) {
 
 Route::get('/deleteAccount/{userId}', function ($userId) {
     $user = User::findOrFail($userId);
-
     // Delete user's posts and associated images
     $user->posts->each(function ($post) {
         $post->comments()->delete();

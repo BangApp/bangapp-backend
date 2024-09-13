@@ -15,7 +15,6 @@ class PushNotificationService extends Controller
     public function sendPushNotification($deviceToken, $title, $body, $notificationId, $type, $userName = null, $userId = null)
     {
         $client = new Client();
-    
         try {
             $response = $client->post('http://bangapp.pro:3005/send-notification', [
                 'json' => [
@@ -28,7 +27,6 @@ class PushNotificationService extends Controller
                     'userId' => $userId,
                 ]
             ]);
-    
             if ($response->getStatusCode() === 200) {
                 return 'Notification sent successfully';
             } else {
