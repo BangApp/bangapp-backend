@@ -1431,7 +1431,7 @@ Route::middleware('auth:api')->group(function () {
                     }
                 }
             }
-            $battle->like_count_A = $likeCountA + 100;
+            $battle->like_count_A = $likeCountA + 130;
             $battle->like_count_B = $likeCountB + 150;
             return $battle;
         });
