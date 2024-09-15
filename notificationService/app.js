@@ -11,7 +11,6 @@ admin.initializeApp({
 
 const app = express();
 app.use(express.json());
-
 // Send notification function
 app.post('/send-notification', async (req, res) => {
   const { token, title, body, notificationId, type, userName, userId } = req.body;

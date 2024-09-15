@@ -38,6 +38,7 @@ use App\BlockedUser;
 use App\FewerPost;
 use Illuminate\Validation\Rule;
 use App\Http\Controllers\PushNotificationService;
+use App\Http\Controllers\FlutterwaveController;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\ChatController;
 use Illuminate\Support\Facades\Mail;
@@ -199,6 +200,9 @@ Route::get('/getPaymentStatus/{transactionId}', function ($transactionId) {
         return response()->json(['status' => false], 200);
     }
 });
+
+Route::post('/payments/flutterwave', [FlutterwaveController::class, 'pay']);
+Route::post('/payments/transfer', [FlutterwaveController::class, 'initiateTransfer']);
 
 
 
