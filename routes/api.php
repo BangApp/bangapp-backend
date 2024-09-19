@@ -530,7 +530,7 @@ Route::middleware('auth:api')->group(function () {
 
            $pinnedUserIds = User::where('subscribe', true)->pluck('id')->toArray();
 
-           $friendsPinned = Friend::where('')
+        //    $friendsPinned = Friend::where('')
 
            $subscribeUserIds = azampay::where('type', 'message')->whereDate('created_at', '<=', now()->subDays(30))->where('user_id', $user_id)->pluck('post_id')->toArray();
 
