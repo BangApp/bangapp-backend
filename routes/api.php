@@ -530,7 +530,13 @@ Route::middleware('auth:api')->group(function () {
 
            $pinnedUserIds = User::where('subscribe', true)->pluck('id')->toArray();
 
-        //    $friendsPinned = Friend::where('')
+        //    $friendsPinned = friends::where('user_id', $user_id)
+        //    ->orWhere('friend_id', $user_id)
+        //    ->where('confirmed', 1)->join('users', function($join) {
+        //         $join->on('friends.friend_id', '=', 'users.id')
+        //              ->where('users.subscribe', 0);
+        //     })->pluck('user_id', 'friend_id')
+        //     ->toArray();        
 
            $subscribeUserIds = azampay::where('type', 'message')->whereDate('created_at', '<=', now()->subDays(30))->where('user_id', $user_id)->pluck('post_id')->toArray();
 
@@ -1536,18 +1542,18 @@ Route::middleware('auth:api')->group(function () {
 
             function getUniqueValues($user_id) 
             {
-                // $user_friends_id = friends::where('user_id', $user_id)
-                //     ->orWhere('friend_id', $user_id)
-                //     ->where('confirmed', 1)
-                //     ->pluck('user_id', 'friend_id')
-                //     ->toArray(); 
+                $user_friends_id = friends::where('user_id', $user_id)
+                    ->orWhere('friend_id', $user_id)
+                    ->where('confirmed', 1)
+                    ->pluck('user_id', 'friend_id')
+                    ->toArray(); 
                 $user_friends_id = friends::where(function($query) use ($user_id) {
                     $query->where('user_id', $user_id)
                           ->orWhere('friend_id', $user_id);
                 })
                 ->where('confirmed', 1)
                 ->join('users', function($join) {
-                    $join->on('friends.friend_id', '=', 'users.id')
+                    $join->on('friends.user_id', '=', 'users.id')
                          ->where('users.subscribe', 0);
                 })
                 ->pluck('user_id', 'friend_id')
