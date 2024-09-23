@@ -22,7 +22,7 @@ app.post('/send-notification', async (req, res) => {
       body: body,
     },
     data: {
-      notification_id: notificationId,
+      notification_id: notificationId.toString() || '',
       type: type,
       user_name: userName || '',
       user_id: userId.toString() || '',
