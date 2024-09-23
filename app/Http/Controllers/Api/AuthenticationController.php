@@ -27,10 +27,8 @@ class AuthenticationController extends Controller
             'email' => [
                 'required',
                 function ($attribute, $value, $fail) {
-
                         $exists = \App\User::where(function ($query) use ($value) {
-                            $query->where('email', $value)
-                                ->orWhere('phone_number', $value);
+                            $query->where('email', $value);
                         })->exists();
                         if ($exists) {
                             $fail('The ' . $attribute . ' has already been taken.');
@@ -39,36 +37,38 @@ class AuthenticationController extends Controller
 
             ],
             'password' => ['required', 'string', 'min:6', 'max:30'],
+            'phone_number' => [
+                'required', 
+                function ($attribute, $value, $fail){
+                    $exists = \App\User::where(function ($query) use ($value ){
+                        $query->where('phone_number', $value);
+                    })->exists();
+                    if ($exists) {
+                        $fail('The ' . $attribute . ' has already been taken.');
+                    }
+                }
+            ],
         ]);
-
         if ($validator->fails()) {
             return response(['errors' => $validator->errors()], 422);
         }
-
-        $validatedData = $validator->validated();
-
-        $validatedData['password'] = bcrypt($request->password);
-        $validatedData['role_id'] = 3;
-
-        $user = User::create($validatedData);
-
-
-        $token = JWTAuth::attempt(['email' => $request->email, 'password' => $request->password]);
-
-        return response(['name'=>$user->name,'access_token'=>$token,'id'=>$user->id,'email'=>$user->email,'image'=>env('APP_URL').'storage/app/'.$user->image]);
+        else {
+            $validatedData = $validator->validated();
+            $validatedData['password'] = bcrypt($request->password);
+            $validatedData['role_id'] = 3;
+            $user = User::create($validatedData);
+            $token = JWTAuth::attempt(['email' => $request->email, 'password' => $request->password]);
+            return response(['name'=>$user->name,'access_token'=>$token,'id'=>$user->id,'email'=>$user->email,'image'=>env('APP_URL').'storage/app/'.$user->image]);
+        }
     }
 
     public function registerGoogleUser(Request $request) {
-        // Perform validation
         $validator = Validator::make($request->all(), [
             'user_email' => 'required|email|unique:users,email',
-            // Add additional validation rules as needed
         ]);
-        // Check if validation fails
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 400);
         }
-        // Create user if validation passes
         $user = User::create([
             'email'=> $request->user_email,
             'phone_number' => $request->user_phone,
@@ -78,7 +78,6 @@ class AuthenticationController extends Controller
             'password' => bcrypt($request->uid)
         ]);
 
-        // Check if the user was created successfully
         if ($user->wasRecentlyCreated) {
             $token = JWTAuth::attempt(['email' => $user->email, 'password' => $request->uid]);
             return response(['name'=>$user->name,'access_token'=>$token,'id'=>$user->id,'email'=>$user->email,'image'=>$user->image]);

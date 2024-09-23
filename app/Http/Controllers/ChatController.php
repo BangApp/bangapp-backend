@@ -144,7 +144,10 @@ public function sendMessage(Request $request)
    // Notification block
    try {
     $pushNotificationService = new PushNotificationService();
-    $pushNotificationService->sendPushNotification($receiver->device_token, $sender->name, "New Message: " . $messageText, $sender->id, "message", userName: $sender->name);
+    // $pushNotificationService->sendPushNotification($post->user->device_token, $user->name, commentMessage(), $request->post_id, 'comment',$comment->user->name,$comment->user->id);
+
+    $pushNotificationService->sendPushNotification($receiver->device_token, $sender->name, "New Message: " . $messageText, $sender->id, "message", $receiver->name, $receiver->id);
+
 } catch (\Exception $e) {
     // Log the error or handle it as needed
     Log::error('Failed to send push notification: ' . $e->getMessage());

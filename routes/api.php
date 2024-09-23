@@ -241,9 +241,7 @@ Route::middleware('auth:api')->group(function () {
 
 
     Route::get('/bang-updates/{userId}/{per_page}/{page}', function ($userId,$per_page,$page) {
-
         $appUrl = "https://bangapp.pro/BangAppBackend/";
-        // Get the bang updates and include like information for the given user
         $bangUpdates = BangUpdate::unseenPosts($userId)->where('type','image')->orderBy('created_at', 'desc')
             ->with([
                 'bang_update_likes' => function ($query) use ($userId) {
@@ -260,19 +258,15 @@ Route::middleware('auth:api')->group(function () {
                 },
             ])->paginate($per_page, ['*'], 'page', $page);
 
-        // Format the updates and add the isLiked variable
         $formattedUpdates = $bangUpdates->map(function ($update) use ($appUrl, $userId) {
             if($update->type=="image"){
                 $update->filename = $appUrl . 'storage/app/bangUpdates/' . $update->filename;
-
             }
 
-            // Check if the user has liked the post
-            $update->isLiked = DB::table('bang_update_likes')
-                ->where('user_id', $userId)
-                ->where('post_id', $update->id)
-                ->exists();
-
+        $update->isLiked = DB::table('bang_update_likes')
+            ->where('user_id', $userId)
+            ->where('post_id', $update->id)
+            ->exists();
             return $update;
         });
 
@@ -281,7 +275,6 @@ Route::middleware('auth:api')->group(function () {
 
     Route::get('/user-bang-updates/', function (Request $request) {
         $appUrl = "https://bangapp.pro/BangAppBackend/";
-        // Get the _page and _limit parameters from the request query
         $pageNumber = $request->query('_page', 1);
         $numberOfPostsPerRequest = $request->query('_limit', 10);
 
@@ -301,7 +294,6 @@ Route::middleware('auth:api')->group(function () {
                 },
             ])->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
 
-        // Format the updates and add the isLiked variable
         $formattedUpdates = $bangUpdates->map(function ($update) use ($appUrl, $userId) {
 
             if ($update->type == "image") {
@@ -399,8 +391,6 @@ Route::middleware('auth:api')->group(function () {
     });
 
     Route::post('/addChallenge', function (Request $request) {
-        ini_set('post_max_size', '20M');
-        ini_set('upload_max_filesize', '20M');
         $image = new Challenge;
         $image->body = $request->body;
         $image->user_id = $request->user_id;
@@ -415,11 +405,8 @@ Route::middleware('auth:api')->group(function () {
 
 
     Route::post('/addBangUpdate', function (Request $request) {
-        // Get the uploaded file
         $file = $request->file('image');
-        // Generate a unique filename
         $filename = uniqid() . '.' . $file->getClientOriginalExtension();
-        // Store the file locally in the storage/app/public directory
         $file->storeAs('bangUpdates', $filename);
         $bangUpdate = new BangUpdate();
         $bangUpdate->caption = $request->body;
@@ -427,7 +414,6 @@ Route::middleware('auth:api')->group(function () {
         $bangUpdate->filename = $filename;
         $bangUpdate->type = $request->type;
         $bangUpdate->save();
-        // Redirect back or show a success message
         return response()->json(['BangUpdateID' => $bangUpdate->id], 200);
     });
 
