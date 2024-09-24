@@ -1263,7 +1263,6 @@ Route::middleware('auth:api')->group(function () {
     });
 
     Route::get('/hobbies', function (Request $request) {
-        // Retrieve hobbies with the count of associated users
         $hobbies = Hobby::withCount('users')
                         ->orderByDesc('users_count')
                         ->get(['id', 'name']);
@@ -1274,7 +1273,6 @@ Route::middleware('auth:api')->group(function () {
 
     Route::get('/notificationIsRead/{notification_id}', function ($notification_id) {
         $notification = Notification::find($notification_id);
-
         if ($notification) {
             $notification->is_read = true; // Assuming you have an "is_read" column
             $notification->save();
@@ -1331,27 +1329,35 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/setUserProfile', function (request $request) {
         $user = User::findOrFail($request->user_id);
-        // Update the user's profile
         if ($request->hasFile('image')) {
-            // Save the profile picture and get its path
             $profilePicturePath = $request->file('image')->store('profile_pictures');
             $user->image = $profilePicturePath;
         }
-        if (json_decode($request->hobbies) > 0) {
-            foreach (json_decode($request->hobbies) as $key => $value) {
-                UserHobby::create(['user_id' => $user->id, 'hobby_id' => $value]);
+        if ($request->filled('hobbies')) {
+            $hobbies = json_decode($request->hobbies);
+            if (is_array($hobbies) && count($hobbies) > 0) {
+                UserHobby::where('user_id', $user->id)->delete();
+                foreach ($hobbies as $hobbyId) {
+                    UserHobby::create(['user_id' => $user->id, 'hobby_id' => $hobbyId]);
+                }
             }
         }
-        if (!empty($request->input('name'))) {
+        if ($request->filled('name')) {
             $user->name = $request->input('name');
         }
-        $user->date_of_birth = $request->input('date_of_birth');
-        $user->phone_number = $request->input('phoneNumber');
-        $user->occupation = $request->input('occupation');
-        $user->bio = $request->input('bio');
+        if ($request->filled('date_of_birth')) {
+            $user->date_of_birth = $request->input('date_of_birth');
+        }
+        if ($request->filled('occupation')) {
+            $user->occupation = $request->input('occupation');
+        }
+        if ($request->filled('bio')) {
+            $user->bio = $request->input('bio');
+        }
         $user->update();
         return response()->json(['message' => 'Profile updated successfully']);
     });
+    
 
 
     Route::post('/postBattleComment', function (request $request, Post $post) {
