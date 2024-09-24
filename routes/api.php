@@ -1270,7 +1270,6 @@ Route::middleware('auth:api')->group(function () {
         return response()->json($hobbies);
     });
 
-
     Route::get('/notificationIsRead/{notification_id}', function ($notification_id) {
         $notification = Notification::find($notification_id);
         if ($notification) {
@@ -1719,7 +1718,7 @@ Route::post('/sendNotification12', function (Request $request) {
 });
 
 
-Route::get('/deleteAccount/{userId}', function ($userId) {
+Route::get('/deleteUserAccount/{userId}', function ($userId) {
     $user = User::findOrFail($userId);
     // Delete user's posts and associated images
     $user->posts->each(function ($post) {
