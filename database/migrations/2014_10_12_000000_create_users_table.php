@@ -23,6 +23,13 @@ class CreateUsersTable extends Migration
             $table->boolean('public')->default(0); 
             $table->boolean('subscribe')->default(0); 
             $table->string('password');
+            $table->string('phone_number')->nullable();
+            $table->string('country_code')->nullable();
+            $table->string('date_of_birth')->nullable();
+            $table->enum('status')->nullable();
+            $table->string('occupation')->nullable();
+            $table->string('bio')->nullable();
+            $table->integer('role_id')->nullable();
             $table->string('device_token');
             $table->decimal('price')->nullable();
             $table->decimal('subscriptionPrice')->nullable();

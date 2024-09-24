@@ -34,7 +34,6 @@ class AuthenticationController extends Controller
                             $fail('The ' . $attribute . ' has already been taken.');
                         }
                     }
-
             ],
             'password' => ['required', 'string', 'min:6', 'max:30'],
             'phone_number' => [
@@ -71,7 +70,8 @@ class AuthenticationController extends Controller
         }
         $user = User::create([
             'email'=> $request->user_email,
-            'phone_number' => $request->user_phone,
+            'phone_number' => $request->phone_number,
+            'country_code' => $request->country_code,
             'image'=> $request->user_picture,
             'name' => $request->user_name,
             'role_id'=>3,
