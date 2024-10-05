@@ -33,6 +33,7 @@ class CreateUsersTable extends Migration
             $table->string('device_token');
             $table->decimal('price')->nullable();
             $table->decimal('subscriptionPrice')->nullable();
+            $table->timestamp('last_seen')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

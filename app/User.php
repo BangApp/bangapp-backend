@@ -52,7 +52,7 @@ class User extends Authenticatable implements JWTSubject
         'email_verified_at' => 'datetime',
     ];
 
-    protected $appends = ['followerCount', 'followingCount', 'followingMe', 'followed','user_image_url','postCount','friendsCount'];
+    protected $appends = ['followerCount', 'followingCount', 'followingMe', 'followed','user_image_url','postCount','friendsCount','lastSeen'];
 
     public function posts()
     {
@@ -135,6 +135,12 @@ class User extends Authenticatable implements JWTSubject
                 ->where('confirmed', true)
                 ->count();
     }
+
+    public function getLastSeenAttribute($value)
+    {
+        return (new Carbon($value))->diffForHumans();
+    }
+    
     public function follow(User $user)
     {
         if ($this->following()->where('following_id', $user->id)->count() > 0) {

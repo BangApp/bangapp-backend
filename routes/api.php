@@ -1459,26 +1459,22 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/reportPost', function(Request $request) {
         $request->validate([
-            'post_id' => 'required|exists:posts,id', // Ensure the post_id exists in the posts table
-            'reason' => 'required|string|max:255', // Validate the reason for reporting
-            'user_id' => 'required|exists:users,id', // Ensure the user_id exists in the users table
+            'post_id' => 'required|exists:posts,id', 
+            'reason' => 'required|string|max:255', 
+            'user_id' => 'required|exists:users,id',
         ]);
-
-        // Check if the user has already reported this post
         $existingReport = ReportedPost::where('post_id', $request->post_id)
-                                      ->where('user_id', $request->user_id) // Use user_id from request
+                                      ->where('user_id', $request->user_id) 
                                       ->first();
 
         if ($existingReport) {
             return response()->json(['message' => 'You have already reported this post.'], 400);
         }
-
         $reportedPost = new ReportedPost();
         $reportedPost->post_id = $request->post_id;
         $reportedPost->user_id = $request->user_id;
         $reportedPost->reason = $request->reason;
         $reportedPost->save();
-
         return response()->json(['message' => 'Post reported successfully.'], 200);
     });
 
@@ -1713,7 +1709,6 @@ Route::post('/sendNotification12', function (Request $request) {
     $deviceToken = $user->device_token;
     $pushNotificationService = new PushNotificationService();
     $notify =  $pushNotificationService->sendPushNotification($deviceToken, $request->heading, $request->body, $request->challengeId, $request->type);
-    // $pushNotificationService->sendPushNotification12($deviceToken, $request->heading, $request->body, $request->challengeId, $request->type);
     return response()->json(['message' => $notify]);
 });
 
@@ -1801,14 +1796,11 @@ Route::get('/deleteUserAccount/{userId}', function ($userId) {
     // Delete user's posts if exist
     if ($user->posts()->exists()) {
         $user->posts()->each(function ($post) {
-
             $post->delete();
         });
     }
-
     // Finally, delete the user
     $user->delete();
-
     return response()->json(['message' => 'User account deleted successfully'], 200);
 });
 
@@ -1836,9 +1828,7 @@ Route::post('/buyFollowers', function (Request $request) {
             ->limit($count)
             ->pluck('user_id')
             ->toArray();
-        
         $followersAdded = 0;
-
         foreach ($users as $followerUserId) {
             if (!Follower::where('following_id', $user_id)->where('follower_id', $followerUserId)->exists()) {
                 $follower = new Follower();
@@ -1854,30 +1844,38 @@ Route::post('/buyFollowers', function (Request $request) {
     }
 });
 
+Route::post('/updateLastSeen', function(Request $request){
+    $user_id = $request->user_id;
+    $user = User::find($request->user_id);
+    // Update the last seen timestamp
+    $user->last_seen = now();
+    if( $user->save()){
+        return response()->json(['message' => 'Last seen updated successfully'],200);
+    }
+    else{
+        return response()->json(['message' => 'Last seen Not updated'], 400);
+    }
+});
+
 
 
 Route::post('/getSuggestedFriends', function(Request $request){
     $user_id = $request->user_id;
     $contacts = $request->contacts;
     $userHobbies = UserHobby::where('user_id', $user_id)->pluck('hobby_id');
-
     $usersByHobbies = UserHobby::whereIn('hobby_id', $userHobbies)
                                 ->where('user_id', '!=', $user_id)
                                 ->pluck('user_id');
-
-     // Fetch friends IDs where the user is a friend or has been added as a friend
     $friendIds = friends::where(function ($query) use ($user_id) {
                             $query->where('user_id', $user_id)
                                   ->orWhere('friend_id', $user_id);
                         })
                         ->pluck('user_id', 'friend_id','confirmed')
                         ->toArray();
-
     $suggestedFriends = User::select('id', 'name')
                             ->whereIn('phone_number', $contacts)
                             ->orWhereIn('id', $usersByHobbies)
                             ->get();
-     // Iterate through suggested friends and check if they are friends or added as friends
     $suggestedFriends->each(function ($friend) use ($user_id, $friendIds) {
         $friend->is_friend = isset($friendIds[$friend->id]);
         $friend->friend_added = isset($friendIds[$friend->id]) ? true : false;
