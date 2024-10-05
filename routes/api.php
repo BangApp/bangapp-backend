@@ -2055,7 +2055,7 @@ Route::post('/add5HobbiesToUser', function(Request $request){
     $users = User::find($request->user_id);
     $hobbies = Hobby::all();
     $randomHobbyIds = $hobbies->random(5)->pluck('id');
-    $user->hobbies()->attach($randomHobbyIds);
+    $users->hobbies()->attach($randomHobbyIds);
     return response()->json(['message' => '5 random hobbies added to users successfully']);
 });
 
