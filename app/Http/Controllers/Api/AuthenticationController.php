@@ -10,8 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Unique;
-
-
+use App\Hobby;
 
 class AuthenticationController extends Controller
 {
