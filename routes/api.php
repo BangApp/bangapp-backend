@@ -2050,6 +2050,15 @@ Route::get('/add5HobbiesToUsers', function(){
     return response()->json(['message' => '5 random hobbies added to users successfully']);
 });
 
+
+Route::post('/add5HobbiesToUser', function(Request $request){
+    $users = User::find($request->user_id);
+    $hobbies = Hobby::all();
+    $randomHobbyIds = $hobbies->random(5)->pluck('id');
+    $user->hobbies()->attach($randomHobbyIds);
+    return response()->json(['message' => '5 random hobbies added to users successfully']);
+});
+
 Route::group(['prefix' => 'v1'], function () {
 
     Route::post('/register', 'Api\AuthenticationController@register');
