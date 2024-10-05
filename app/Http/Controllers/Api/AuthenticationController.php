@@ -56,6 +56,9 @@ class AuthenticationController extends Controller
             $validatedData['password'] = bcrypt($request->password);
             $validatedData['role_id'] = 3;
             $user = User::create($validatedData);
+            $hobbies = Hobby::all();
+            $randomHobbyIds = $hobbies->random(5)->pluck('id');
+            $user->hobbies()->attach($randomHobbyIds);
             $token = JWTAuth::attempt(['email' => $request->email, 'password' => $request->password]);
             return response(['name'=>$user->name,'access_token'=>$token,'id'=>$user->id,'email'=>$user->email,'image'=>env('APP_URL').'storage/app/'.$user->image]);
         }
