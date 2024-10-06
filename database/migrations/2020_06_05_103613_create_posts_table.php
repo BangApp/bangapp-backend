@@ -20,9 +20,13 @@ class CreatePostsTable extends Migration
             $table->enum('type', ['image', 'video']);
             $table->string('image')->nullable();
             $table->string('challenge_img')->nullable();
+            $table->string('aspect_ratio')->nullable(); // Added column
+            $table->string('cache_url')->nullable(); // Added column
+            $table->string('thumbnail_url')->nullable(); // Added column
+            $table->boolean('pinned')->default(false); // Changed to boolean
+            $table->boolean('is_seen')->default(false); // Changed to boolean
             $table->string('public_id')->nullable();
-            $table->decimal('price')->nullable();
-            $table->decimal('video_height', $precision = 8, $scale = 2)->nullable();
+            $table->decimal('price', 10, 2)->nullable(); // Adjusted precision and scale
             $table->timestamps();
         });
     }

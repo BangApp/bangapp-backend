@@ -34,6 +34,7 @@ class CreateUsersTable extends Migration
             $table->decimal('price')->nullable();
             $table->decimal('subscriptionPrice')->nullable();
             $table->timestamp('last_seen')->nullable();
+            $table->boolean('isOnline')->default(0);
             $table->rememberToken();
             $table->timestamps();
         });

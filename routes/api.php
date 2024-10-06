@@ -36,6 +36,7 @@ use App\UpdateCommentReplies;
 use App\BattleLike;
 use App\BlockedUser;
 use App\FewerPost;
+use App\Models\SavedPost; 
 use Illuminate\Validation\Rule;
 use App\Http\Controllers\PushNotificationService;
 use App\Http\Controllers\FlutterwaveController;
@@ -1845,9 +1846,7 @@ Route::post('/buyFollowers', function (Request $request) {
 });
 
 Route::post('/updateLastSeen', function(Request $request){
-    $user_id = $request->user_id;
     $user = User::find($request->user_id);
-    // Update the last seen timestamp
     $user->last_seen = now();
     if( $user->save()){
         return response()->json(['message' => 'Last seen updated successfully'],200);
@@ -1856,6 +1855,19 @@ Route::post('/updateLastSeen', function(Request $request){
         return response()->json(['message' => 'Last seen Not updated'], 400);
     }
 });
+
+Route::post('/updateOnlineStatus', function(Request $request){
+    $user = User::find($request->user_id);
+    $user->last_seen = $request->isOnline;
+    if( $user->save()){
+        return response()->json(['message'=> 'Online status updated successfully'],200);
+    }
+    else{
+        return response()->json(['message'=> 'Online status not updated']);
+    }
+});
+
+
 
 
 
@@ -2055,6 +2067,50 @@ Route::post('/add5HobbiesToUser', function(Request $request){
     $randomHobbyIds = $hobbies->random(5)->pluck('id');
     $users->hobbies()->attach($randomHobbyIds);
     return response()->json(['message' => '5 random hobbies added to users successfully']);
+});
+
+Route::post('/savePost', function(Request $request){
+    $validator = Validator::make($request->all(), [
+        'user_id' => 'required|exists:users,id',
+        'post_id' => 'required|exists:posts,id',
+    ]);
+    if ($validator->fails()) {
+        return response()->json([
+            'success' => false,
+            'errors' => $validator->errors(),
+        ], 400);
+    }
+    $savedPost = SavedPost::create([
+        'user_id' => $request->user_id,
+        'post_id' => $request->post_id,
+    ]);
+    return response()->json(['success' => true,'data' => $savedPost], 201);
+});
+
+Route::get('/getSavedPosts/{userId}',function($userId){
+    if (!is_numeric($userId)) {
+        return response()->json(['success' => false,'message' => 'Invalid user ID.'], 400);
+    }
+    $savedPosts = SavedPost::where('user_id', $userId)
+        ->with('post')
+        ->get();
+    if ($savedPosts->isEmpty()) {return response()->json(['success' => true,'data' => [],'message' => 'No saved posts found for this user.',], 200);}
+    return response()->json(['success' => true,'data' => $savedPosts,], 200);
+});
+
+Route::post('/uploadFile', function(Request $request){
+    $request->validate([
+        'file' => 'required|file|max:50480',
+    ]);
+    $path = $request->file('file')->store('uploads');
+    $file = File::create([
+        'user_id'   => $request->user_id,
+        'file_name' => $request->file('file')->getClientOriginalName(),
+        'file_path' => $path,
+        'file_type' => $request->file('file')->getClientMimeType(),
+        'file_size' => $request->file('file')->getSize(),
+    ]);
+    return response()->json(['success' => true, 'data' => $file], 201);
 });
 
 Route::group(['prefix' => 'v1'], function () {
