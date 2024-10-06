@@ -1860,6 +1860,7 @@ Route::post('/updateLastSeen', function(Request $request){
 Route::post('/updateOnlineStatus', function(Request $request){
     $user = User::find($request->user_id);
     $user->isOnline = $request->isOnline;
+    $user->last_seen = now();
     if( $user->save()){
         return response()->json(['message'=> 'Online status updated successfully'],200);
     }
@@ -1867,10 +1868,6 @@ Route::post('/updateOnlineStatus', function(Request $request){
         return response()->json(['message'=> 'Online status not updated']);
     }
 });
-
-
-
-
 
 Route::post('/getSuggestedFriends', function(Request $request){
     $user_id = $request->user_id;
