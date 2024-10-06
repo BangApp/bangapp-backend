@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('file_path');
             $table->string('file_type');
             $table->unsignedBigInteger('file_size');
+            $table->text('body')->nullable();
             $table->boolean('pinned')->default(false); 
             $table->decimal('price', 10, 2)->nullable();
             $table->timestamps();

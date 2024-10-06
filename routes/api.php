@@ -1858,7 +1858,7 @@ Route::post('/updateLastSeen', function(Request $request){
 
 Route::post('/updateOnlineStatus', function(Request $request){
     $user = User::find($request->user_id);
-    $user->last_seen = $request->isOnline;
+    $user->isOnline = $request->isOnline;
     if( $user->save()){
         return response()->json(['message'=> 'Online status updated successfully'],200);
     }
@@ -2105,6 +2105,7 @@ Route::post('/uploadFile', function(Request $request){
     $path = $request->file('file')->store('uploads');
     $file = File::create([
         'user_id'   => $request->user_id,
+        'body'      => $request->caption,
         'file_name' => $request->file('file')->getClientOriginalName(),
         'file_path' => $path,
         'file_type' => $request->file('file')->getClientMimeType(),
