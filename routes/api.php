@@ -37,7 +37,7 @@ use App\BattleLike;
 use App\BlockedUser;
 use App\FewerPost;
 use App\File;
-use App\Models\SavedPost; 
+use App\Models\SavedPost;
 use Illuminate\Validation\Rule;
 use App\Http\Controllers\PushNotificationService;
 use App\Http\Controllers\FlutterwaveController;
@@ -103,7 +103,7 @@ Route::post('/videoAddServer', function (Request $request) {
         $bangUpdate->thumbnail_url = $request->thumbnail_url;
         $bangUpdate->save();
     }
-  
+
     return response()->json(['url' => $request->path], 201);
 });
 
@@ -335,6 +335,31 @@ Route::middleware('auth:api')->group(function () {
         }
     });
 
+    Route::post('/updateIsSeenArray', function (Request $request) {
+        $userId = $request->input('userId');
+        $postIds = $request->input('postIds'); // Expecting an array of post IDs
+
+        $responses = [];
+
+        foreach ($postIds as $postId) {
+            $existingRecord = PostView::where('user_id', $userId)
+                ->where('post_id', $postId)
+                ->exists();
+
+            if (!$existingRecord) {
+                PostView::create([
+                    'user_id' => $userId,
+                    'post_id' => $postId,
+                ]);
+                $responses[] = ['postId' => $postId, 'status' => true, 'message' => 'Record created successfully'];
+            } else {
+                $responses[] = ['postId' => $postId, 'status' => false, 'message' => 'Post has already been seen'];
+            }
+        }
+
+        return response()->json($responses);
+    });
+
     Route::get('/updateBangUpdateIsSeen/{bangUpdateId}/{userId}', function ($bangUpdateId, $userId) {
         $existingRecord = BangUpdateView::where('user_id', $userId)
             ->where('bang_update_id', $bangUpdateId)
@@ -348,6 +373,31 @@ Route::middleware('auth:api')->group(function () {
         } else {
             return response()->json(['status' => false, 'message' => 'Bang update has already been seen']);
         }
+    });
+
+    Route::post('/updateBangUpdatesIsSeenArray', function (Request $request) {
+        $userId = $request->input('userId');
+        $bangUpdateIds = $request->input('bangUpdateIds'); // Expecting an array of bang update IDs
+
+        $responses = [];
+
+        foreach ($bangUpdateIds as $bangUpdateId) {
+            $existingRecord = BangUpdateView::where('user_id', $userId)
+                ->where('bang_update_id', $bangUpdateId)
+                ->exists();
+
+            if (!$existingRecord) {
+                BangUpdateView::create([
+                    'user_id' => $userId,
+                    'bang_update_id' => $bangUpdateId,
+                ]);
+                $responses[] = ['bangUpdateId' => $bangUpdateId, 'status' => true, 'message' => 'Record created successfully'];
+            } else {
+                $responses[] = ['bangUpdateId' => $bangUpdateId, 'status' => false, 'message' => 'Bang update has already been seen'];
+            }
+        }
+
+        return response()->json($responses);
     });
 
 
@@ -477,7 +527,7 @@ Route::middleware('auth:api')->group(function () {
         return response()->json($formattedInspirations);
     });
 
-    
+
     Route::get('/get/bangInspirations/{videoId}', function ($videoId) {
         $appUrl = "https://bangapp.pro/BangAppBackend/";
         // Retrieve the Video model instance by its ID
@@ -524,7 +574,7 @@ Route::middleware('auth:api')->group(function () {
         //         $join->on('friends.friend_id', '=', 'users.id')
         //              ->where('users.subscribe', 0);
         //     })->pluck('user_id', 'friend_id')
-        //     ->toArray();        
+        //     ->toArray();
 
            $subscribeUserIds = azampay::where('type', 'message')->whereDate('created_at', '<=', now()->subDays(30))->where('user_id', $user_id)->pluck('post_id')->toArray();
 
@@ -751,7 +801,7 @@ Route::middleware('auth:api')->group(function () {
         return response(['data' => $posts, 'message' => 'success'], 200);
     });
 
-    
+
 
     Route::delete('/deletePost/{id}', function ($id) {
         // Find the post by ID
@@ -1188,7 +1238,7 @@ Route::middleware('auth:api')->group(function () {
                 $query->select('id', 'name', 'image');
             },
         ])->findOrFail($comment->id);
-        if ($commentUser->user->id <> $request->user_id) { 
+        if ($commentUser->user->id <> $request->user_id) {
              Log::info('uhakika naingia kwenye video');
             $pushNotificationService = new PushNotificationService();
             $pushNotificationService->sendPushNotification($commentUser->user->device_token, $comment->user->name, commentReplyMessage(), $request->post_id, 'comment',$comment->user->name,$comment->user->id);
@@ -1212,7 +1262,7 @@ Route::middleware('auth:api')->group(function () {
                 $query->select('id', 'name', 'image');
             },
         ])->findOrFail($updateComment->id);
-        
+
         return response(['data' => $updateComment, 'message' => 'success'], 200);
     });
 
@@ -1220,7 +1270,7 @@ Route::middleware('auth:api')->group(function () {
         $request->validate([
             'body' => 'string|max:6000',
         ]);
-       
+
         $user = User::find($request->user_id);
         $battleComment = BattleCommentReplies::create([
             'user_id' => $request->user_id,
@@ -1232,7 +1282,7 @@ Route::middleware('auth:api')->group(function () {
                 $query->select('id', 'name', 'image');
             },
         ])->findOrFail($battleComment->id);
-        
+
         return response(['data' => $battleComment, 'message' => 'success'], 200);
     });
 
@@ -1358,7 +1408,7 @@ Route::middleware('auth:api')->group(function () {
         $user->update();
         return response()->json(['message' => 'Profile updated successfully']);
     });
-    
+
 
 
     Route::post('/postBattleComment', function (request $request, Post $post) {
@@ -1461,12 +1511,12 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/reportPost', function(Request $request) {
         $request->validate([
-            'post_id' => 'required|exists:posts,id', 
-            'reason' => 'required|string|max:255', 
+            'post_id' => 'required|exists:posts,id',
+            'reason' => 'required|string|max:255',
             'user_id' => 'required|exists:users,id',
         ]);
         $existingReport = ReportedPost::where('post_id', $request->post_id)
-                                      ->where('user_id', $request->user_id) 
+                                      ->where('user_id', $request->user_id)
                                       ->first();
 
         if ($existingReport) {
@@ -1529,13 +1579,13 @@ Route::middleware('auth:api')->group(function () {
 
         if (!function_exists('getUniqueValues')) {
 
-            function getUniqueValues($user_id) 
+            function getUniqueValues($user_id)
             {
                 $user_friends_id = friends::where('user_id', $user_id)
                     ->orWhere('friend_id', $user_id)
                     ->where('confirmed', 1)
                     ->pluck('user_id', 'friend_id')
-                    ->toArray(); 
+                    ->toArray();
                 $user_friends_id = friends::where(function($query) use ($user_id) {
                     $query->where('user_id', $user_id)
                           ->orWhere('friend_id', $user_id);
@@ -1546,7 +1596,7 @@ Route::middleware('auth:api')->group(function () {
                          ->where('users.subscribe', 0);
                 })
                 ->pluck('user_id', 'friend_id')
-                ->toArray();            
+                ->toArray();
                 $user_follow_id = Follower::where('follower_id', $user_id)
                     ->pluck('following_id')
                     ->toArray();
@@ -1555,11 +1605,11 @@ Route::middleware('auth:api')->group(function () {
                     ->where('user_id', $user_id)
                     ->pluck('post_id')
                     ->toArray();
-        
+
                 // Extract values and keys from the friends array
                 $user_friends_values = array_values($user_friends_id);
                 $user_friends_keys = array_keys($user_friends_id);
-                
+
                 // Merge all arrays and convert keys to strings
                 $mergedArray = array_merge(
                     array_map('strval', $user_friends_values),
@@ -1567,11 +1617,11 @@ Route::middleware('auth:api')->group(function () {
                     array_map('strval', $user_subscribe_id),
                     array_map('strval', $user_friends_keys)
                 );
-        
+
                 // Return unique values
                 return array_unique($mergedArray);
             }
-        
+
         }
 
         if (!function_exists('deleteVideoApi')) {
@@ -1581,7 +1631,7 @@ Route::middleware('auth:api')->group(function () {
         Log::info('uhakika naingia kwenye video');
         Log::info($uid);
         $apiUrl = "https://video.bangapp.pro/api/v1/delete-video";
-        
+
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
@@ -1837,7 +1887,7 @@ Route::post('/buyFollowers', function (Request $request) {
                 $follower->following_id = $user_id;
                 $follower->follower_id = $followerUserId;
                 $follower->save();
-                $followersAdded++; 
+                $followersAdded++;
             }
         }
         return response()->json(['message' => 'Followers added successfully', 'followers_added' => $followersAdded]);
@@ -1951,9 +2001,9 @@ Route::get('/allFriends/{user_id}', function($user_id){
 
 Route::get('/allFollowers/{user_id}', function($user_id){
     $user = User::findOrFail($user_id);
-    
+
     $followers = $user->followers()->get();
-    
+
     return response()->json(['followers' =>$followers]);
 });
 
