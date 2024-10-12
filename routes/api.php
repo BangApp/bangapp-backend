@@ -337,8 +337,10 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/updateIsSeenArray', function (Request $request) {
         $userId = $request->input('userId');
-        $postIds = $request->input('postIds'); // Expecting an array of post IDs
+        $postIds = json_decode($request->input('postIds'), true); // Expecting an array of post IDs
 
+
+     
         $responses = [];
 
         foreach ($postIds as $postId) {
@@ -377,7 +379,7 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/updateBangUpdatesIsSeenArray', function (Request $request) {
         $userId = $request->input('userId');
-        $bangUpdateIds = $request->input('bangUpdateIds'); // Expecting an array of bang update IDs
+        $bangUpdateIds = json_decode($request->input('bangUpdateIds'), true);// Expecting an array of bang update IDs
 
         $responses = [];
 
