@@ -2152,6 +2152,8 @@ Route::post('/uploadFile', function(Request $request){
     $file = File::create([
         'user_id'   => $request->user_id,
         'body'      => $request->caption,
+        'pinned'    => $request->pinned,
+        'price'     => $request->price,
         'file_name' => $request->file('file')->getClientOriginalName(),
         'file_path' => $path,
         'file_type' => $request->file('file')->getClientMimeType(),
