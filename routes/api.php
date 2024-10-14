@@ -37,7 +37,7 @@ use App\BattleLike;
 use App\BlockedUser;
 use App\FewerPost;
 use App\File;
-use App\Models\SavedPost;
+use App\SavedPost;
 use Illuminate\Validation\Rule;
 use App\Http\Controllers\PushNotificationService;
 use App\Http\Controllers\FlutterwaveController;
