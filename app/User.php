@@ -222,7 +222,7 @@ class User extends Authenticatable implements JWTSubject
             return $remainingDays;
         }
 
-        return 0; // No active subscription found
+        return 0; 
     }
 
     public static function hasUserPaid($userId, $viewerId)

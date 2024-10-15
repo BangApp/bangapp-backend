@@ -2112,6 +2112,10 @@ Route::post('/uploadFile', function(Request $request){
     return response()->json(['success' => true, 'data' => $file], 201);
 });
 
+Route::get('/getFileUploads/{userId}', function($userId){
+    
+});
+
 Route::group(['prefix' => 'v1'], function () {
 
     Route::post('/register', 'Api\AuthenticationController@register');
