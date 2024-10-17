@@ -2163,10 +2163,15 @@ Route::post('/uploadFile', function(Request $request){
 });
 
 Route::get('/getFileUploads/{userId}/{perPage}', function($userId,$perPage) {
+    $baseUrl = 'https://bangapp.pro/BangAppBackend/storage/app/'; 
     $files = File::where('user_id', $userId)->paginate($perPage);
     if ($files->isEmpty()) {
         return response()->json(['success' => false, 'message' => 'No files found for this user.'], 404);
     }
+    $filesData = $files->items()->map(function ($file) use ($baseUrl) {
+        $file->file_path = $baseUrl . $file->file_path;
+        return $file;
+    });
     return response()->json([
         'success' => true,
         'data' => $files->items(), 
