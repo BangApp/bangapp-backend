@@ -2162,7 +2162,7 @@ Route::post('/uploadFile', function(Request $request){
     return response()->json(['success' => true, 'data' => $file], 201);
 });
 
-Route::get('/getFileUploads/{userId}/{perPage}', function($userId) {
+Route::get('/getFileUploads/{userId}/{perPage}', function($userId,$perPage) {
     $files = File::where('user_id', $userId)->paginate($perPage);
     if ($files->isEmpty()) {
         return response()->json(['success' => false, 'message' => 'No files found for this user.'], 404);
