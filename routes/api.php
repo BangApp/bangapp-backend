@@ -2162,8 +2162,18 @@ Route::post('/uploadFile', function(Request $request){
     return response()->json(['success' => true, 'data' => $file], 201);
 });
 
-Route::get('/getFileUploads/{userId}', function($userId){
-    
+Route::get('/getFileUploads/{userId}/{perPage}', function($userId) {
+    $files = File::where('user_id', $userId)->paginate($perPage);
+    if ($files->isEmpty()) {
+        return response()->json(['success' => false, 'message' => 'No files found for this user.'], 404);
+    }
+    return response()->json([
+        'success' => true,
+        'data' => $files->items(), 
+        'current_page' => $files->currentPage(),
+        'last_page' => $files->lastPage(),
+        'total' => $files->total(),
+    ], 200);
 });
 
 Route::group(['prefix' => 'v1'], function () {
