@@ -2162,24 +2162,29 @@ Route::post('/uploadFile', function(Request $request){
     return response()->json(['success' => true, 'data' => $file], 201);
 });
 
-Route::get('/getFileUploads/{userId}/{perPage}', function($userId,$perPage) {
+Route::get('/getFileUploads/{userId}/{perPage}', function($userId, $perPage) {
     $baseUrl = 'https://bangapp.pro/BangAppBackend/storage/app/'; 
     $files = File::where('user_id', $userId)->paginate($perPage);
+
     if ($files->isEmpty()) {
         return response()->json(['success' => false, 'message' => 'No files found for this user.'], 404);
     }
-    $filesData = $files->items()->map(function ($file) use ($baseUrl) {
+
+    // Convert items to a collection and modify the file_path
+    $filesData = collect($files->items())->map(function ($file) use ($baseUrl) {
         $file->file_path = $baseUrl . $file->file_path;
         return $file;
     });
+
     return response()->json([
         'success' => true,
-        'data' => $files->items(), 
+        'data' => $filesData, // Use the modified file data
         'current_page' => $files->currentPage(),
         'last_page' => $files->lastPage(),
         'total' => $files->total(),
     ], 200);
 });
+
 
 Route::group(['prefix' => 'v1'], function () {
 
