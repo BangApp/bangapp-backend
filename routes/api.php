@@ -1198,8 +1198,6 @@ Route::middleware('auth:api')->group(function () {
         ]);
         $post = Post::find($request->post_id);
         $user = User::find($request->user_id);
-
-
         $comment = Comment::create([
             'user_id' => $request->user_id,
             'post_id' => $request->post_id,
@@ -1255,7 +1253,7 @@ Route::middleware('auth:api')->group(function () {
             $pushNotificationService->sendPushNotification($commentUser->user->device_token, $comment->user->name, commentReplyMessage(), $request->post_id, 'comment',$comment->user->name,$comment->user->id);
             saveNotification($request->user_id, commentReplyMessage(), 'commentReply', $post->user->id, $request->post_id,);
          }
-
+        return response(['data' => $comment, 'message' => 'success'], 200);
     });
 
     Route::post('/postUpdateCommentReply', function (Request $request, Post $post) {
