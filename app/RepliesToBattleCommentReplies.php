@@ -5,16 +5,13 @@ namespace App;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-use Carbon\Carbon;
-
-class CommentReplies extends Model
+class RepliesToBattleCommentReplies extends Model
 {
-    use Favorable;
+    use HasFactory;
 
     protected $fillable = [
         'user_id', 'comment_id','body',
     ];
-    
     protected $appends = ['user_image_url'];
 
     public function getCreatedAtAttribute($value) {
@@ -25,9 +22,9 @@ class CommentReplies extends Model
         return $this->belongsTo(User::class,'user_id');
     }
 
-    public function getUserImageUrlAttribute() {
+     public function getUserImageUrlAttribute()
+    {
         $appUrl = "https://bangapp.pro/BangAppBackend/";
         return $appUrl .'storage/app/'.$this->user->image;
     }
-
 }

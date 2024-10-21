@@ -33,6 +33,9 @@ use App\Subscription;
 use App\Notification;
 use App\BattleCommentReplies;
 use App\UpdateCommentReplies;
+use App\RepliesToCommentReplies;
+use App\RepliesToBangUpdateCommentReplies;
+use App\RepliesToBattleCommentReplies;
 use App\BattleLike;
 use App\BlockedUser;
 use App\FewerPost;
@@ -72,8 +75,6 @@ Route::post('imageAddServer', function (Request $request) {
 
     return response()->json(['url' => asset($image->image)], 201);
 });
-
-
 
 Route::post('/videoAddServer', function (Request $request) {
     if($request->location == "post")
@@ -1134,7 +1135,6 @@ Route::middleware('auth:api')->group(function () {
             $post->isLikedA = false;
             $post->isLikedB = false;
             $post->isLiked = false;
-            // Check if the user has liked the post and update isLikedA and isLikedB accordingly
             $likeType = Post::getLikeTypeForUser($user_id, $post->id);
             if ($likeType == "A") {
                 $post->isLikedA = true;
@@ -1151,7 +1151,6 @@ Route::middleware('auth:api')->group(function () {
 
     Route::get('/getUpdateInfo/{post_id}/{user_id}', function ($post_id, $user_id) {
         $appUrl = "https://bangapp.pro/BangAppBackend/";
-        // Get the bang update and include like information for the given user
         $bangUpdate = BangUpdate::where('id', $post_id)
             ->with([
                 'bang_update_likes' => function ($query) use ($user_id) {
@@ -1171,11 +1170,9 @@ Route::middleware('auth:api')->group(function () {
         if (!$bangUpdate) {
             return response()->json(['message' => 'Update not found'], 404);
         }
-        // Format the update and add the isLiked variable
         if ($bangUpdate->type == "image") {
             $bangUpdate->filename = $appUrl . 'storage/app/bangUpdates/' . $bangUpdate->filename;
         }
-        // Check if the user has liked the post
         $bangUpdate->isLiked = DB::table('bang_update_likes')
             ->where('user_id', $user_id)
             ->where('post_id', $bangUpdate->id)
@@ -1201,16 +1198,14 @@ Route::middleware('auth:api')->group(function () {
         ]);
         $post = Post::find($request->post_id);
         $user = User::find($request->user_id);
+
+
         $comment = Comment::create([
             'user_id' => $request->user_id,
             'post_id' => $request->post_id,
             'body' => $request->body,
-        ]);
-        $comment = Comment::with([
-            'user' => function ($query) {
-                $query->select('id', 'name', 'image');
-            },
-        ])->findOrFail($comment->id);
+        ])->load(['user:id,name,image']);
+
         if ($post->user->id <> $request->user_id) {
             $pushNotificationService = new PushNotificationService();
             $pushNotificationService->sendPushNotification($post->user->device_token, $user->name, commentMessage(), $request->post_id, 'comment',$comment->user->name,$comment->user->id);
@@ -1226,18 +1221,14 @@ Route::middleware('auth:api')->group(function () {
         $post = Post::find($request->post_id);
         $user = User::find($request->user_id);
         $commentUser = Comment::find($request->comment_id);
+
         $comment = CommentReplies::create([
             'user_id' => $request->user_id,
             'comment_id' => $request->comment_id,
             'body' => $request->body,
-        ]);
-        $comment = CommentReplies::with([
-            'user' => function ($query) {
-                $query->select('id', 'name', 'image');
-            },
-        ])->findOrFail($comment->id);
+        ])->load(['user:id,name,image']);
+
         if ($commentUser->user->id <> $request->user_id) {
-             Log::info('uhakika naingia kwenye video');
             $pushNotificationService = new PushNotificationService();
             $pushNotificationService->sendPushNotification($commentUser->user->device_token, $comment->user->name, commentReplyMessage(), $request->post_id, 'comment',$comment->user->name,$comment->user->id);
             saveNotification($request->user_id, commentReplyMessage(), 'commentReply', $post->user->id, $request->post_id,);
@@ -1245,22 +1236,49 @@ Route::middleware('auth:api')->group(function () {
         return response(['data' => $comment, 'message' => 'success'], 200);
     });
 
-    Route::post('/postUpdateCommentReply', function (request $request, Post $post) {
+    Route::post('/postReplyToCommentReply', function (request $request, Post $post){
         $request->validate([
             'body' => 'string|max:6000',
         ]);
+        $post = Post::find($request->post_id);
         $user = User::find($request->user_id);
+        $commentUser = CommentReplies::find($request->comment_id);
+
+        $comment = RepliesToCommentReplies::create([
+            'user_id' => $request->user_id,
+            'comment_id' => $request->comment_id,
+            'body' => $request->body,
+        ])->load(['user:id,name,image']);
+    
+        if ($commentUser->user->id <> $request->user_id) {
+            $pushNotificationService = new PushNotificationService();
+            $pushNotificationService->sendPushNotification($commentUser->user->device_token, $comment->user->name, commentReplyMessage(), $request->post_id, 'comment',$comment->user->name,$comment->user->id);
+            saveNotification($request->user_id, commentReplyMessage(), 'commentReply', $post->user->id, $request->post_id,);
+         }
+
+    });
+
+    Route::post('/postUpdateCommentReply', function (Request $request, Post $post) {
+        $request->validate([
+            'body' => 'string|max:6000',
+        ]);
         $updateComment = UpdateCommentReplies::create([
             'user_id' => $request->user_id,
             'comment_id' => $request->comment_id,
             'body' => $request->body,
-        ]);
-        $updateComment = UpdateCommentReplies::with([
-            'user' => function ($query) {
-                $query->select('id', 'name', 'image');
-            },
-        ])->findOrFail($updateComment->id);
+        ])->load(['user:id,name,image']);
+        return response(['data' => $updateComment, 'message' => 'success'], 200);
+    });
 
+    Route::post('/postReplyUpdateCommentReply', function (request $request, Post $post){
+        $request->validate([
+            'body' => 'string|max:6000',
+        ]);
+        $updateComment = RepliesToBangUpdateCommentReplies::create([
+            'user_id' => $request->user_id,
+            'comment_id' => $request->comment_id,
+            'body' => $request->body,
+        ])->load(['user:id,name,image']);
         return response(['data' => $updateComment, 'message' => 'success'], 200);
     });
 
@@ -1269,18 +1287,24 @@ Route::middleware('auth:api')->group(function () {
             'body' => 'string|max:6000',
         ]);
 
-        $user = User::find($request->user_id);
         $battleComment = BattleCommentReplies::create([
             'user_id' => $request->user_id,
             'comment_id' => $request->comment_id,
             'body' => $request->body,
-        ]);
-        $battleComment = BattleCommentReplies::with([
-            'user' => function ($query) {
-                $query->select('id', 'name', 'image');
-            },
-        ])->findOrFail($battleComment->id);
+        ])->load(['user:id,name,image']);
 
+        return response(['data' => $battleComment, 'message' => 'success'], 200);
+    });
+
+    Route::post('/postReplyBattleCommentReply', function(Request $request, Post $post){
+        $request->validate([
+            'body' => 'string|max:6000',
+        ]);
+        $battleComment = RepliesToBattleCommentReplies::create([
+            'user_id' => $request->user_id,
+            'comment_id' => $request->comment_id,
+            'body' => $request->body,
+        ])->load(['user:id,name,image']);
         return response(['data' => $battleComment, 'message' => 'success'], 200);
     });
 
@@ -1292,13 +1316,7 @@ Route::middleware('auth:api')->group(function () {
             'user_id' => $request->user_id,
             'post_id' => $request->post_id,
             'body' => $request->body,
-        ]);
-        $comment = bangUpdateComment::with([
-            'user' => function ($query) {
-                $query->select('id', 'name', 'image');
-            },
-        ])->findOrFail($comment->id);
-        // $post->user->notify(new CommentedOnYourPost($post, auth()->user()));
+        ])->load(['user:id,name,image']);
         return response(['data' => $comment, 'message' => 'success'], 200);
     });
 
@@ -2162,6 +2180,8 @@ Route::post('/uploadFile', function(Request $request){
     return response()->json(['success' => true, 'data' => $file], 201);
 });
 
+
+
 Route::get('/getFileUploads/{userId}/{perPage}', function($userId, $perPage) {
     $baseUrl = 'https://bangapp.pro/BangAppBackend/storage/app/'; 
     $files = File::where('user_id', $userId)->paginate($perPage);
@@ -2170,7 +2190,6 @@ Route::get('/getFileUploads/{userId}/{perPage}', function($userId, $perPage) {
         return response()->json(['success' => false, 'message' => 'No files found for this user.'], 404);
     }
 
-    // Convert items to a collection and modify the file_path
     $filesData = collect($files->items())->map(function ($file) use ($baseUrl) {
         $file->file_path = $baseUrl . $file->file_path;
         return $file;
