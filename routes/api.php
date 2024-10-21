@@ -1192,6 +1192,26 @@ Route::middleware('auth:api')->group(function () {
         return response()->json(['comments' => $comments]);
     });
 
+    // Route::post('/postComment', function (request $request, Post $post) {
+    //     $request->validate([
+    //         'body' => 'string|max:6000',
+    //     ]);
+    //     $post = Post::find($request->post_id);
+    //     $user = User::find($request->user_id);
+    //     $comment = Comment::create([
+    //         'user_id' => $request->user_id,
+    //         'post_id' => $request->post_id,
+    //         'body' => $request->body,
+    //     ])->load(['user:id,name,image']);
+
+    //     if ($post->user->id <> $request->user_id) {
+    //         $pushNotificationService = new PushNotificationService();
+    //         $pushNotificationService->sendPushNotification($post->user->device_token, $user->name, commentMessage(), $request->post_id, 'comment',$comment->user->name,$comment->user->id);
+    //         saveNotification($request->user_id, commentMessage(), 'comment', $post->user->id, $request->post_id);
+    //     }
+    //     return response(['data' => $comment, 'message' => 'success'], 200);
+    // });
+
     Route::post('/postComment', function (request $request, Post $post) {
         $request->validate([
             'body' => 'string|max:6000',
@@ -1202,8 +1222,12 @@ Route::middleware('auth:api')->group(function () {
             'user_id' => $request->user_id,
             'post_id' => $request->post_id,
             'body' => $request->body,
-        ])->load(['user:id,name,image']);
-
+        ]);
+        $comment = Comment::with([
+            'user' => function ($query) {
+                $query->select('id', 'name', 'image');
+            },
+        ])->findOrFail($comment->id);
         if ($post->user->id <> $request->user_id) {
             $pushNotificationService = new PushNotificationService();
             $pushNotificationService->sendPushNotification($post->user->device_token, $user->name, commentMessage(), $request->post_id, 'comment',$comment->user->name,$comment->user->id);
@@ -1241,18 +1265,16 @@ Route::middleware('auth:api')->group(function () {
         $post = Post::find($request->post_id);
         $user = User::find($request->user_id);
         $commentUser = CommentReplies::find($request->comment_id);
-
         $comment = RepliesToCommentReplies::create([
             'user_id' => $request->user_id,
             'comment_id' => $request->comment_id,
             'body' => $request->body,
         ])->load(['user:id,name,image']);
-    
         if ($commentUser->user->id <> $request->user_id) {
             $pushNotificationService = new PushNotificationService();
             $pushNotificationService->sendPushNotification($commentUser->user->device_token, $comment->user->name, commentReplyMessage(), $request->post_id, 'comment',$comment->user->name,$comment->user->id);
             saveNotification($request->user_id, commentReplyMessage(), 'commentReply', $post->user->id, $request->post_id,);
-         }
+        }
         return response(['data' => $comment, 'message' => 'success'], 200);
     });
 
