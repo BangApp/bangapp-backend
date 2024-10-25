@@ -2066,6 +2066,27 @@ Route::post('/declineFriendship', function(Request $request) {
     return response()->json(['responseCode'=>'success','message' => 'Friend request declined successfully'], 200);
 });
 
+
+
+Route::post('/cancelFriendshipRequest', function(Request $request) {
+    $userId = $request->input('user_id'); 
+    $friendId = $request->input('friend_id');
+    $user = User::find($userId);
+    $friend = User::find($friendId);
+    if (!$user || !$friend) {
+        return response()->json(['error' => 'User not found'], 404);
+    }
+    $friendRequest = FriendRequest::where(function($query) use ($userId, $friendId) {
+        $query->where('sender_id', $userId)
+              ->where('receiver_id', $friendId);
+    })->first();
+    if (!$friendRequest) {
+        return response()->json(['responseCode'=>'fail','error' => 'Friendship request not found or already handled'], 404);
+    }
+    $friendRequest->delete();
+    return response()->json(['responseCode'=>'success','message' => 'Friendship request canceled successfully'], 200);
+});
+
 Route::post('/blockUser', function(Request $request){
     $user_id = $request->user_id;
     $blocked_user_id = $request->blocked_user_id;
@@ -2116,10 +2137,10 @@ Route::post('/deleteFriendship', function(Request $request){
                         ->first();
     if($friendship){
         $friendship->delete();
-        return response()->json(["message" => "Friendship Deleted Successfully"]);
+        return response()->json(['responseCode'=>'success',"message" => "Friendship Deleted Successfully"]);
     }
     else{
-        return response()->json(["message" => "Friendship not Found"]);
+        return response()->json(['responseCode'=>'fail',"message" => "Friendship not Found"]);
     }
 });
 
