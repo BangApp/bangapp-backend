@@ -2026,7 +2026,7 @@ Route::post('/requestFriendship', function(Request $request) {
     $friendRequest->status = 'pending';
     if($friendRequest->save()){
         $pushNotificationService = new PushNotificationService();
-        $pushNotificationService->sendPushNotification($friend->device_token, $user->name, friendRequestMessage(), $friendRequest->id, 'friend');
+        $pushNotificationService->sendPushNotification($friend->device_token, $user->name, friendRequestMessage(), $friendRequest->id, 'friend',$user->name,$user->id);
         saveNotification($userId, friendRequestMessage(), 'friend', $friendId, $friendRequest->id);
         return response()->json(['responseCode'=>'success', 'message' => 'Friend request sent successfully'], 200);
     }
