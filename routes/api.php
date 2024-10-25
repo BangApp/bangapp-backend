@@ -39,7 +39,7 @@ use App\RepliesToBattleCommentReplies;
 use App\BattleLike;
 use App\BlockedUser;
 use App\FewerPost;
-use App\File;
+use App\FilePost;
 use App\SavedPost;
 use Illuminate\Validation\Rule;
 use App\Http\Controllers\PushNotificationService;
@@ -49,6 +49,7 @@ use App\Http\Controllers\ChatController;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ResetPasswordMail;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\File;
 
 
 global $appUrl;
@@ -820,7 +821,6 @@ Route::middleware('auth:api')->group(function () {
         if ($post->type == 'image') {
             if ($post->image) {
                 $imagePath = Str::replaceFirst($appUrl . 'storage/app/', '', $post->image);
-
                 $deletedImageName = basename($imagePath);
                 $deletedImagePath = $deletedPath . '/' . $deletedImageName;
                 File::move(storage_path('app/' . $imagePath), $deletedImagePath);
@@ -832,7 +832,6 @@ Route::middleware('auth:api')->group(function () {
                 File::move(storage_path('app/' . $challengeImagePath), $deletedChallengeImagePath);
             }
         } else {
-            // Inside your function or closure
             Log::info('naingia kwenye video');
             $url = $post->image;
             $parts = explode('/', $url);
@@ -2187,7 +2186,7 @@ Route::post('/uploadFile', function(Request $request){
         'file' => 'required|file|max:50480',
     ]);
     $path = $request->file('file')->store('uploads');
-    $file = File::create([
+    $file = FilePost::create([
         'user_id'   => $request->user_id,
         'body'      => $request->caption,
         'pinned'    => $request->pinned,
@@ -2204,7 +2203,7 @@ Route::post('/uploadFile', function(Request $request){
 
 Route::get('/getFileUploads/{userId}/{perPage}', function($userId, $perPage) {
     $baseUrl = 'https://bangapp.pro/BangAppBackend/storage/app/'; 
-    $files = File::where('user_id', $userId)->paginate($perPage);
+    $files = FilePost::where('user_id', $userId)->paginate($perPage);
 
     if ($files->isEmpty()) {
         return response()->json(['success' => false, 'message' => 'No files found for this user.'], 404);
