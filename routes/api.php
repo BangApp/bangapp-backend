@@ -1,5 +1,4 @@
 <?php
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Image;
@@ -22,6 +21,7 @@ use App\DeletedPost;
 use App\Hobby;
 use App\Follower;
 use App\friends;
+use App\FriendRequest;
 use App\PostView;
 use App\ReportedPost;
 use App\BangUpdateView;
@@ -1979,7 +1979,7 @@ Route::post('/getSuggestedFriends', function(Request $request){
     return response()->json(['suggested_friends' => $suggestedFriends]);
 });
 
-Route::post('/requestFriendship', function(Request $request){
+Route::post('/requestFriendship1', function(Request $request){
     $user_id = $request->user_id;
     $friend_id = $request->friend_id;
     $requestFriend = User::find($friend_id);
@@ -1999,6 +1999,39 @@ Route::post('/requestFriendship', function(Request $request){
         return response()->json(['message' => 'Friend added successfully'], 200);
     } else {
         return response()->json(['error' => 'Friendship already exists or invalid request'], 400);
+    }
+});
+
+Route::post('/requestFriendship', function(Request $request) {
+    $userId = $request->input('user_id'); 
+    $friendId = $request->input('friend_id');
+    $user = User::find($userId);
+    $friend = User::find($friendId);
+    if (!$user || !$friend) {
+        return response()->json(['error' => 'User not found'], 404);
+    }
+    $existingRequest = FriendRequest::where(function($query) use ($userId, $friendId) {
+        $query->where('sender_id', $userId)
+              ->where('receiver_id', $friendId);
+    })->orWhere(function($query) use ($userId, $friendId) {
+        $query->where('sender_id', $friendId)
+              ->where('receiver_id', $userId);
+    })->where('status', 'pending')->exists();
+    if ($existingRequest || $userId == $friendId) {
+        return response()->json(['error' => 'Friendship request already exists or invalid request'], 400);
+    }
+    $friendRequest = new FriendRequest();
+    $friendRequest->sender_id = $userId;
+    $friendRequest->receiver_id = $friendId;
+    $friendRequest->status = 'pending';
+    if($friendRequest->save()){
+        $pushNotificationService = new PushNotificationService();
+        $pushNotificationService->sendPushNotification($friend->device_token, $user->name, friendRequestMessage(), $friendRequest->id, 'friend');
+        saveNotification($userId, friendRequestMessage(), 'friend', $friendId, $friendRequest->id);
+        return response()->json(['responseCode'=>'success', 'message' => 'Friend request sent successfully'], 200);
+    }
+    else{
+        return response()->json(['responseCode'=>'fail','message' => 'Friend request not sent successfully'], 202);
     }
 });
 
