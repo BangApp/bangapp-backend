@@ -1979,28 +1979,7 @@ Route::post('/getSuggestedFriends', function(Request $request){
     return response()->json(['suggested_friends' => $suggestedFriends]);
 });
 
-Route::post('/requestFriendship1', function(Request $request){
-    $user_id = $request->user_id;
-    $friend_id = $request->friend_id;
-    $requestFriend = User::find($friend_id);
-    $user = User::find($user_id);
-    $existingFriendship = friends::where('user_id', $user_id)
-                                ->where('friend_id', $friend_id)
-                                ->exists();
-    if (!$existingFriendship && $user_id != $friend_id) {
-        $friend = new friends();
-        $friend->user_id = $user_id;
-        $friend->friend_id = $friend_id;
-        $friend->confirmed = false;
-        $friend->save();
-        $pushNotificationService = new PushNotificationService();
-        $pushNotificationService->sendPushNotification($requestFriend->device_token, $user->name, friendRequestMessage(), $friend->id, 'friend');
-        saveNotification($user_id, friendRequestMessage(), 'friend', $friend_id, $friend->id);
-        return response()->json(['message' => 'Friend added successfully'], 200);
-    } else {
-        return response()->json(['error' => 'Friendship already exists or invalid request'], 400);
-    }
-});
+
 
 Route::post('/requestFriendship', function(Request $request) {
     $userId = $request->input('user_id'); 
@@ -2036,18 +2015,44 @@ Route::post('/requestFriendship', function(Request $request) {
 });
 
 
-Route::post('/acceptFriendship', function(Request $request){
-    $friendship_id = $request->friendship_id;
-    $friendship = friends::where('id', $friendship_id)
-                        ->where('confirmed', false)
-                        ->first();
-    if (!$friendship) {
+// Route::post('/acceptFriendship', function(Request $request){
+//     $friendship_id = $request->friendship_id;
+//     $friendship = friends::where('id', $friendship_id)
+//                         ->where('confirmed', false)
+//                         ->first();
+//     if (!$friendship) {
+//         return response()->json(['error' => 'Friendship request not found or already confirmed'], 404);
+//     }
+//     $friendship->update(['confirmed' => true]);
+//     $pushNotificationService = new PushNotificationService();
+//     $pushNotificationService->sendPushNotification($friendship->user->device_token, $friendship->user->name, friendAcceptMessage($friendship->friend_user->name), $friendship_id, 'friend');
+//     return response()->json(['message' => 'Confirmed']);
+// });
+
+Route::post('/acceptFriendship', function(Request $request) {
+    $friendRequestId = $request->input('friendship_id');
+    $friendRequest = FriendRequest::where('id', $friendRequestId)->where('status', 'pending')->first();
+    if (!$friendRequest) {
         return response()->json(['error' => 'Friendship request not found or already confirmed'], 404);
     }
-    $friendship->update(['confirmed' => true]);
-    $pushNotificationService = new PushNotificationService();
-    $pushNotificationService->sendPushNotification($friendship->user->device_token, $friendship->user->name, friendAcceptMessage($friendship->friend_user->name), $friendship_id, 'friend');
-    return response()->json(['message' => 'Confirmed']);
+    $friend = Friends::create([
+        'user_id' => $friendRequest->sender_id,
+        'friend_id' => $friendRequest->receiver_id,
+        'friendship_started' => now()
+    ]);
+    $friendRequest->update(['status' => 'accepted']);
+    if($friend){
+        $pushNotificationService = new PushNotificationService();
+        $sender = User::find($friendRequest->sender_id);
+        $receiver = User::find($friendRequest->receiver_id);
+        $pushNotificationService->sendPushNotification($sender->device_token,$receiver->name,friendAcceptMessage($receiver->name),$friendRequestId,'friend',$sender->name,$sender->id);
+        saveNotification($sender->id,friendAcceptMessage($receiver->name),'friend',$receiver->id,$friendRequestId);
+        return response()->json(['responseCode'=>'success','message' => 'Friend request accepted successfully'], 200);
+
+    }
+    else{
+        return response()->json(['responseCode'=>'fail','message' => 'Friend request not accepted successfully!'], 202);
+    }
 });
 
 Route::get('/allFriends/{user_id}', function($user_id){
