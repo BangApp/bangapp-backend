@@ -2179,7 +2179,7 @@ Route::post('/savePost', function(Request $request){
         'user_id' => $request->user_id,
         'post_id' => $request->post_id,
     ]);
-    return response()->json(['success' => true,'data' => $savedPost], 201);
+    return response()->json(['responseCode'=>'success','success' => true,'data' => $savedPost], 201);
 });
 
 Route::get('/getSavedPosts/{userId}',function($userId){
