@@ -126,14 +126,11 @@ class User extends Authenticatable implements JWTSubject
 
     public function getFriendsCountAttribute()
     {
-        // return $this->friends()->where('user_id',$this->id)->orWhere('friend_id',$this->id)->where('confirmed', true)->count();
         $user_id = $this->id;
         return friends::where(function($query) use ($user_id) {
-                    $query->where('friend_id', $user_id)
-                          ->orWhere('user_id', $user_id);
-                })
-                ->where('confirmed', true)
-                ->count();
+                    $query->where('user_id', $user_id)
+                        ->orWhere('friend_id', $user_id);
+                })->count();
     }
 
     public function getLastSeenAttribute($value)
