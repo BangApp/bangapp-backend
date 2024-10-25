@@ -2014,21 +2014,6 @@ Route::post('/requestFriendship', function(Request $request) {
     }
 });
 
-
-// Route::post('/acceptFriendship', function(Request $request){
-//     $friendship_id = $request->friendship_id;
-//     $friendship = friends::where('id', $friendship_id)
-//                         ->where('confirmed', false)
-//                         ->first();
-//     if (!$friendship) {
-//         return response()->json(['error' => 'Friendship request not found or already confirmed'], 404);
-//     }
-//     $friendship->update(['confirmed' => true]);
-//     $pushNotificationService = new PushNotificationService();
-//     $pushNotificationService->sendPushNotification($friendship->user->device_token, $friendship->user->name, friendAcceptMessage($friendship->friend_user->name), $friendship_id, 'friend');
-//     return response()->json(['message' => 'Confirmed']);
-// });
-
 Route::post('/acceptFriendship', function(Request $request) {
     $friendRequestId = $request->input('friendship_id');
     $friendRequest = FriendRequest::where('id', $friendRequestId)->where('status', 'pending')->first();
@@ -2055,22 +2040,13 @@ Route::post('/acceptFriendship', function(Request $request) {
     }
 });
 
-Route::get('/allFriends/{user_id}', function($user_id){
-    $friends = friends::where(function ($query) use ($user_id) {
-                    $query->where('user_id', $user_id)
-                          ->orWhere('friend_id', $user_id);
-                })
-                ->where('confirmed', true)
-                ->get();
-
-    $friendIds = $friends->pluck('user_id')->merge($friends->pluck('friend_id'))->filter(function ($id) use ($user_id) {
-            return $id != $user_id;
-        })->unique();
-
+Route::get('/allFriends/{user_id}', function($user_id) {
+    $friends = Friends::where('user_id', $user_id)->orWhere('friend_id', $user_id)->get();
+    $friendIds = $friends->pluck('user_id')->merge($friends->pluck('friend_id'))->filter(fn($id) => $id != $user_id)->unique();
     $friendUsers = User::whereIn('id', $friendIds)->get();
-
-    return response()->json(['friends' =>$friendUsers]);
+    return response()->json(['friends' => $friendUsers]);
 });
+
 
 Route::get('/allFollowers/{user_id}', function($user_id){
     $user = User::findOrFail($user_id);
@@ -2080,16 +2056,14 @@ Route::get('/allFollowers/{user_id}', function($user_id){
     return response()->json(['followers' =>$followers]);
 });
 
-Route::post('/declineFriendship', function(Request $request){
-    $friendship_id = $request->friendship_id;
-    $friendship = friends::where('id', $friendship_id)
-                        ->where('confirmed', false)
-                        ->first();
-    if (!$friendship) {
-        return response()->json(['error' => 'Friendship request not found or already confirmed'], 404);
+Route::post('/declineFriendship', function(Request $request) {
+    $friendRequestId = $request->input('friendship_id');
+    $friendRequest = FriendRequest::where('id', $friendRequestId)->where('status', 'pending')->first();
+    if (!$friendRequest) {
+        return response()->json(['responseCode'=>'fail','error' => 'Friendship request not found or already handled'], 404);
     }
-    $friendship->delete();
-    return response()->json(['message' => 'Declined']);
+    $friendRequest->update(['status' => 'rejected']);
+    return response()->json(['responseCode'=>'success','message' => 'Friend request declined successfully'], 200);
 });
 
 Route::post('/blockUser', function(Request $request){
