@@ -1650,7 +1650,7 @@ Route::middleware('auth:api')->group(function () {
 
     if (!function_exists('deleteNotification')){function deleteNoticiation($reference_id){
         $notificationToBeDeleted = Notification::where('reference_id',$reference_id)->first();
-        $friendRequest->delete();
+        $notificationToBeDeleted->delete();
     }}
 
     if (!function_exists('deleteVideoApi')) {
@@ -2078,7 +2078,7 @@ Route::post('/cancelFriendshipRequest', function(Request $request) {
         return response()->json(['responseCode'=>'fail','error' => 'Friendship request not found or already handled'], 404);
     }
     deleteNoticiation($friendRequest->id);
-    $notificationToBeDeleted->delete();
+    $friendRequest->delete();
     return response()->json(['responseCode'=>'success','message' => 'Friendship request canceled successfully'], 200);
 });
 
