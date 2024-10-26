@@ -846,7 +846,6 @@ Route::middleware('auth:api')->group(function () {
             return response()->json(['message' => 'Post or user not found'], 404);
         }
         $oppositeLikeType = ($likeType === 'A') ? 'B' : 'A';
-
         // Check if the user has already liked the post with the given like_type
         $isLiked = Like::where('user_id', $user->id)->where('post_id', $postId)->exists();
         $isLikedChallenge = Like::where('user_id', $user->id)->where('post_id', $postId)->where('like_type', $oppositeLikeType)->exists();
@@ -854,7 +853,7 @@ Route::middleware('auth:api')->group(function () {
 
         if ($isLiked && $challengeLike) {
             Like::where('user_id', $user->id)->where('post_id', $postId)->delete();
-            deleteNoticiation($postId);
+            deleteLikeNotification($postId,$userId);
             $message = 'Post unliked successfully';
         } else if (isset($isLiked) && isset($isLikedChallenge)) {
 
@@ -1648,6 +1647,12 @@ Route::middleware('auth:api')->group(function () {
     }
     if (!function_exists('deleteNotification')){function deleteNoticiation($reference_id){
         $notificationToBeDeleted = Notification::where('reference_id',$reference_id)->first();
+        if($notificationToBeDeleted){
+             $notificationToBeDeleted->delete();
+        }
+    }}
+    if (!function_exists('deleteLikeNotification')){function deleteLikeNotification($post_id,$user_id){
+        $notificationToBeDeleted = Notification::where('user_id',$user_id)->where('post_id',$post_id)->first();
         if($notificationToBeDeleted){
              $notificationToBeDeleted->delete();
         }
