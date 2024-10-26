@@ -1613,19 +1613,16 @@ Route::middleware('auth:api')->group(function () {
         }}
 
         if (!function_exists('getUniqueValues')) {
-
             function getUniqueValues($user_id)
             {
                 $user_friends_id = friends::where('user_id', $user_id)
                     ->orWhere('friend_id', $user_id)
-                    ->where('confirmed', 1)
                     ->pluck('user_id', 'friend_id')
                     ->toArray();
                 $user_friends_id = friends::where(function($query) use ($user_id) {
                     $query->where('user_id', $user_id)
                           ->orWhere('friend_id', $user_id);
                 })
-                ->where('confirmed', 1)
                 ->join('users', function($join) {
                     $join->on('friends.user_id', '=', 'users.id')
                          ->where('users.subscribe', 0);
@@ -1640,11 +1637,9 @@ Route::middleware('auth:api')->group(function () {
                     ->where('user_id', $user_id)
                     ->pluck('post_id')
                     ->toArray();
-
                 // Extract values and keys from the friends array
                 $user_friends_values = array_values($user_friends_id);
                 $user_friends_keys = array_keys($user_friends_id);
-
                 // Merge all arrays and convert keys to strings
                 $mergedArray = array_merge(
                     array_map('strval', $user_friends_values),
@@ -1652,7 +1647,6 @@ Route::middleware('auth:api')->group(function () {
                     array_map('strval', $user_subscribe_id),
                     array_map('strval', $user_friends_keys)
                 );
-
                 // Return unique values
                 return array_unique($mergedArray);
             }
