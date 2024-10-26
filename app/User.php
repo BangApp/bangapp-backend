@@ -252,6 +252,18 @@ class User extends Authenticatable implements JWTSubject
         }
     }
 
+    // Define the relationship to the files
+    public function files()
+    {
+        return $this->hasMany(FilePost::class, 'user_id');
+    }
+
+    // Accessor to check if the user has uploaded any files
+    public function getIsHavingFilesAttribute()
+    {
+        return $this->files()->exists();
+    }
+
 
 
 }
