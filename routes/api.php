@@ -211,24 +211,17 @@ Route::post('/payments/transfer', [FlutterwaveController::class, 'initiateTransf
 
 
 Route::middleware('auth:api')->group(function () {
-
     Route::get('/users/search', 'App\Http\Controllers\UserController@search');
     Route::get('/users/getMyInfo', 'App\Http\Controllers\UserController@getMyInfo');
-
-
     Route::get('/bang-updatesnew', function (\Illuminate\Http\Request $request) {
         $appUrl = "https://bangapp.pro/BangAppBackend/";
-
         $page = $request->query('_page', 1);
         $limit = $request->query('_limit', 4);
-
         $bangUpdates = BangUpdate::all();
-
         $formattedUpdates = $bangUpdates->getCollection()->map(function ($update) use ($appUrl) {
             $update->filename = $appUrl . 'storage/app/bangUpdates/' . $update->filename;
             return $update;
         });
-
         $paginatedResponse = [
             'data' => $formattedUpdates,
             'meta' => [
@@ -861,6 +854,7 @@ Route::middleware('auth:api')->group(function () {
 
         if ($isLiked && $challengeLike) {
             Like::where('user_id', $user->id)->where('post_id', $postId)->delete();
+            deleteNoticiation($postId);
             $message = 'Post unliked successfully';
         } else if (isset($isLiked) && isset($isLikedChallenge)) {
 
@@ -1381,6 +1375,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/deleteComment/{commentId}', function ($commentId) {
         $comment = Comment::find($commentId);
         if ($comment) {
+            deleteNoticiation($comment->post_id);
             $comment->commentReplies()->delete();
             $comment->delete();
             return response()->json(['message' => 'Comment deleted']);
@@ -1612,49 +1607,53 @@ Route::middleware('auth:api')->group(function () {
             $notification->save();
         }}
 
-        if (!function_exists('getUniqueValues')) {
-            function getUniqueValues($user_id)
-            {
-                $user_friends_id = friends::where('user_id', $user_id)
-                    ->orWhere('friend_id', $user_id)
-                    ->pluck('user_id', 'friend_id')
-                    ->toArray();
-                $user_friends_id = friends::where(function($query) use ($user_id) {
-                    $query->where('user_id', $user_id)
-                          ->orWhere('friend_id', $user_id);
-                })
-                ->join('users', function($join) {
-                    $join->on('friends.user_id', '=', 'users.id')
-                         ->where('users.subscribe', 0);
-                })
+    if (!function_exists('getUniqueValues')) {
+        function getUniqueValues($user_id)
+        {
+            $user_friends_id = friends::where('user_id', $user_id)
+                ->orWhere('friend_id', $user_id)
                 ->pluck('user_id', 'friend_id')
                 ->toArray();
-                $user_follow_id = Follower::where('follower_id', $user_id)
-                    ->pluck('following_id')
-                    ->toArray();
-                $user_subscribe_id = azampay::where('type', 'message')
-                    ->whereDate('created_at', '<=', now()->subDays(30))
-                    ->where('user_id', $user_id)
-                    ->pluck('post_id')
-                    ->toArray();
-                // Extract values and keys from the friends array
-                $user_friends_values = array_values($user_friends_id);
-                $user_friends_keys = array_keys($user_friends_id);
-                // Merge all arrays and convert keys to strings
-                $mergedArray = array_merge(
-                    array_map('strval', $user_friends_values),
-                    array_map('strval', $user_follow_id),
-                    array_map('strval', $user_subscribe_id),
-                    array_map('strval', $user_friends_keys),
-                    array_map('strval', [$user_id])
-                );
-                // Return unique values
-                return array_unique($mergedArray);
-            }
-
+            $user_friends_id = friends::where(function($query) use ($user_id) {
+                $query->where('user_id', $user_id)
+                        ->orWhere('friend_id', $user_id);
+            })
+            ->join('users', function($join) {
+                $join->on('friends.user_id', '=', 'users.id')
+                        ->where('users.subscribe', 0);
+            })
+            ->pluck('user_id', 'friend_id')
+            ->toArray();
+            $user_follow_id = Follower::where('follower_id', $user_id)
+                ->pluck('following_id')
+                ->toArray();
+            $user_subscribe_id = azampay::where('type', 'message')
+                ->whereDate('created_at', '<=', now()->subDays(30))
+                ->where('user_id', $user_id)
+                ->pluck('post_id')
+                ->toArray();
+            // Extract values and keys from the friends array
+            $user_friends_values = array_values($user_friends_id);
+            $user_friends_keys = array_keys($user_friends_id);
+            // Merge all arrays and convert keys to strings
+            $mergedArray = array_merge(
+                array_map('strval', $user_friends_values),
+                array_map('strval', $user_follow_id),
+                array_map('strval', $user_subscribe_id),
+                array_map('strval', $user_friends_keys),
+                array_map('strval', [$user_id])
+            );
+            // Return unique values
+            return array_unique($mergedArray);
         }
+    }
 
-        if (!function_exists('deleteVideoApi')) {
+    if (!function_exists('deleteNotification')){function deleteNoticiation($reference_id){
+        $notificationToBeDeleted = Notification::where('reference_id',$reference_id)->first();
+        $friendRequest->delete();
+    }}
+
+    if (!function_exists('deleteVideoApi')) {
 
     function deleteVideoApi($uid)
     {
@@ -2078,7 +2077,8 @@ Route::post('/cancelFriendshipRequest', function(Request $request) {
     if (!$friendRequest) {
         return response()->json(['responseCode'=>'fail','error' => 'Friendship request not found or already handled'], 404);
     }
-    $friendRequest->delete();
+    deleteNoticiation($friendRequest->id);
+    $notificationToBeDeleted->delete();
     return response()->json(['responseCode'=>'success','message' => 'Friendship request canceled successfully'], 200);
 });
 
