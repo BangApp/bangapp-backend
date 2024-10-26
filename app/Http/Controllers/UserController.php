@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\User;
 use App\friends;
+use App\FriendRequest;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -128,15 +129,11 @@ class UserController extends Controller
     public function getMyInfo(Request $request)
     {
         $user_id = $request->input('user_id');
-
         $viewer_id = $request->input('viewer_id');
-        // Check if the user_id is provided in the request
         if (!$user_id) {
             return response()->json(['error' => 'User ID is missing in the request'], 400);
         }
-        // Find the user based on the user_id
         $user = User::find($user_id);
-
         if (!$user) {
             return response()->json(['error' => 'User not found'], 404);
         }
@@ -146,22 +143,22 @@ class UserController extends Controller
         if ($user->hasActiveSubscription($viewer_id)) {
             $user->subscribe = 0;
         }
-
         $user->subscriptionDays = $user->subscriptionDaysRemaining($viewer_id);
-        // Check if the viewer is a friend of the user
-        $isFriend = friends::where(function($query) use ($viewer_id) {
-                        $query->where('friend_id', $viewer_id)
-                              ->orWhere('user_id', $viewer_id);
-                    })
-                    ->where('confirmed', true)
-                    ->exists();
-        
-        $isFriendRequest = friends::where('friend_id', $user_id)->where('user_id', $viewer_id)->where('confirmed',false)->exists();
-
+        $isFriend = friends::where(function ($query) use ($user_id, $viewer_id) {
+            $query->where('user_id', $user_id)
+                ->where('friend_id', $viewer_id)
+                ->orWhere(function ($query) use ($user_id, $viewer_id) {
+                    $query->where('user_id', $viewer_id)
+                            ->where('friend_id', $user_id);
+                });
+        })
+        ->exists();
+        $isFriendRequest = FriendRequest::where('sender_id', $viewer_id)
+                                ->where('receiver_id', $user_id)
+                                ->where('status', 'pending')
+                                ->exists();
         $user->isFriend = $isFriend;
         $user->isFriendRequest = $isFriendRequest;
-
-        // Return user information as a JSON response
         return response()->json($user, 200);
     }
 
