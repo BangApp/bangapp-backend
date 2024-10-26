@@ -1645,7 +1645,8 @@ Route::middleware('auth:api')->group(function () {
                     array_map('strval', $user_friends_values),
                     array_map('strval', $user_follow_id),
                     array_map('strval', $user_subscribe_id),
-                    array_map('strval', $user_friends_keys)
+                    array_map('strval', $user_friends_keys),
+                    array_map('strval', $user_id)
                 );
                 // Return unique values
                 return array_unique($mergedArray);
