@@ -52,7 +52,7 @@ class User extends Authenticatable implements JWTSubject
         'email_verified_at' => 'datetime',
     ];
 
-    protected $appends = ['followerCount', 'followingCount', 'followingMe', 'followed','user_image_url','postCount','friendsCount','lastSeen','isHavingFiles'];
+    protected $appends = ['followerCount', 'followingCount', 'followingMe', 'followed','user_image_url','postCount','friendsCount','lastSeen','isHavingFiles','isHavingBangUpdate'];
 
     public function posts()
     {
@@ -262,6 +262,11 @@ class User extends Authenticatable implements JWTSubject
     public function getIsHavingFilesAttribute()
     {
         return $this->files()->exists();
+    }
+
+    public function getIsHavingBangUpdate()
+    {
+        return $this->bangUpdates()->exists();
     }
 
 
