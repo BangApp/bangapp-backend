@@ -1606,7 +1606,6 @@ Route::middleware('auth:api')->group(function () {
             $notification->post_id = $post_id;
             $notification->save();
         }}
-
     if (!function_exists('getUniqueValues')) {
         function getUniqueValues($user_id)
         {
@@ -1647,14 +1646,13 @@ Route::middleware('auth:api')->group(function () {
             return array_unique($mergedArray);
         }
     }
-
     if (!function_exists('deleteNotification')){function deleteNoticiation($reference_id){
         $notificationToBeDeleted = Notification::where('reference_id',$reference_id)->first();
-        $notificationToBeDeleted->delete();
+        if($notificationToBeDeleted){
+             $notificationToBeDeleted->delete();
+        }
     }}
-
     if (!function_exists('deleteVideoApi')) {
-
     function deleteVideoApi($uid)
     {
         Log::info('uhakika naingia kwenye video');
