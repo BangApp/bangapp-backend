@@ -627,7 +627,6 @@ Route::middleware('auth:api')->group(function () {
             if ($post->hasUserPaid($user_id,$post->id)) {
                 $post->pinned = 0;
             }
-
             if ($post->type === 'image') {
                 $post->image ? $post->image = $appUrl . 'storage/app/' . $post->image : $post->image = null;
                 $post->challenge_img ? $post->challenge_img = $appUrl . 'storage/app/' . $post->challenge_img : $post->challenge_img = null;
@@ -637,12 +636,10 @@ Route::middleware('auth:api')->group(function () {
                 $post->image = $post->image;
                 list($post->width, $post->height) = [300, 300];
             }
-
             foreach ($post->challenges as $challenge) {
                 $challenge->challenge_img ? $challenge->challenge_img = $appUrl . 'storage/app/' . $challenge->challenge_img : $challenge->challenge_img = null;
             }
             if ($post->challenges->isNotEmpty()) {
-                // Create a new Challenge object to add at the top of the challenges array
                 $newChallenge = new Challenge([
                     'id' => $post->id, // replace with appropriate values
                     'post_id' => $post->id,
@@ -657,11 +654,9 @@ Route::middleware('auth:api')->group(function () {
                 ]);
                 // Convert the challenges collection to an array, add the new challenge at the top, and reindex the array
                 $challengesArray = $post->challenges->prepend($newChallenge)->values()->toArray();
-
                 // Set the challenges property with the modified array
                 $post->challenges = $challengesArray;
             }
-
             $post->isLikedA = false;
             $post->isLikedB = false;
             $post->isLiked = false;
@@ -674,7 +669,6 @@ Route::middleware('auth:api')->group(function () {
                 $post->isLikedB = true;
                 //$post->isLiked = true;
             }
-
             // Retrieve the like counts for both A and B challenge images
             // $likeCount
             $likeCountA = 0;
@@ -690,7 +684,6 @@ Route::middleware('auth:api')->group(function () {
             }
             $post->like_count_A = $likeCountA;
             $post->like_count_B = $likeCountB;
-
             return $post;
         });
 
@@ -724,7 +717,6 @@ Route::middleware('auth:api')->group(function () {
             if ($post->hasUserPaid($user_id,$post->id)) {
                 $post->pinned = 0;
             }
-
             if ($post->type === 'image') {
                 $post->image ? $post->image = $appUrl . 'storage/app/' . $post->image : $post->image = null;
                 $post->challenge_img ? $post->challenge_img = $appUrl . 'storage/app/' . $post->challenge_img : $post->challenge_img = null;
@@ -734,7 +726,6 @@ Route::middleware('auth:api')->group(function () {
                 $post->image = $post->image;
                 list($post->width, $post->height) = [300, 300];
             }
-
             foreach ($post->challenges as $challenge) {
                 $challenge->challenge_img ? $challenge->challenge_img = $appUrl . 'storage/app/' . $challenge->challenge_img : $challenge->challenge_img = null;
             }
@@ -758,7 +749,6 @@ Route::middleware('auth:api')->group(function () {
                 // Set the challenges property with the modified array
                 $post->challenges = $challengesArray;
             }
-
             $post->isLikedA = false;
             $post->isLikedB = false;
             $post->isLiked = false;
@@ -771,7 +761,6 @@ Route::middleware('auth:api')->group(function () {
                 $post->isLikedB = true;
                 //$post->isLiked = true;
             }
-
             // Retrieve the like counts for both A and B challenge images
             // $likeCount
             $likeCountA = 0;
