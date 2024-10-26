@@ -52,7 +52,7 @@ class User extends Authenticatable implements JWTSubject
         'email_verified_at' => 'datetime',
     ];
 
-    protected $appends = ['followerCount', 'followingCount', 'followingMe', 'followed','user_image_url','postCount','friendsCount','lastSeen'];
+    protected $appends = ['followerCount', 'followingCount', 'followingMe', 'followed','user_image_url','postCount','friendsCount','lastSeen','isHavingFiles'];
 
     public function posts()
     {
