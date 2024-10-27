@@ -12,7 +12,7 @@
 
 
     <div class="w-100 m-4">
-      
+
 
         <div class="card my-3">
 
@@ -36,8 +36,8 @@
                             <td>{{$post->reason}}</td>
                             <td>{{$post->created_at}}</td>
                             <td>
-                                <a href="{{ route('view_post', ['id'=>$post->id]) }}" class="btn btn-primary">VIEW</a>
-                                <a href="{{ route('delete_post', ['id' => $post->id]) }}" class="btn btn-danger"  >DELETE</a>
+                                {{-- <a href="{{ route('view_post', ['id'=>$post->id]) }}" class="btn btn-primary">VIEW</a>
+                                <a href="{{ route('delete_post', ['id' => $post->id]) }}" class="btn btn-danger"  >DELETE</a> --}}
                             </td>
                         </tr>
                         @endforeach
