@@ -594,7 +594,9 @@ Route::middleware('auth:api')->group(function () {
                 ->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
         }
         else{
-            $posts = Post::unseenPosts($user_id)->latest()->where('type', 'image')->whereIn('user_id',getUniqueValues($user_id))
+            Log::info("naingia hapa" );
+            Log::info($getUniqueValues);
+            $posts = Post::unseenPosts($user_id)->latest()->where('type', 'image')->whereIn('user_id',$getUniqueValues)
                 ->with([
                     'likes' => function ($query) {
                         $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
@@ -604,22 +606,8 @@ Route::middleware('auth:api')->group(function () {
                         $query->select('*')->where('confirmed', 1);
                     }
                 ])->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
+            
         }
-
-        // $posts = Post::unseenPosts($user_id)->latest()->where('type', 'image')
-        // ->with([
-        //     'category' => function($query) {
-        //         $query->select('id', 'name');
-        //     },
-        //     'likes' => function($query) {
-        //         $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
-        //             ->groupBy('post_id', 'like_type');
-        //     },
-        //     'challenges' => function($query) {
-        //         $query->select('*')->where('confirmed', 1);
-        //     }
-        // ])->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
-
 
         $posts->getCollection()->transform(function ($post) use ($appUrl, $user_id) {
             $post->post_views_count = $post->pinned == 1 ?  $post->payedCount() : $post->postViews->count();
@@ -1619,6 +1607,13 @@ Route::middleware('auth:api')->group(function () {
                 ->where('user_id', $user_id)
                 ->pluck('post_id')
                 ->toArray();
+
+            $userHobbyIds = UserHobby::where('user_id', $user_id)->pluck('hobby_id');
+            $matchingUserIds = UserHobby::whereIn('hobby_id', $userHobbyIds)
+                ->where('user_id', '!=', $user_id)
+                ->distinct()
+                ->pluck('user_id')
+                ->toArray();
             // Extract values and keys from the friends array
             $user_friends_values = array_values($user_friends_id);
             $user_friends_keys = array_keys($user_friends_id);
@@ -1628,7 +1623,8 @@ Route::middleware('auth:api')->group(function () {
                 array_map('strval', $user_follow_id),
                 array_map('strval', $user_subscribe_id),
                 array_map('strval', $user_friends_keys),
-                array_map('strval', [$user_id])
+                array_map('strval', [$user_id]),
+                array_map('strval', $matchingUserIds)
             );
             // Return unique values
             return array_unique($mergedArray);
