@@ -1,0 +1,391 @@
+{
+    "status": "success",
+    "message": "Banks fetched successfully",
+    "data": [
+        {
+            "id": 2099,
+            "code": "10383906",
+            "name": "ODDO BHF Aktiengesellschaft"
+        },
+        {
+            "id": 2100,
+            "code": "10656609",
+            "name": "Citibank, N.A., A branch of Citibank, N.A."
+        },
+        {
+            "id": 2101,
+            "code": "11274858",
+            "name": "TIB Corporate Bank Limited"
+        },
+        {
+            "id": 2102,
+            "code": "11288188",
+            "name": "Canara Bank (Tanzania) Limited"
+        },
+        {
+            "id": 2103,
+            "code": "11288192",
+            "name": "Tanzania Agricultural Development Bank"
+        },
+        {
+            "id": 2104,
+            "code": "11295332",
+            "name": "FINCA Microfinance Bank Ltd"
+        },
+        {
+            "id": 2105,
+            "code": "11298200",
+            "name": "Mwalimu Commercial Bank Plc"
+        },
+        {
+            "id": 2106,
+            "code": "11321840",
+            "name": "Guaranty Trust Bank (Tanzania) Limited"
+        },
+        {
+            "id": 2107,
+            "code": "11335200",
+            "name": "Yetu Microfinance Bank PLC"
+        },
+        {
+            "id": 2108,
+            "code": "190815670S",
+            "name": "VISA"
+        },
+        {
+            "id": 2109,
+            "code": "20021376IK",
+            "name": "TZWALLET"
+        },
+        {
+            "id": 2110,
+            "code": "200902B7KU",
+            "name": "NCBA BANK TANZANIA LIMITED"
+        },
+        {
+            "id": 2111,
+            "code": "201211F9EW",
+            "name": "Exim Bank Tanzania"
+        },
+        {
+            "id": 2112,
+            "code": "201217FGCT",
+            "name": "CHINA DASHENG BANK LIMITED"
+        },
+        {
+            "id": 2113,
+            "code": "20638200",
+            "name": "Bank of Tanzania"
+        },
+        {
+            "id": 2114,
+            "code": "20638300",
+            "name": "CRDB Bank PLC"
+        },
+        {
+            "id": 2115,
+            "code": "20638400",
+            "name": "National Bank of Commerce Ltd."
+        },
+        {
+            "id": 2116,
+            "code": "20638700",
+            "name": "TIB Development Bank Ltd"
+        },
+        {
+            "id": 2117,
+            "code": "20638800",
+            "name": "The People's Bank of Zanzibar Ltd."
+        },
+        {
+            "id": 2118,
+            "code": "210409HOLP",
+            "name": "National Microfinance Bank Limited"
+        },
+        {
+            "id": 2119,
+            "code": "210413HQX1",
+            "name": "I AND M BANK (T) LIMITED"
+        },
+        {
+            "id": 2120,
+            "code": "210414HU05",
+            "name": "FIRST NATIONAL BANK OF TANZANIA"
+        },
+        {
+            "id": 2121,
+            "code": "22017470",
+            "name": "TPB Bank Company Ltd"
+        },
+        {
+            "id": 2122,
+            "code": "220211PFXC",
+            "name": "Tanzania Commercial Bk"
+        },
+        {
+            "id": 2123,
+            "code": "220531RO6M",
+            "name": "Dar es Salaam Community Bank"
+        },
+        {
+            "id": 2124,
+            "code": "25522602",
+            "name": "Crown Finance And Leasing Limited"
+        },
+        {
+            "id": 2125,
+            "code": "25522604",
+            "name": "Karadha Company Ltd"
+        },
+        {
+            "id": 2126,
+            "code": "25522606",
+            "name": "National Bureau De Change Limited"
+        },
+        {
+            "id": 2127,
+            "code": "25522608",
+            "name": "The African Banking Corporation of Tanzania Limited"
+        },
+        {
+            "id": 2128,
+            "code": "25548988",
+            "name": "Bank of Baroda (Tanzania) Ltd"
+        },
+        {
+            "id": 2129,
+            "code": "25562250",
+            "name": "Twiga Bancorp Limited"
+        },
+        {
+            "id": 2130,
+            "code": "25702616",
+            "name": "Bank M Tanzania Public Limited Company"
+        },
+        {
+            "id": 2131,
+            "code": "25716848",
+            "name": "Accessbank Tanzania Ltd"
+        },
+        {
+            "id": 2132,
+            "code": "25894404",
+            "name": "Bank Of India (Tanzania) Limited"
+        },
+        {
+            "id": 2133,
+            "code": "26187724",
+            "name": "Orbit Securites Co Ltd"
+        },
+        {
+            "id": 2134,
+            "code": "26194946",
+            "name": "United Bank For Africa (Tanzania) Limited"
+        },
+        {
+            "id": 2135,
+            "code": "26260012",
+            "name": "Mkombozi Commercial Bank Ltd"
+        },
+        {
+            "id": 2136,
+            "code": "26262682",
+            "name": "Tanzania Womens Bank Limited"
+        },
+        {
+            "id": 2137,
+            "code": "26500306",
+            "name": "First National Bank Tanzania Limited"
+        },
+        {
+            "id": 2138,
+            "code": "26545582",
+            "name": "Tanzania Revenue Authority"
+        },
+        {
+            "id": 2139,
+            "code": "26618356",
+            "name": "Tanzania Housing Bank"
+        },
+        {
+            "id": 2140,
+            "code": "26695702",
+            "name": "Amana Bank Limited"
+        },
+        {
+            "id": 2141,
+            "code": "26702352",
+            "name": "Equity Bank Tanzania Limited"
+        },
+        {
+            "id": 2142,
+            "code": "26852058",
+            "name": "Letshego Bank (T) Limited"
+        },
+        {
+            "id": 2143,
+            "code": "26955990",
+            "name": "SABMiller Tanzania"
+        },
+        {
+            "id": 2144,
+            "code": "26965348",
+            "name": "Covenant Bank For Women (Tanzania) Limited"
+        },
+        {
+            "id": 2145,
+            "code": "26965406",
+            "name": "Mwanga Community Bank Ltd"
+        },
+        {
+            "id": 2146,
+            "code": "27121304",
+            "name": "UBL Bank (Tanzania) Limited"
+        },
+        {
+            "id": 2147,
+            "code": "27121334",
+            "name": "Maendeleo Bank Ltd"
+        },
+        {
+            "id": 2148,
+            "code": "27162738",
+            "name": "Trust Bank (Tanzania) Limited"
+        },
+        {
+            "id": 2149,
+            "code": "27187316",
+            "name": "Dar Es Salaam Stock Exchange"
+        },
+        {
+            "id": 2150,
+            "code": "27307960",
+            "name": "China Commercial Bank Limited"
+        },
+        {
+            "id": 2151,
+            "code": "27357708",
+            "name": "Mucoba Bank Plc"
+        },
+        {
+            "id": 2152,
+            "code": "27541834",
+            "name": "First Housing Finance Tanzania Limited"
+        },
+        {
+            "id": 2153,
+            "code": "60000066",
+            "name": "Stanbic Bank Tanzania Ltd"
+        },
+        {
+            "id": 2154,
+            "code": "97723612",
+            "name": "National Microfinance Bank Ltd."
+        },
+        {
+            "id": 2155,
+            "code": "97723620",
+            "name": "Citibank Tanzania Ltd."
+        },
+        {
+            "id": 2156,
+            "code": "97723632",
+            "name": "Diamond Trust Bank Tanzania Limited"
+        },
+        {
+            "id": 2157,
+            "code": "97723634",
+            "name": "Kilimanjaro Cooperative Bank Limited"
+        },
+        {
+            "id": 2158,
+            "code": "97723710",
+            "name": "KCB Bank Tanzania Ltd"
+        },
+        {
+            "id": 2159,
+            "code": "97723712",
+            "name": "International Commercial Bank (Tanzania) Limited"
+        },
+        {
+            "id": 2160,
+            "code": "97723714",
+            "name": "Habib African Bank Ltd."
+        },
+        {
+            "id": 2161,
+            "code": "97723718",
+            "name": "Barclays Bank (Tanzania) Ltd."
+        },
+        {
+            "id": 2162,
+            "code": "97906794",
+            "name": "Akiba Commercial Bank PLC"
+        },
+        {
+            "id": 2163,
+            "code": "98080262",
+            "name": "Exim Bank (Tanzania) Limited"
+        },
+        {
+            "id": 2164,
+            "code": "98116448",
+            "name": "DCB Commercial Bank Plc"
+        },
+        {
+            "id": 2165,
+            "code": "98116452",
+            "name": "Azania Bank Limited"
+        },
+        {
+            "id": 2166,
+            "code": "98116456",
+            "name": "NIC Bank Tanzania Limited"
+        },
+        {
+            "id": 2167,
+            "code": "99055174",
+            "name": "Uchumi Commercial Bank"
+        },
+        {
+            "id": 2168,
+            "code": "99055178",
+            "name": "Commercial Bank of Africa (Tanzania) Limited"
+        },
+        {
+            "id": 2169,
+            "code": "99229218",
+            "name": "Bank of Africa Tanzania Limited"
+        },
+        {
+            "id": 2170,
+            "code": "99354428",
+            "name": "Standard Chartered Bank Tanzania Ltd."
+        },
+        {
+            "id": 1331,
+            "code": "airtel",
+            "name": "Airtel Tanzania"
+        },
+        {
+            "id": 2028,
+            "code": "halopesa",
+            "name": "Halopesa"
+        },
+        {
+            "id": 2074,
+            "code": "tigo",
+            "name": "Tigo"
+        },
+        {
+            "id": 2171,
+            "code": "TZ674000",
+            "name": "Ecobank Tanzania"
+        },
+        {
+            "id": 2073,
+            "code": "vodacom",
+            "name": "Vodacom"
+        }
+    ]
+}

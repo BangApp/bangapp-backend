@@ -40,10 +40,10 @@ class FlutterwaveController extends Controller
     }
 
 
-    public function makePayment($postId, $userId, $type, $amount)
+    public function makePayment($postId, $userId, $type, $amount, $phone_number)
     {
         $flutterwaveSecretKey = env('FLUTTERWAVE_SECRET_KEY');
-        $url = env('FLUTTERWAVE_URL');
+        $url = env('FLUTTERWAVE_URL_PAY');
 
         $client = new Client();
         $headers = [
@@ -55,12 +55,12 @@ class FlutterwaveController extends Controller
 
 
         $data = [
-            'amount' => "200",
+            'amount' =>  $amount,
             'email' => 'user@example.com',
             'tx_ref' => "67677677",
             'currency' => 'TZS',
             'redirect_url' =>'https://google.com',
-            'phone_number' => '255746030326',
+            'phone_number' => $phone_number,
             'fullname' => 'Example User',
             'meta' => [
                 "postId"=> $postId,
@@ -69,7 +69,7 @@ class FlutterwaveController extends Controller
             ],
             'customer' => [
                 'email' => 'user@example.com',
-                'phonenumber' => '255717161736', 
+                'phonenumber' => $phone_number,
                 'name' => 'Example User' 
             ]
         ];
@@ -103,6 +103,7 @@ class FlutterwaveController extends Controller
             'userId' => 'required|integer',
             'type' => 'required|string',
             'amount' => 'required|numeric',
+            'phone_number' => 'required',
         ]);
 
         // Extract the validated parameters
@@ -110,9 +111,10 @@ class FlutterwaveController extends Controller
         $userId = $validated['userId'];
         $type = $validated['type'];
         $amount = $validated['amount'];
+        $phone_number = $validated['phone_number'];
 
         // Call the makePayment method
-        return $this->makePayment($postId, $userId, $type, $amount);
+        return $this->makePayment(  $postId,  $userId, $type, $amount, $phone_number);
     }
 
 
@@ -135,10 +137,12 @@ class FlutterwaveController extends Controller
             'Content-Type' => 'application/json',
         ];
 
+        // dd($accountBank, $accountNumber, $amount, $reference);
+
         // Define the payload (body parameters)
         $payload = [
             'account_number' => $accountNumber,
-            'account_bank' => $this->checkProvider($phoneNumber),
+            'account_bank' => $accountBank,
             'amount' => $amount,
             'currency' => 'TZS',
             'narration' => 'Payment for goods',
@@ -179,6 +183,10 @@ class FlutterwaveController extends Controller
                 'message' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    public function webhook(Request $request){
+        dd($request->all());
     }
 
 }

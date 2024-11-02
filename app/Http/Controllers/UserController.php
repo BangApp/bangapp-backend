@@ -117,6 +117,7 @@ class UserController extends Controller
     public function search(Request $request)
     {
         $keyword = $request->input('keyword');
+        $viewer_id = $request->input('viewerId');
         $results = [];
 
         if ($keyword) {
@@ -163,7 +164,7 @@ class UserController extends Controller
     }
 
     // public function addFollowersToHobby(Request $request)
-    // { 
+    // {
     //     $hobbies = $request->hobbies;
     //     $userHobbies = UserHobby::('hobby_id', '')
 

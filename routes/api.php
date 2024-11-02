@@ -207,6 +207,8 @@ Route::get('/getPaymentStatus/{transactionId}', function ($transactionId) {
 
 Route::post('/payments/flutterwave', [FlutterwaveController::class, 'pay']);
 Route::post('/payments/transfer', [FlutterwaveController::class, 'initiateTransfer']);
+Route::post('/payments/webhook', [FlutterwaveController::class, 'webhook']);
+
 
 
 
@@ -576,6 +578,7 @@ Route::middleware('auth:api')->group(function () {
            // Optional: Reset the array keys to have a continuous sequence (if needed)
           // $uniqueArray = array_values($uniqueArray);
 
+<<<<<<< HEAD
           // $posts = Post::unseenPosts($user_id)->where('type', 'image')
             //    ->whereNotIn('user_id', $uniqueArray)
               //  ->whereHas('user.hobbies', function ($query) use ($userHobbies) {
@@ -621,13 +624,47 @@ Route::middleware('auth:api')->group(function () {
          ])->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
 
 
+=======
+           $posts = Post::unseenPosts($user_id)->where('type', 'image')
+                ->whereNotIn('user_id', $uniqueArray)
+                ->whereHas('user.hobbies', function ($query) use ($userHobbies) {
+                    $query->whereIn('hobby_id', $userHobbies);
+                })
+                ->with([
+                    'likes' => function ($query) {
+                        $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
+                            ->groupBy('post_id', 'like_type');
+                    },
+                    'challenges' => function ($query) {
+                        $query->select('*')->where('confirmed', 1);
+                    }
+                ])
+                ->latest()
+                ->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
+        }
+        else{
+            Log::info("naingia hapa" );
+            Log::info($getUniqueValues);
+            $posts = Post::unseenPosts($user_id)->latest()->where('type', 'image')->whereIn('user_id',$getUniqueValues)
+                ->with([
+                    'likes' => function ($query) {
+                        $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
+                            ->groupBy('post_id', 'like_type');
+                    },
+                    'challenges' => function ($query) {
+                        $query->select('*')->where('confirmed', 1);
+                    }
+                ])->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
+            
+        }
+
+>>>>>>> f15097327c422b076a6355dac9681229c1d3d2f0
         $posts->getCollection()->transform(function ($post) use ($appUrl, $user_id) {
             $post->post_views_count = $post->pinned == 1 ?  $post->payedCount() : $post->postViews->count();
             // Update the 'pinned' attribute based on whether the user has paid or not
             if ($post->hasUserPaid($user_id,$post->id)) {
                 $post->pinned = 0;
             }
-
             if ($post->type === 'image') {
                 $post->image ? $post->image = $appUrl . 'storage/app/' . $post->image : $post->image = null;
                 $post->challenge_img ? $post->challenge_img = $appUrl . 'storage/app/' . $post->challenge_img : $post->challenge_img = null;
@@ -637,12 +674,10 @@ Route::middleware('auth:api')->group(function () {
                 $post->image = $post->image;
                 list($post->width, $post->height) = [300, 300];
             }
-
             foreach ($post->challenges as $challenge) {
                 $challenge->challenge_img ? $challenge->challenge_img = $appUrl . 'storage/app/' . $challenge->challenge_img : $challenge->challenge_img = null;
             }
             if ($post->challenges->isNotEmpty()) {
-                // Create a new Challenge object to add at the top of the challenges array
                 $newChallenge = new Challenge([
                     'id' => $post->id, // replace with appropriate values
                     'post_id' => $post->id,
@@ -657,11 +692,9 @@ Route::middleware('auth:api')->group(function () {
                 ]);
                 // Convert the challenges collection to an array, add the new challenge at the top, and reindex the array
                 $challengesArray = $post->challenges->prepend($newChallenge)->values()->toArray();
-
                 // Set the challenges property with the modified array
                 $post->challenges = $challengesArray;
             }
-
             $post->isLikedA = false;
             $post->isLikedB = false;
             $post->isLiked = false;
@@ -674,7 +707,6 @@ Route::middleware('auth:api')->group(function () {
                 $post->isLikedB = true;
                 //$post->isLiked = true;
             }
-
             // Retrieve the like counts for both A and B challenge images
             // $likeCount
             $likeCountA = 0;
@@ -690,7 +722,6 @@ Route::middleware('auth:api')->group(function () {
             }
             $post->like_count_A = $likeCountA;
             $post->like_count_B = $likeCountB;
-
             return $post;
         });
 
@@ -724,7 +755,6 @@ Route::middleware('auth:api')->group(function () {
             if ($post->hasUserPaid($user_id,$post->id)) {
                 $post->pinned = 0;
             }
-
             if ($post->type === 'image') {
                 $post->image ? $post->image = $appUrl . 'storage/app/' . $post->image : $post->image = null;
                 $post->challenge_img ? $post->challenge_img = $appUrl . 'storage/app/' . $post->challenge_img : $post->challenge_img = null;
@@ -734,7 +764,6 @@ Route::middleware('auth:api')->group(function () {
                 $post->image = $post->image;
                 list($post->width, $post->height) = [300, 300];
             }
-
             foreach ($post->challenges as $challenge) {
                 $challenge->challenge_img ? $challenge->challenge_img = $appUrl . 'storage/app/' . $challenge->challenge_img : $challenge->challenge_img = null;
             }
@@ -758,7 +787,6 @@ Route::middleware('auth:api')->group(function () {
                 // Set the challenges property with the modified array
                 $post->challenges = $challengesArray;
             }
-
             $post->isLikedA = false;
             $post->isLikedB = false;
             $post->isLiked = false;
@@ -771,7 +799,6 @@ Route::middleware('auth:api')->group(function () {
                 $post->isLikedB = true;
                 //$post->isLiked = true;
             }
-
             // Retrieve the like counts for both A and B challenge images
             // $likeCount
             $likeCountA = 0;
@@ -1630,6 +1657,13 @@ Route::middleware('auth:api')->group(function () {
                 ->where('user_id', $user_id)
                 ->pluck('post_id')
                 ->toArray();
+
+            $userHobbyIds = UserHobby::where('user_id', $user_id)->pluck('hobby_id');
+            $matchingUserIds = UserHobby::whereIn('hobby_id', $userHobbyIds)
+                ->where('user_id', '!=', $user_id)
+                ->distinct()
+                ->pluck('user_id')
+                ->toArray();
             // Extract values and keys from the friends array
             $user_friends_values = array_values($user_friends_id);
             $user_friends_keys = array_keys($user_friends_id);
@@ -1639,7 +1673,8 @@ Route::middleware('auth:api')->group(function () {
                 array_map('strval', $user_follow_id),
                 array_map('strval', $user_subscribe_id),
                 array_map('strval', $user_friends_keys),
-                array_map('strval', [$user_id])
+                array_map('strval', [$user_id]),
+                array_map('strval', $matchingUserIds)
             );
             // Return unique values
             return array_unique($mergedArray);

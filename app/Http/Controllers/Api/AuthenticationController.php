@@ -36,7 +36,7 @@ class AuthenticationController extends Controller
             ],
             'password' => ['required', 'string', 'min:6', 'max:30'],
             'phone_number' => [
-                'required', 
+                'required',
                 function ($attribute, $value, $fail){
                     $exists = \App\User::where(function ($query) use ($value ){
                         $query->where('phone_number', $value);
@@ -56,8 +56,10 @@ class AuthenticationController extends Controller
             $validatedData['role_id'] = 3;
             $user = User::create($validatedData);
             $hobbies = Hobby::all();
-            $randomHobbyIds = $hobbies->random(5)->pluck('id');
-            $user->hobbies()->attach($randomHobbyIds);
+            if ($hobbies->isNotEmpty()) {
+                $randomHobbyIds = $hobbies->random(min(5, $hobbies->count()))->pluck('id');
+                $user->hobbies()->attach($randomHobbyIds);
+            }
             $token = JWTAuth::attempt(['email' => $request->email, 'password' => $request->password]);
             return response(['name'=>$user->name,'access_token'=>$token,'id'=>$user->id,'email'=>$user->email,'image'=>env('APP_URL').'storage/app/'.$user->image]);
         }
@@ -96,22 +98,34 @@ class AuthenticationController extends Controller
             'password' => 'required',
         ]);
         if ($validator->fails()) {
-            return response()->json(['error' => 'invalid_credentials'], 401);
+            return response()->json(['error' => 'email or password is missing'], 401);
         }
         $credentials = $request->only('email', 'password');
-
-        if (! $token = JWTAuth::attempt($credentials)) {
+        $input = $request->input('email');
+        if (filter_var($input, FILTER_VALIDATE_EMAIL)) {
+            $user = User::where('email', $input)->first();
+        } else {
+            $user = User::where('phone_number', $input)->first(); // Adjust based on your database structure
+        }
+        if (! $token = JWTAuth::attempt(['email' => $user->email, 'password' => $credentials['password']])) {
             return response()->json(['error' => 'invalid_credentials'], 401);
         }
-        // Get the authenticated user from the JWT token
         $user = JWTAuth::user();
-        // Return the token and user ID in the response
         return response()->json([
             'token' => $token,
             'user_id' => $user->id,
             'user_image' => env('APP_URL').'storage/app/'.$user->image,
             'name' => $user->name,
-            'role' => $user->role ? $user->role->name : 'user', // Set default role if null
+            'role' => $user->role ? $user->role->name : 'user',
+            'postCount' => $user->postCount,
+            'friendsCount' => $user->friendsCount,
+            'bio' => $user->bio,
+            'isFriend' =>false,
+            'isFriendRequest' => false,
+            'occupation'=>$user->occupation,
+            'isHavingFiles' => $user->isHavingFiles,
+            'isHavingBangUpdate' => $user->isHavingBangUpdate,
+            'phone_number' => $user->phone_number,
         ]);
     }
 
