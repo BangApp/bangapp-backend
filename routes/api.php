@@ -207,6 +207,8 @@ Route::get('/getPaymentStatus/{transactionId}', function ($transactionId) {
 
 Route::post('/payments/flutterwave', [FlutterwaveController::class, 'pay']);
 Route::post('/payments/transfer', [FlutterwaveController::class, 'initiateTransfer']);
+Route::post('/payments/webhook', [FlutterwaveController::class, 'webhook']);
+
 
 
 
