@@ -559,7 +559,7 @@ Route::middleware('auth:api')->group(function () {
 
         //if (empty($getUniqueValues)){
 
-          // $userHobbies = UserHobby::where('user_id', $user_id)->pluck('hobby_id')->toArray();
+           $userHobbies = UserHobby::where('user_id', $user_id)->pluck('hobby_id')->toArray();
 
           $pinnedUserIds = User::where('subscribe', true)->pluck('id')->toArray();
 
@@ -571,60 +571,13 @@ Route::middleware('auth:api')->group(function () {
         //     })->pluck('user_id', 'friend_id')
         //     ->toArray();
 
-          // $subscribeUserIds = azampay::where('type', 'message')->whereDate('created_at', '<=', now()->subDays(30))->where('user_id', $user_id)->pluck('post_id')->toArray();
+          $subscribeUserIds = azampay::where('type', 'message')->whereDate('created_at', '<=', now()->subDays(30))->where('user_id', $user_id)->pluck('post_id')->toArray();
 
-          // $uniqueArray = array_diff($pinnedUserIds, $subscribeUserIds);
+           $uniqueArray = array_diff($pinnedUserIds, $subscribeUserIds);
 
            // Optional: Reset the array keys to have a continuous sequence (if needed)
           // $uniqueArray = array_values($uniqueArray);
 
-<<<<<<< HEAD
-          // $posts = Post::unseenPosts($user_id)->where('type', 'image')
-            //    ->whereNotIn('user_id', $uniqueArray)
-              //  ->whereHas('user.hobbies', function ($query) use ($userHobbies) {
-                //    $query->whereIn('hobby_id', $userHobbies);
-               // })
-              //  ->with([
-              //      'likes' => function ($query) {
-              //          $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
-              //              ->groupBy('post_id', 'like_type');
-              //      },
-              //      'challenges' => function ($query) {
-              //          $query->select('*')->where('confirmed', 1);
-              //      }
-              //  ])
-              //  ->latest()
-              //  ->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
-        //}
-       // else{
-         //   $posts = Post::unseenPosts($user_id)->latest()->where('type', 'image')->whereIn('user_id',getUniqueValues($user_id))
-         //       ->with([
-         //           'likes' => function ($query) {
-         //               $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
-         //                   ->groupBy('post_id', 'like_type');
-         //           },
-        //            'challenges' => function ($query) {
-        //                $query->select('*')->where('confirmed', 1);
-        //            }
-        //        ])->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
-       // }
-
-         $posts = Post::unseenPosts($user_id)->latest()->where('type', 'image')->whereNotIn('user_id', $pinnedUserIds)
-        	 ->with([
-             'category' => function($query) {
-                 $query->select('id', 'name');
-             },
-             'likes' => function($query) {
-                 $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
-                     ->groupBy('post_id', 'like_type');
-             },
-             'challenges' => function($query) {
-                 $query->select('*')->where('confirmed', 1);
-             }
-         ])->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
-
-
-=======
            $posts = Post::unseenPosts($user_id)->where('type', 'image')
                 ->whereNotIn('user_id', $uniqueArray)
                 ->whereHas('user.hobbies', function ($query) use ($userHobbies) {
@@ -641,24 +594,23 @@ Route::middleware('auth:api')->group(function () {
                 ])
                 ->latest()
                 ->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
-        }
-        else{
-            Log::info("naingia hapa" );
-            Log::info($getUniqueValues);
-            $posts = Post::unseenPosts($user_id)->latest()->where('type', 'image')->whereIn('user_id',$getUniqueValues)
-                ->with([
-                    'likes' => function ($query) {
-                        $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
-                            ->groupBy('post_id', 'like_type');
-                    },
-                    'challenges' => function ($query) {
-                        $query->select('*')->where('confirmed', 1);
-                    }
-                ])->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
+        // }
+        // else{
+        //     Log::info("naingia hapa" );
+        //     Log::info($getUniqueValues);
+        //     $posts = Post::unseenPosts($user_id)->latest()->where('type', 'image')->whereIn('user_id',$getUniqueValues)
+        //         ->with([
+        //             'likes' => function ($query) {
+        //                 $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
+        //                     ->groupBy('post_id', 'like_type');
+        //             },
+        //             'challenges' => function ($query) {
+        //                 $query->select('*')->where('confirmed', 1);
+        //             }
+        //         ])->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
             
-        }
+        // }
 
->>>>>>> f15097327c422b076a6355dac9681229c1d3d2f0
         $posts->getCollection()->transform(function ($post) use ($appUrl, $user_id) {
             $post->post_views_count = $post->pinned == 1 ?  $post->payedCount() : $post->postViews->count();
             // Update the 'pinned' attribute based on whether the user has paid or not
