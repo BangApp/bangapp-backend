@@ -107,8 +107,8 @@ class FlutterwaveController extends Controller
         ]);
 
         // Extract the validated parameters
-        $postId = $validated['postId'];
-        $userId = $validated['userId'];
+        $postId = $validated['post_id'];
+        $userId = $validated['user_id'];
         $type = $validated['type'];
         $amount = $validated['amount'];
         $phone_number = $validated['phone_number'];
