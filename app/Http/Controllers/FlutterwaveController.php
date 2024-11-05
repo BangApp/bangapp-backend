@@ -114,16 +114,16 @@ class FlutterwaveController extends Controller
     {
         // Validate the incoming request
         $validated = $request->validate([
-            'postId' => 'required|integer',
-            'userId' => 'required|integer',
+            'post_id' => 'required|string',
+            'user_id' => 'required|string',
             'type' => 'required|string',
-            'amount' => 'required|numeric',
+            'amount' => 'required|string',
             'phone_number' => 'required',
         ]);
 
         // Extract the validated parameters
-        $postId = $validated['postId'];
-        $userId = $validated['userId'];
+        $postId = $validated['post_id'];
+        $userId = $validated['user_id'];
         $type = $validated['type'];
         $amount = $validated['amount'];
         $phone_number = $validated['phone_number'];
