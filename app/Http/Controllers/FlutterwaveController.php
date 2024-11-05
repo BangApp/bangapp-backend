@@ -186,7 +186,9 @@ class FlutterwaveController extends Controller
     }
 
     public function webhook(Request $request){
-        dd($request->all());
+        Log::info(json_encode($request->all()));
+        Log::info("flutter wave callback data");
+        return true;
     }
 
 }
