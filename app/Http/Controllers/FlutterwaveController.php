@@ -99,10 +99,10 @@ class FlutterwaveController extends Controller
     {
         // Validate the incoming request
         $validated = $request->validate([
-            'postId' => 'required|integer',
-            'userId' => 'required|integer',
+            'post_id' => 'required|string',
+            'user_id' => 'required|string',
             'type' => 'required|string',
-            'amount' => 'required|numeric',
+            'amount' => 'required|string',
             'phone_number' => 'required',
         ]);
 
