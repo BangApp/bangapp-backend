@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
-use Illuminate\Support\Facades\Log;
 namespace App\Http\Controllers;
+use Illuminate\Support\Facades\Log;
 
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
@@ -186,8 +186,9 @@ class FlutterwaveController extends Controller
     }
 
     public function webhook(Request $request){
-        Log::info(json_encode($request->all()));
-        Log::info("flutter wave callback data");
+
+        \Illuminate\Support\Facades\Log::info(json_encode($request->all()));
+        \Illuminate\Support\Facades\Log::info("flutter wave callback data");
         return true;
     }
 
