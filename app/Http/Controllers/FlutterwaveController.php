@@ -215,12 +215,10 @@ class FlutterwaveController extends Controller
     {
         $payload = $request->all();
 
-
         if ($payload['event'] === 'charge.completed') {
             $data = $payload['data'];
             $customer = $data['customer'];
 
-            // Decode the tx_ref field
             $txRef = $data['tx_ref'];
 
             // Split tx_ref to get the ref and encoded meta part

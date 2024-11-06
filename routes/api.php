@@ -156,7 +156,6 @@ Route::any('/azampay', function (Request $request) {
 
 Route::any('/saveDummyAzampPay', function (Request $request) {
     $data = $request->all();
-
     $transactionId = $data['transactionId'] ?? null;
     $type= $data['type'] ?? null;
 
@@ -193,6 +192,23 @@ Route::any('/saveDummyAzampPay', function (Request $request) {
 
     return response()->json(['id' => $dummyPayment->id], 200);
 });
+
+Route::any('/saveDummyFlutterWave', function(Request $request){
+    $data = $request->all();
+    $transactionId = $data['transactionId'] ?? null;
+    $type= $data['type'] ?? null;
+
+    if (!$transactionId) {
+        return response()->json(['error' => 'Transaction ID not provided'], 400);
+    }
+
+    $previousPayment = Azampay::latest()->first();
+
+    if (!$previousPayment) {
+        return response()->json(['error' => 'No previous payment found with the provided transaction ID'], 404);
+    }
+
+})
 
 
 
