@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Flutterwave;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\DB;
 
 namespace App\Http\Controllers;
 
@@ -275,7 +276,7 @@ class FlutterwaveController extends Controller
     }
 
     public function getPaymentStatus($transactionId){
-        $payment = Flutterwave::where('reference', $transactionId)->where('status', 'successful')->first();
+        $payment = \App\Flutterwave::where('reference', $transactionId)->where('status', 'successful')->first();
         if ($payment) {
             return response()->json(['status' => true, 'post_id' => $payment->post_id], 200);
         } else {
@@ -284,18 +285,18 @@ class FlutterwaveController extends Controller
     }
 
     public function getUserInsights($user_id){
-        $userPosts = DB::table('flutterwaves')
+        $userPosts = \Illuminate\Support\Facades\DB::table('flutterwaves')
                         ->join('posts', 'flutterwaves.post_id', '=', 'posts.id')
                         ->select('flutterwaves.amount')
                         ->where('posts.user_id', $user_id)
                         ->where('flutterwaves.type', 'post')
                         ->get();
-        $userSubscriptions = DB::table('flutterwaves')
+        $userSubscriptions = \Illuminate\Support\Facades\DB::table('flutterwaves')
                                 ->select('amount')
                                 ->where('post_id', $user_id)
                                 ->where('type', 'subscription')
                                 ->get();
-        $userMessages = DB::table('flutterwaves')
+        $userMessages = \Illuminate\Support\Facades\DB::table('flutterwaves')
                             ->select('amount')
                             ->where('post_id', $user_id)
                             ->where('type', 'message')
@@ -304,7 +305,7 @@ class FlutterwaveController extends Controller
         $totalAmountPost = $userPosts->sum('amount');
         $totalAmountSubscription = $userSubscriptions->sum('amount');
         $totalAmountMessages = $userMessages->sum('amount');
-        $totalAmount = $totalAmountPost + $totalAmountSubscription + $totalAmountMessages;
+        $totalAmount = ($totalAmountPost + $totalAmountSubscription + $totalAmountMessages) * 0.7;
         return response()->json(['total_earned' => $totalAmount, 'total_post'=>$totalAmountPost, 'total_subscription'=>$totalAmountSubscription, 'total_messages'=>$totalAmountMessages] , 200);
     }
 
