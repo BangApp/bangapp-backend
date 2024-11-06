@@ -153,6 +153,7 @@ class AuthenticationController extends Controller
             'user_image' => env('APP_URL').'storage/app/'.$user->image,
             'name' => $user->name,
             'role' => $user->role ? $user->role->name : 'user',
+            'phone_number' => $user->phone_number,
 ]);
     }
 
