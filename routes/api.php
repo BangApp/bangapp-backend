@@ -208,7 +208,7 @@ Route::any('/saveDummyFlutterWave', function(Request $request){
         return response()->json(['error' => 'No previous payment found with the provided transaction ID'], 404);
     }
 
-})
+});
 
 
 
