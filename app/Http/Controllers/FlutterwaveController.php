@@ -19,6 +19,9 @@ class FlutterwaveController extends Controller
     {
         $firstThreeDigits = substr($phoneNumber, 0, 3);
 
+        \Log::info($firstThreeDigits);
+        \Log::info('first three digits');
+
         switch ($firstThreeDigits) {
             case '074':
             case '075':
@@ -37,7 +40,7 @@ class FlutterwaveController extends Controller
             case '069':
                 return 'halopesa';
             default:
-                return 'mpesa';
+                return 'tigo';
         }
     }
 
