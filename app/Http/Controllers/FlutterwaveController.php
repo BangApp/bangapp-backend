@@ -184,6 +184,10 @@ class FlutterwaveController extends Controller
             ],
         ];
 
+        \Log::info(json_encode( $payload ));
+
+        \Log::info("this is payload that is going");
+
         try {
             // Send the POST request
             $response = $client->post($url, [
