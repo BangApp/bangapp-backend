@@ -291,7 +291,7 @@ class FlutterwaveController extends Controller
     }
 
     public function getPaymentStatus($transactionId){
-        $payment = \App\Flutterwave::where('reference', $transactionId)->where('status', 'successful')->first();
+        $payment = \App\Flutterwave::where('reference', $transactionId)->where('transactionstatus', 'successful')->first();
         if ($payment) {
             return response()->json(['status' => true, 'post_id' => $payment->post_id], 200);
         } else {
