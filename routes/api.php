@@ -209,12 +209,15 @@ Route::get('/getFlutterWavePaymentStatus/{transactionId}', [FlutterwaveControlle
 
 
 
+
+
 Route::post('/payments/webhook', [FlutterwaveController::class, 'webhook']);
 
 
 Route::middleware('auth:api')->group(function () {
     Route::post('/payments/flutterwave', [FlutterwaveController::class, 'pay']);
     Route::post('/payments/transfer', [FlutterwaveController::class, 'initiateTransfer']);
+    Route::get('/getFlutterWaveInsights/{userId}', [FlutterwaveController::class, 'getUserInsights']);
     Route::get('/users/search', 'App\Http\Controllers\UserController@search');
     Route::get('/users/getMyInfo', 'App\Http\Controllers\UserController@getMyInfo');
     Route::get('/bang-updatesnew', function (\Illuminate\Http\Request $request) {
