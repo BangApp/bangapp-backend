@@ -145,11 +145,11 @@ class FlutterwaveController extends Controller
         $url = env('FLUTTERWAVE_URL');
 
         // Fetch data from the request
-        $accountBank = $request->input('account_bank');
+        // $accountBank = $request->input('account_bank');
         $accountNumber = $request->input('account_number');
         $user_id = $request->input('user_id');
         $amount = $request->input('amount');
-        $reference = $request->input('reference');
+        // $reference = $request->input('reference');
 
         $client = new Client();
 
@@ -166,14 +166,14 @@ class FlutterwaveController extends Controller
         $withdaw->amount = $amount;
         $withdaw->user_id = $user_id;
         $withdaw->destination = $accountNumber;
-        $withdaw->channel = $this->checkProvider($accountBank);
+        $withdaw->channel = $this->checkProvider($accountNumber);
         $withdaw->save();
         
 
         
         $payload = [
-            'account_number' => $accountNumber,
-            'account_bank' =>  $this->checkProvider($accountBank),
+            'account_number' => '+255' . ltrim($accountNumber, '0'),
+            'account_bank' =>  $this->checkProvider($accountNumber),
             'amount' => $amount,
             'currency' => 'TZS',
             'narration' => 'Payment for goods',
