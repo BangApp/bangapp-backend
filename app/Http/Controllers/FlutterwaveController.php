@@ -42,6 +42,7 @@ class FlutterwaveController extends Controller
 
     public function makePayment($postId, $userId, $type, $amount, $phone_number)
     {
+        $user = User::find($userId);
         $flutterwaveSecretKey = env('FLUTTERWAVE_SECRET_KEY');
         $url = env('FLUTTERWAVE_URL_PAY');
 
@@ -56,21 +57,21 @@ class FlutterwaveController extends Controller
 
         $data = [
             'amount' =>  $amount,
-            'email' => 'user@example.com',
+            'email' => $user->email,
             'tx_ref' => "67677677",
             'currency' => 'TZS',
             'redirect_url' =>'https://google.com',
             'phone_number' => $phone_number,
-            'fullname' => 'Example User',
+            'fullname' => $user->name,
             'meta' => [
                 "postId"=> $postId,
                 "userId" => $userId,
                 "type" => $type
             ],
             'customer' => [
-                'email' => 'user@example.com',
+                'email' => $user->email,
                 'phonenumber' => $phone_number,
-                'name' => 'Example User' 
+                'name' => $user->name, 
             ]
         ];
 
@@ -190,6 +191,10 @@ class FlutterwaveController extends Controller
         \Illuminate\Support\Facades\Log::info(json_encode($request->all()));
         \Illuminate\Support\Facades\Log::info("flutter wave callback data");
         return true;
+    }
+
+    public function getPaymentStatus(Request $request){
+        
     }
 
 }
