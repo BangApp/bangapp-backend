@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 namespace App\Http\Controllers;
 
+use App\Withdrawal;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 
@@ -143,6 +144,7 @@ class FlutterwaveController extends Controller
         // Fetch data from the request
         $accountBank = $request->input('account_bank');
         $accountNumber = $request->input('account_number');
+        $user_id = $request->input('user_id');
         $amount = $request->input('amount');
         $reference = $request->input('reference');
 
@@ -157,6 +159,15 @@ class FlutterwaveController extends Controller
         // dd($accountBank, $accountNumber, $amount, $reference);
 
         // Define the payload (body parameters)
+        $withdaw = new \App\Withdrawal();
+        $withdaw->amount = $amount;
+        $withdaw->user_id = $user_id;
+        $withdaw->destination = $accountNumber;
+        $withdaw->channel = $this->checkProvider($accountBank);
+        $withdaw->save();
+        
+
+        
         $payload = [
             'account_number' => $accountNumber,
             'account_bank' =>  $this->checkProvider($accountBank),
@@ -187,6 +198,12 @@ class FlutterwaveController extends Controller
                     'status' => 'success',
                     'data' => $response_data
                 ]);
+                
+                if ($response_data['data']['status'] == 'success') {
+                    $withdaw->status = 'success';
+                    $withdaw->save();
+                }
+                
             } else {
                 return response()->json([
                     'status' => 'fail',
