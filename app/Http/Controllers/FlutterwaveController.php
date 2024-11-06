@@ -44,7 +44,7 @@ class FlutterwaveController extends Controller
 
     public function makePayment($postId, $userId, $type, $amount, $phone_number)
     {
-        $user = User::find($userId);
+        $user = \App\User::find($userId);
         $flutterwaveSecretKey = env('FLUTTERWAVE_SECRET_KEY');
         $url = env('FLUTTERWAVE_URL_PAY');
 
