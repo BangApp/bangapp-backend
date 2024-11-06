@@ -25,7 +25,7 @@ class FlutterwaveController extends Controller
             case '071':
             case '065':
             case '067':
-                return 'tigopesa';
+                return 'tigo';
             case '078':
             case '068':
             case '069':
@@ -158,7 +158,7 @@ class FlutterwaveController extends Controller
         // Define the payload (body parameters)
         $payload = [
             'account_number' => $accountNumber,
-            'account_bank' => $accountBank,
+            'account_bank' =>  $this->checkProvider($accountBank),
             'amount' => $amount,
             'currency' => 'TZS',
             'narration' => 'Payment for goods',
