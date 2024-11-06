@@ -1,13 +1,13 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Http\Request;
+use App\Flutterwave;
 use GuzzleHttp\Client;
-namespace App\Http\Controllers;
-use Illuminate\Support\Facades\Log;
 
-use Illuminate\Http\Request;
+namespace App\Http\Controllers;
+
 use GuzzleHttp\Client;
+use Illuminate\Http\Request;
 
 class FlutterwaveController extends Controller
 {
@@ -54,17 +54,32 @@ class FlutterwaveController extends Controller
 
         $ref = random_int(100000, 99999999999);
 
+        $ref = random_int(100000, 99999999999);
+
+        // Meta data to be included in the transref
+        $meta = [
+            "postId" => $postId,
+            "userId" => $userId,
+            "type" => $type
+        ];
+
+        // Encode the metadata as JSON and then base64 encode it to make it URL-safe
+        $encodedMeta = base64_encode(json_encode($meta));
+
+        // Combine the random ref and encoded metadata
+        $transref = $ref . '_' . $encodedMeta;
+
 
         $data = [
             'amount' =>  $amount,
             'email' => $user->email,
-            'tx_ref' => "67677677",
+            'tx_ref' => $transref,
             'currency' => 'TZS',
-            'redirect_url' =>'https://google.com',
+            'redirect_url' => 'https://google.com',
             'phone_number' => $phone_number,
             'fullname' => $user->name,
             'meta' => [
-                "postId"=> $postId,
+                "postId" => $postId,
                 "userId" => $userId,
                 "type" => $type
             ],
@@ -115,7 +130,7 @@ class FlutterwaveController extends Controller
         $phone_number = $validated['phone_number'];
 
         // Call the makePayment method
-        return $this->makePayment(  $postId,  $userId, $type, $amount, $phone_number);
+        return $this->makePayment($postId, $userId, $type, $amount, $phone_number);
     }
 
 
@@ -129,12 +144,12 @@ class FlutterwaveController extends Controller
         $accountNumber = $request->input('account_number');
         $amount = $request->input('amount');
         $reference = $request->input('reference');
-        
+
         $client = new Client();
-        
+
         // Define the headers
         $headers = [
-        'Authorization' => "Bearer $flutterwaveSecretKey",
+            'Authorization' => "Bearer $flutterwaveSecretKey",
             'Content-Type' => 'application/json',
         ];
 
@@ -182,14 +197,81 @@ class FlutterwaveController extends Controller
                 'status' => 'error',
                 'message' => $e->getMessage(),
             ], 500);
+
         }
     }
 
-    public function webhook(Request $request){
+    // public function webhook(Request $request)
+    // {
 
-        \Illuminate\Support\Facades\Log::info(json_encode($request->all()));
-        \Illuminate\Support\Facades\Log::info("flutter wave callback data");
-        return true;
+    //     return response()->json([
+    //         'message' => 'Callback received and processed successfully.'
+    //     ], 200);
+    // }
+
+
+    public function webhook(Request $request)
+    {
+        $payload = $request->all();
+
+
+        if ($payload['event'] === 'charge.completed') {
+            $data = $payload['data'];
+            $customer = $data['customer'];
+
+            // Decode the tx_ref field
+            $txRef = $data['tx_ref'];
+
+            // Split tx_ref to get the ref and encoded meta part
+            list($ref, $encodedMeta) = explode('_', $txRef, 2);
+
+            // Decode the metadata
+            $decodedMeta = json_decode(base64_decode($encodedMeta), true);
+
+            // dd($decodedMeta);
+
+            // Extract meta fields if decoded successfully
+            if ($decodedMeta) {
+                $postId = $decodedMeta['postId'];
+                $userId = $decodedMeta['userId'];
+                $type = $decodedMeta['type'];
+            } else {
+                return response()->json(['message' => 'Invalid tx_ref format.'], 400);
+            }
+
+            // Save to the flutterwaves table
+            $flutterwave = new \App\Flutterwave();
+            $flutterwave->response = json_encode($payload);
+            $flutterwave->message = $data['processor_response'];
+            $flutterwave->user = $customer['name'];
+            $flutterwave->transactionstatus = $data['status'];
+            $flutterwave->operator = $data['payment_type'];
+            $flutterwave->reference = $txRef;
+            $flutterwave->externalreference = $data['flw_ref'];
+            $flutterwave->utilityref = $data['narration'];
+            $flutterwave->amount = $data['amount'];
+            $flutterwave->transid = $data['id'];
+            $flutterwave->msisdn = $customer['phone_number'];
+            $flutterwave->mnoreference = $data['account_id'];
+            $flutterwave->submerchantAcc = ''; // Leave empty if no submerchant account in payload
+
+            // Set extracted values for type, user_id, and post_id
+            $flutterwave->type = $type;
+            $flutterwave->user_id = $userId;
+            $flutterwave->post_id = $postId;
+
+            // Save the record to the database
+            $flutterwave->save();
+
+            return response()->json([
+                'message' => 'Callback received and processed successfully.'
+            ], 200);
+
+
+            // return response()->json(['message' => 'Event not supported'], 400);
+        }
+
+
     }
 
     public function getPaymentStatus($transactionId){
