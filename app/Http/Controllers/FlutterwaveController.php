@@ -149,7 +149,6 @@ class FlutterwaveController extends Controller
         $accountNumber = $request->input('account_number');
         $user_id = $request->input('user_id');
         $amount = $request->input('amount');
-        // $reference = $request->input('reference');
 
         $client = new Client();
 
@@ -159,8 +158,6 @@ class FlutterwaveController extends Controller
             'Content-Type' => 'application/json',
         ];
 
-        // dd($accountBank, $accountNumber, $amount, $reference);
-
         // Define the payload (body parameters)
         $withdaw = new \App\Withdrawal();
         $withdaw->amount = $amount;
@@ -168,8 +165,6 @@ class FlutterwaveController extends Controller
         $withdaw->destination = $accountNumber;
         $withdaw->channel = $this->checkProvider($accountNumber);
         $withdaw->save();
-        
-
         
         $payload = [
             'account_number' => '+255' . ltrim($accountNumber, '0'),
@@ -199,13 +194,11 @@ class FlutterwaveController extends Controller
             ]);
 
             $response_data = json_decode($response->getBody(), true);
-
             if ($response->getStatusCode() == 200) {
                 return response()->json([
                     'status' => 'success',
                     'data' => $response_data
                 ]);
-                
                 if ($response_data['data']['status'] == 'success') {
                     $withdaw->status = 'success';
                     $withdaw->save();
@@ -226,14 +219,6 @@ class FlutterwaveController extends Controller
         }
     }
 
-    // public function webhook(Request $request)
-    // {
-
-    //     return response()->json([
-    //         'message' => 'Callback received and processed successfully.'
-    //     ], 200);
-    // }
-
 
     public function webhook(Request $request)
     {
@@ -250,8 +235,6 @@ class FlutterwaveController extends Controller
 
             // Decode the metadata
             $decodedMeta = json_decode(base64_decode($encodedMeta), true);
-
-            // dd($decodedMeta);
 
             // Extract meta fields if decoded successfully
             if ($decodedMeta) {
@@ -282,16 +265,12 @@ class FlutterwaveController extends Controller
             $flutterwave->type = $type;
             $flutterwave->user_id = $userId;
             $flutterwave->post_id = $postId;
-
-            // Save the record to the database
             $flutterwave->save();
 
             return response()->json([
                 'message' => 'Callback received and processed successfully.'
             ], 200);
 
-
-            // return response()->json(['message' => 'Event not supported'], 400);
         }
 
 
@@ -323,12 +302,18 @@ class FlutterwaveController extends Controller
                             ->where('post_id', $user_id)
                             ->where('type', 'message')
                             ->get();
+        $userWithdrawals = \Illuminate\Support\Facades\DB::table('withdrawals')
+                            ->select('amount')
+                            ->where('user_id', $user_id)
+                            ->get();
         // Calculating total amount earned from user's posts
         $totalAmountPost = $userPosts->sum('amount');
         $totalAmountSubscription = $userSubscriptions->sum('amount');
         $totalAmountMessages = $userMessages->sum('amount');
-        $totalAmount = ($totalAmountPost + $totalAmountSubscription + $totalAmountMessages) * 0.7;
-        return response()->json(['total_earned' => $totalAmount, 'total_post'=>$totalAmountPost, 'total_subscription'=>$totalAmountSubscription, 'total_messages'=>$totalAmountMessages] , 200);
+        $totalUserWithdrawals = $userWithdrawals->sum('amount');
+        $subTotalAmount = ($totalAmountPost + $totalAmountSubscription + $totalAmountMessages) * 0.7;
+        $totalAmount = $totalUserWithdrawals - $subTotalAmount;
+        return response()->json(['sub_total'=> $subTotalAmount, 'total_earned' => $totalAmount, 'total_post'=>$totalAmountPost, 'total_subscription'=>$totalAmountSubscription, 'total_messages'=>$totalAmountMessages, 'total_user_withdrawals'=>$totalUserWithdrawals] , 200);
     }
 
 }

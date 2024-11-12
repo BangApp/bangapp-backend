@@ -254,11 +254,8 @@ Route::middleware('auth:api')->group(function () {
                 'totalItems' => $bangUpdates->total(),
             ],
         ];
-
         return response()->json($paginatedResponse);
     });
-
-
 
     Route::get('/bang-updates/{userId}/{per_page}/{page}', function ($userId,$per_page,$page) {
         $appUrl = "https://bangapp.pro/BangAppBackend/";

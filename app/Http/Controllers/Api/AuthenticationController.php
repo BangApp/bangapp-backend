@@ -154,6 +154,13 @@ class AuthenticationController extends Controller
             'name' => $user->name,
             'role' => $user->role ? $user->role->name : 'user',
             'phone_number' => $user->phone_number,
+            'post_count' => $user->postCount,
+            'bio' => $user->bio,
+            'friends_count' => $user->friendsCount,
+            'is_having_files' => $user->isHavingFiles,
+            'is_having_bang_update' => $user->isHavingBangUpdate,
+            'occupation' => $user->occupation,
+            'country_code' => $user->isHavingBangUpdate,
 ]);
     }
 
