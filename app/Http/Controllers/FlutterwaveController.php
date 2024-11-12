@@ -312,7 +312,7 @@ class FlutterwaveController extends Controller
         $totalAmountMessages = $userMessages->sum('amount');
         $totalUserWithdrawals = $userWithdrawals->sum('amount');
         $subTotalAmount = ($totalAmountPost + $totalAmountSubscription + $totalAmountMessages) * 0.7;
-        $totalAmount = $totalUserWithdrawals - $subTotalAmount;
+        $totalAmount = $subTotalAmount -  $totalUserWithdrawals;
         return response()->json(['sub_total'=> $subTotalAmount, 'total_earned' => $totalAmount, 'total_post'=>$totalAmountPost, 'total_subscription'=>$totalAmountSubscription, 'total_messages'=>$totalAmountMessages, 'total_user_withdrawals'=>$totalUserWithdrawals] , 200);
     }
 
