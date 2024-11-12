@@ -160,12 +160,12 @@ class User extends Authenticatable implements JWTSubject
 
     public function getBioAttribute()
     {
-        return $this->bio;
+        return $this->attributes['bio'];
     }
 
     public function getOccupationAttribute()
     {
-        return $this->occupation;
+        return $this->attributes['occupation'];
     }
 
     public function getPostCountAttribute()
