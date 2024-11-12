@@ -1934,14 +1934,20 @@ Route::post('/buyFollowers', function (Request $request) {
 });
 
 Route::post('/updateLastSeen', function(Request $request){
-    $user = User::find($request->user_id);
-    $user->last_seen = now();
-    if( $user->save()){
-        return response()->json(['message' => 'Last seen updated successfully'],200);
+    if($request->user_id){
+        $user = User::find($request->user_id);
+        $user->last_seen = now();
+        if( $user->save()){
+            return response()->json(['message' => 'Last seen updated successfully'],200);
+        }
+        else{
+            return response()->json(['message' => 'Last seen Not updated'], 400);
+        }
     }
     else{
-        return response()->json(['message' => 'Last seen Not updated'], 400);
+        return response()->json(['message' => 'User id empty'], 400);
     }
+    
 });
 
 Route::post('/updateOnlineStatus', function(Request $request){
