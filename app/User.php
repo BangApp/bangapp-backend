@@ -158,7 +158,15 @@ class User extends Authenticatable implements JWTSubject
         return $this->followers()->count();
     }
 
-    
+    public function getBioAttribute()
+    {
+        return $this->user->bio;
+    }
+
+    public function getOccupationAttribute()
+    {
+        return $this->attributes['occupation'];
+    }
 
     public function getPostCountAttribute()
     {
