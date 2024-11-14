@@ -161,7 +161,7 @@ class User extends Authenticatable implements JWTSubject
     public function getSubscriptionCountAttribute()
     {
         return \DB::table('flutterwaves')
-            ->where('user_id', $this->id)
+            ->where('post_id', $this->id)
             ->where('type', 'subscription')
             ->count();
     }
