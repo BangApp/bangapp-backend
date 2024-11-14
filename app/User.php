@@ -168,13 +168,14 @@ class User extends Authenticatable implements JWTSubject
 
     public function getBioAttribute($value)
     {
-        return  $value;
+        return $value ?? '';
     }
-
+    
     public function getOccupationAttribute($value)
     {
-        return $value;
+        return $value ?? '';
     }
+    
 
     public function getPostCountAttribute()
     {
