@@ -31,7 +31,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password','phone_number','date_of_birth','bio','image','device_token','public','price','subscribe','subscriptionPrice','country_code'
+        'name', 'email', 'password','phone_number','date_of_birth','bio','image','device_token','public','price','subscribe','subscriptionPrice','country_code','occupation'
     ];
 
     /**
@@ -52,7 +52,7 @@ class User extends Authenticatable implements JWTSubject
         'email_verified_at' => 'datetime',
     ];
 
-    protected $appends = ['followerCount', 'followingCount', 'followingMe', 'followed','user_image_url','postCount','friendsCount','lastSeen','isHavingFiles','isHavingBangUpdate'];
+    protected $appends = ['followerCount', 'followingCount', 'followingMe', 'followed','user_image_url','postCount','friendsCount','lastSeen','isHavingFiles','isHavingBangUpdate','bio','occupation',];
 
     public function posts()
     {
@@ -156,6 +156,16 @@ class User extends Authenticatable implements JWTSubject
     public function getFollowerCountAttribute()
     {
         return $this->followers()->count();
+    }
+
+    public function getBioAttribute($value)
+    {
+        return  $value;
+    }
+
+    public function getOccupationAttribute($value)
+    {
+        return $value;
     }
 
     public function getPostCountAttribute()

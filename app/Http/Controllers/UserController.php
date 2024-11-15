@@ -67,10 +67,12 @@ class UserController extends Controller
                 'name' => $user->name,
                 'profileUrl' => $appUrl.'storage/app/'.$user->image,
                 'bio' => $user->body,
-                'followCount' => $user->followers->count(),
-                'followingCount' => $user->following->count(),
-                'postCount' => $user->posts->count()
-
+                'postCount' => $user->posts->count(),
+                'occupation' => $user->occupation,
+                'friendsCount' => $user->friendsCount,
+                'isHavingFiles' => $user->isHavingFiles,
+                'isHavingBangUpdate' => $user->isHavingBangUpdate,
+                'subscriptionCount' => 0,
             ];
         }
     }

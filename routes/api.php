@@ -156,7 +156,6 @@ Route::any('/azampay', function (Request $request) {
 
 Route::any('/saveDummyAzampPay', function (Request $request) {
     $data = $request->all();
-
     $transactionId = $data['transactionId'] ?? null;
     $type= $data['type'] ?? null;
 
@@ -194,6 +193,23 @@ Route::any('/saveDummyAzampPay', function (Request $request) {
     return response()->json(['id' => $dummyPayment->id], 200);
 });
 
+Route::any('/saveDummyFlutterWave', function(Request $request){
+    $data = $request->all();
+    $transactionId = $data['transactionId'] ?? null;
+    $type= $data['type'] ?? null;
+
+    if (!$transactionId) {
+        return response()->json(['error' => 'Transaction ID not provided'], 400);
+    }
+
+    $previousPayment = Azampay::latest()->first();
+
+    if (!$previousPayment) {
+        return response()->json(['error' => 'No previous payment found with the provided transaction ID'], 404);
+    }
+
+});
+
 
 
 Route::get('/getPaymentStatus/{transactionId}', function ($transactionId) {
@@ -205,12 +221,19 @@ Route::get('/getPaymentStatus/{transactionId}', function ($transactionId) {
     }
 });
 
-Route::post('/payments/flutterwave', [FlutterwaveController::class, 'pay']);
-Route::post('/payments/transfer', [FlutterwaveController::class, 'initiateTransfer']);
+Route::get('/getFlutterWavePaymentStatus/{transactionId}', [FlutterwaveController::class, 'getPaymentStatus']);
 
+
+
+
+
+Route::post('/payments/webhook', [FlutterwaveController::class, 'webhook']);
 
 
 Route::middleware('auth:api')->group(function () {
+    Route::post('/payments/flutterwave', [FlutterwaveController::class, 'pay']);
+    Route::post('/payments/transfer', [FlutterwaveController::class, 'initiateTransfer']);
+    Route::get('/getFlutterWaveInsights/{userId}', [FlutterwaveController::class, 'getUserInsights']);
     Route::get('/users/search', 'App\Http\Controllers\UserController@search');
     Route::get('/users/getMyInfo', 'App\Http\Controllers\UserController@getMyInfo');
     Route::get('/bang-updatesnew', function (\Illuminate\Http\Request $request) {
@@ -231,11 +254,8 @@ Route::middleware('auth:api')->group(function () {
                 'totalItems' => $bangUpdates->total(),
             ],
         ];
-
         return response()->json($paginatedResponse);
     });
-
-
 
     Route::get('/bang-updates/{userId}/{per_page}/{page}', function ($userId,$per_page,$page) {
         $appUrl = "https://bangapp.pro/BangAppBackend/";
@@ -553,13 +573,13 @@ Route::middleware('auth:api')->group(function () {
 
         $user_id = $request->input('user_id');
 
-        $getUniqueValues = getUniqueValues($user_id);
+        //$getUniqueValues = getUniqueValues($user_id);
 
-        if (empty($getUniqueValues)){
+        //if (empty($getUniqueValues)){
 
            $userHobbies = UserHobby::where('user_id', $user_id)->pluck('hobby_id')->toArray();
 
-           $pinnedUserIds = User::where('subscribe', true)->pluck('id')->toArray();
+          $pinnedUserIds = User::where('subscribe', true)->pluck('id')->toArray();
 
         //    $friendsPinned = friends::where('user_id', $user_id)
         //    ->orWhere('friend_id', $user_id)
@@ -569,12 +589,12 @@ Route::middleware('auth:api')->group(function () {
         //     })->pluck('user_id', 'friend_id')
         //     ->toArray();
 
-           $subscribeUserIds = azampay::where('type', 'message')->whereDate('created_at', '<=', now()->subDays(30))->where('user_id', $user_id)->pluck('post_id')->toArray();
+          $subscribeUserIds = azampay::where('type', 'message')->whereDate('created_at', '<=', now()->subDays(30))->where('user_id', $user_id)->pluck('post_id')->toArray();
 
            $uniqueArray = array_diff($pinnedUserIds, $subscribeUserIds);
 
            // Optional: Reset the array keys to have a continuous sequence (if needed)
-           $uniqueArray = array_values($uniqueArray);
+          // $uniqueArray = array_values($uniqueArray);
 
            $posts = Post::unseenPosts($user_id)->where('type', 'image')
                 ->whereNotIn('user_id', $uniqueArray)
@@ -592,34 +612,22 @@ Route::middleware('auth:api')->group(function () {
                 ])
                 ->latest()
                 ->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
-        }
-        else{
-            $posts = Post::unseenPosts($user_id)->latest()->where('type', 'image')->whereIn('user_id',getUniqueValues($user_id))
-                ->with([
-                    'likes' => function ($query) {
-                        $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
-                            ->groupBy('post_id', 'like_type');
-                    },
-                    'challenges' => function ($query) {
-                        $query->select('*')->where('confirmed', 1);
-                    }
-                ])->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
-        }
-
-        // $posts = Post::unseenPosts($user_id)->latest()->where('type', 'image')
-        // ->with([
-        //     'category' => function($query) {
-        //         $query->select('id', 'name');
-        //     },
-        //     'likes' => function($query) {
-        //         $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
-        //             ->groupBy('post_id', 'like_type');
-        //     },
-        //     'challenges' => function($query) {
-        //         $query->select('*')->where('confirmed', 1);
-        //     }
-        // ])->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
-
+        // }
+        // else{
+        //     Log::info("naingia hapa" );
+        //     Log::info($getUniqueValues);
+        //     $posts = Post::unseenPosts($user_id)->latest()->where('type', 'image')->whereIn('user_id',$getUniqueValues)
+        //         ->with([
+        //             'likes' => function ($query) {
+        //                 $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
+        //                     ->groupBy('post_id', 'like_type');
+        //             },
+        //             'challenges' => function ($query) {
+        //                 $query->select('*')->where('confirmed', 1);
+        //             }
+        //         ])->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
+            
+        // }
 
         $posts->getCollection()->transform(function ($post) use ($appUrl, $user_id) {
             $post->post_views_count = $post->pinned == 1 ?  $post->payedCount() : $post->postViews->count();
@@ -1619,6 +1627,13 @@ Route::middleware('auth:api')->group(function () {
                 ->where('user_id', $user_id)
                 ->pluck('post_id')
                 ->toArray();
+
+            $userHobbyIds = UserHobby::where('user_id', $user_id)->pluck('hobby_id');
+            $matchingUserIds = UserHobby::whereIn('hobby_id', $userHobbyIds)
+                ->where('user_id', '!=', $user_id)
+                ->distinct()
+                ->pluck('user_id')
+                ->toArray();
             // Extract values and keys from the friends array
             $user_friends_values = array_values($user_friends_id);
             $user_friends_keys = array_keys($user_friends_id);
@@ -1628,7 +1643,8 @@ Route::middleware('auth:api')->group(function () {
                 array_map('strval', $user_follow_id),
                 array_map('strval', $user_subscribe_id),
                 array_map('strval', $user_friends_keys),
-                array_map('strval', [$user_id])
+                array_map('strval', [$user_id]),
+                array_map('strval', $matchingUserIds)
             );
             // Return unique values
             return array_unique($mergedArray);
@@ -1918,14 +1934,20 @@ Route::post('/buyFollowers', function (Request $request) {
 });
 
 Route::post('/updateLastSeen', function(Request $request){
-    $user = User::find($request->user_id);
-    $user->last_seen = now();
-    if( $user->save()){
-        return response()->json(['message' => 'Last seen updated successfully'],200);
+    if($request->user_id){
+        $user = User::find($request->user_id);
+        $user->last_seen = now();
+        if( $user->save()){
+            return response()->json(['message' => 'Last seen updated successfully'],200);
+        }
+        else{
+            return response()->json(['message' => 'Last seen Not updated'], 400);
+        }
     }
     else{
-        return response()->json(['message' => 'Last seen Not updated'], 400);
+        return response()->json(['message' => 'User id empty'], 400);
     }
+    
 });
 
 Route::post('/updateOnlineStatus', function(Request $request){
