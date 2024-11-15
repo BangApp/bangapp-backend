@@ -52,7 +52,7 @@ class User extends Authenticatable implements JWTSubject
         'email_verified_at' => 'datetime',
     ];
 
-    protected $appends = ['followerCount', 'followingCount', 'followingMe', 'followed','user_image_url','postCount','friendsCount','lastSeen','isHavingFiles','isHavingBangUpdate','bio','occupation',];
+    protected $appends = ['followerCount', 'followingCount', 'followingMe', 'followed','user_image_url','postCount','friendsCount','lastSeen','isHavingFiles','isHavingBangUpdate','bio','occupation','subscriptionCount'];
 
     public function posts()
     {
@@ -158,15 +158,24 @@ class User extends Authenticatable implements JWTSubject
         return $this->followers()->count();
     }
 
-    public function getBioAttribute($value)
+    public function getSubscriptionCountAttribute()
     {
-        return  $value;
+        return \DB::table('flutterwaves')
+            ->where('post_id', $this->id)
+            ->where('type', 'subscription')
+            ->count();
     }
 
+    public function getBioAttribute($value)
+    {
+        return $value ?? '';
+    }
+    
     public function getOccupationAttribute($value)
     {
-        return $value;
+        return $value ?? '';
     }
+    
 
     public function getPostCountAttribute()
     {

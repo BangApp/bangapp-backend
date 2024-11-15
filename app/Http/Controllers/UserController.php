@@ -72,7 +72,7 @@ class UserController extends Controller
                 'friendsCount' => $user->friendsCount,
                 'isHavingFiles' => $user->isHavingFiles,
                 'isHavingBangUpdate' => $user->isHavingBangUpdate,
-                'subscriptionCount' => 0,
+                'subscriptionCount' => $user->subscriptionCount,
             ];
         }
     }
