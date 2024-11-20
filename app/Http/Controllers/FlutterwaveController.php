@@ -190,15 +190,14 @@ class FlutterwaveController extends Controller
 
             $response_data = json_decode($response->getBody(), true);
             if ($response->getStatusCode() == 200) {
-                return response()->json([
-                    'status' => 'success',
-                    'data' => $response_data
-                ]);
-                if ($response_data['data']['status'] == 'success') {
+                \Log::info("this is response");
+                \Log::info(json_encode( $response_data ));
+                return  $response_data;
+                if ($response_data['status'] == 'success') {
                     $withdaw->status = 'pending';
-                    \Log::info(json_encode( $response_data['data']['data'] ));
                     \Log::info("this is payload response");
-                    $withdaw->reference_number = $response_data['data']['data']['id'];
+                    \Log::info(json_encode( $response_data['data'] ));
+                    $withdaw->reference_number = $response_data['data']['id'];
                     $withdaw->save();
                     $pushNotificationService = new \App\Http\Controllers\PushNotificationService();
                     $pushNotificationService->sendPushNotification($user->device_token, $user->name, withdrawMessageNotification(), $withdaw->id, 'withdraw',$user->name,$user->id);
@@ -320,6 +319,20 @@ class FlutterwaveController extends Controller
     public function withdrawMessageNotification()
     {
         return "Your withdrawal request is being processed.";
+    }
+
+    public function sendPayementNotification($type)
+    {
+        switch ($type) {
+            case 'value':
+                # code...
+                break;
+            
+            default:
+                # code...
+                break;
+        }
+
     }
 
 }
