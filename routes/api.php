@@ -210,8 +210,6 @@ Route::any('/saveDummyFlutterWave', function(Request $request){
 
 });
 
-
-
 Route::get('/getPaymentStatus/{transactionId}', function ($transactionId) {
     $payment = Azampay::where('transid', $transactionId)->where('transactionstatus', 'success')->first();
     if ($payment) {
@@ -222,9 +220,6 @@ Route::get('/getPaymentStatus/{transactionId}', function ($transactionId) {
 });
 
 Route::get('/getFlutterWavePaymentStatus/{transactionId}', [FlutterwaveController::class, 'getPaymentStatus']);
-
-
-
 
 
 Route::post('/payments/webhook', [FlutterwaveController::class, 'webhook']);

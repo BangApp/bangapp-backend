@@ -6,7 +6,6 @@ use GuzzleHttp\Client;
 use Illuminate\Support\Facades\DB;
 
 namespace App\Http\Controllers;
-
 use App\Withdrawal;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
@@ -149,7 +148,7 @@ class FlutterwaveController extends Controller
         $accountNumber = $request->input('account_number');
         $user_id = $request->input('user_id');
         $amount = $request->input('amount');
-
+        $user = \App\User::find($user_id);
         $client = new Client();
 
         // Define the headers
@@ -182,10 +181,6 @@ class FlutterwaveController extends Controller
             ],
         ];
 
-        \Log::info(json_encode( $payload ));
-
-        \Log::info("this is payload that is going");
-
         try {
             // Send the POST request
             $response = $client->post($url, [
@@ -200,8 +195,13 @@ class FlutterwaveController extends Controller
                     'data' => $response_data
                 ]);
                 if ($response_data['data']['status'] == 'success') {
-                    $withdaw->status = 'success';
+                    $withdaw->status = 'pending';
+                    \Log::info(json_encode( $response_data['data']['data'] ));
+                    \Log::info("this is payload response");
+                    $withdaw->reference_number = $response_data['data']['data']['id'];
                     $withdaw->save();
+                    $pushNotificationService = new \App\Http\Controllers\PushNotificationService();
+                    $pushNotificationService->sendPushNotification($user->device_token, $user->name, withdrawMessageNotification(), $withdaw->id, 'withdraw',$user->name,$user->id);
                 }
                 
             } else {
@@ -287,25 +287,26 @@ class FlutterwaveController extends Controller
 
     public function getUserInsights($user_id){
         $userPosts = \Illuminate\Support\Facades\DB::table('flutterwaves')
-                        ->join('posts', 'flutterwaves.post_id', '=', 'posts.id')
-                        ->select('flutterwaves.amount')
-                        ->where('posts.user_id', $user_id)
-                        ->where('flutterwaves.type', 'post')
-                        ->get();
+                                ->join('posts', 'flutterwaves.post_id', '=', 'posts.id')
+                                ->select('flutterwaves.amount')
+                                ->where('posts.user_id', $user_id)
+                                ->where('flutterwaves.type', 'post')
+                                ->get();
         $userSubscriptions = \Illuminate\Support\Facades\DB::table('flutterwaves')
                                 ->select('amount')
                                 ->where('post_id', $user_id)
                                 ->where('type', 'subscription')
                                 ->get();
         $userMessages = \Illuminate\Support\Facades\DB::table('flutterwaves')
-                            ->select('amount')
-                            ->where('post_id', $user_id)
-                            ->where('type', 'message')
-                            ->get();
+                                ->select('amount')
+                                ->where('post_id', $user_id)
+                                ->where('type', 'message')
+                                ->get();
         $userWithdrawals = \Illuminate\Support\Facades\DB::table('withdrawals')
-                            ->select('amount')
-                            ->where('user_id', $user_id)
-                            ->get();
+                                ->select('amount')
+                                ->where('user_id', $user_id)
+                                ->where('status', 'success')
+                                ->get();
         // Calculating total amount earned from user's posts
         $totalAmountPost = $userPosts->sum('amount');
         $totalAmountSubscription = $userSubscriptions->sum('amount');
@@ -314,6 +315,11 @@ class FlutterwaveController extends Controller
         $subTotalAmount = ($totalAmountPost + $totalAmountSubscription + $totalAmountMessages) * 0.7;
         $totalAmount = $subTotalAmount -  $totalUserWithdrawals;
         return response()->json(['sub_total'=> $subTotalAmount, 'total_earned' => $totalAmount, 'total_post'=>$totalAmountPost, 'total_subscription'=>$totalAmountSubscription, 'total_messages'=>$totalAmountMessages, 'total_user_withdrawals'=>$totalUserWithdrawals] , 200);
+    }
+
+    public function withdrawMessageNotification()
+    {
+        return "Your withdrawal request is being processed.";
     }
 
 }
