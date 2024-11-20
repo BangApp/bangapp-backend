@@ -224,6 +224,8 @@ Route::get('/getFlutterWavePaymentStatus/{transactionId}', [FlutterwaveControlle
 
 Route::post('/payments/webhook', [FlutterwaveController::class, 'webhook']);
 
+Route::get('/transfers/status', [FlutterwaveController::class, 'getTransactionStatus']);
+
 
 Route::middleware('auth:api')->group(function () {
     Route::post('/payments/flutterwave', [FlutterwaveController::class, 'pay']);
