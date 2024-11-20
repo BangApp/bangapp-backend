@@ -348,7 +348,7 @@ class FlutterwaveController extends Controller
             'Authorization' => "Bearer $flutterwaveSecretKey",
             'Content-Type' => 'application/json',
         ];
-        $finalUrl = rtrim($url, '/').$url.$transId;
+        $finalUrl = rtrim($url, '/').$url.'/'.$transId;
         // Send the GET request
         $response = $client->get($finalUrl, [
             'headers' => $headers, // Optional headers if needed
