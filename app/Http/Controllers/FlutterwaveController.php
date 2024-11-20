@@ -340,22 +340,26 @@ class FlutterwaveController extends Controller
     public function getTransactionStatus()
     {
         $flutterwaveSecretKey = env('FLUTTERWAVE_SECRET_KEY');
-        $url = env('FLUTTERWAVE_URL');
+        $url = env('FLUTTERWAVE_URL'); // Should be: https://api.flutterwave.com/v3/transfers
         $client = new Client();
-        $transId =87014300;
+        $transId = 87014300;
+        
         // Define the headers
         $headers = [
             'Authorization' => "Bearer $flutterwaveSecretKey",
             'Content-Type' => 'application/json',
         ];
-        $finalUrl = rtrim($url, '/').$url.'/'.$transId;
+
+        // Correct URL construction
+        $finalUrl = rtrim($url, '/') . '/' . $transId;
+
         // Send the GET request
         $response = $client->get($finalUrl, [
             'headers' => $headers, // Optional headers if needed
         ]);
 
         return $response;
-       
     }
+
 
 }
