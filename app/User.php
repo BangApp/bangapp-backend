@@ -137,7 +137,7 @@ class User extends Authenticatable implements JWTSubject
     {
         return (new Carbon($value))->diffForHumans();
     }
-    
+
     public function follow(User $user)
     {
         if ($this->following()->where('following_id', $user->id)->count() > 0) {
@@ -238,7 +238,7 @@ class User extends Authenticatable implements JWTSubject
             return $remainingDays;
         }
 
-        return 0; 
+        return 0;
     }
 
     public static function hasUserPaid($userId, $viewerId)
