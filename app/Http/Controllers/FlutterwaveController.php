@@ -287,6 +287,7 @@ class FlutterwaveController extends Controller
     }
 
     public function getUserInsights($user_id){
+        $this->checkAndUpdateWithdrawalsStatus($user_id);
         $userPosts = \Illuminate\Support\Facades\DB::table('flutterwaves')
                                 ->join('posts', 'flutterwaves.post_id', '=', 'posts.id')
                                 ->select('flutterwaves.amount')
@@ -306,7 +307,7 @@ class FlutterwaveController extends Controller
         $userWithdrawals = \Illuminate\Support\Facades\DB::table('withdrawals')
                                 ->select('amount')
                                 ->where('user_id', $user_id)
-                                ->where('status', 'success')
+                                ->where('status', 'complete')
                                 ->get();
         // Calculating total amount earned from user's posts
         $totalAmountPost = $userPosts->sum('amount');
@@ -337,29 +338,43 @@ class FlutterwaveController extends Controller
 
     }
 
-    public function getTransactionStatus()
+    public function getTransactionStatus($transId)
     {
         $flutterwaveSecretKey = env('FLUTTERWAVE_SECRET_KEY');
-        $url = env('FLUTTERWAVE_URL'); // Should be: https://api.flutterwave.com/v3/transfers
+        $url = env('FLUTTERWAVE_URL'); 
         $client = new Client();
-        $transId = 87014300;
-        
         // Define the headers
         $headers = [
             'Authorization' => "Bearer $flutterwaveSecretKey",
             'Content-Type' => 'application/json',
         ];
-
-        // Correct URL construction
         $finalUrl = rtrim($url, '/') . '/' . $transId;
-
-        // Send the GET request
         $response = $client->get($finalUrl, [
-            'headers' => $headers, // Optional headers if needed
+            'headers' => $headers, 
         ]);
-
         return $response;
     }
+
+    public function checkAndUpdateWithdrawalsStatus($userId)
+    {
+        $pendingWithdrawals = Withdrawal::where('user_id', $userId)
+                                        ->where('status', 'pending')
+                                        ->get();
+        foreach ($pendingWithdrawals as $withdrawal) {
+            $reference = $withdrawal->reference_number;
+            $response = $this->getTransactionStatus($reference);
+            $responseData = json_decode($response->getBody()->getContents(), true);
+
+            if ($responseData['status'] == 'success' && $responseData['data']['status'] == 'SUCCESSFUL') {
+                $withdrawal->status = 'complete';
+                $withdrawal->fee = $responseData['data']['fee']; 
+                $withdrawal->save();
+            }
+        }
+        return 'Withdrawals status checked and updated.';
+    }
+
+
 
 
 }
