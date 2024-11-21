@@ -190,17 +190,13 @@ class FlutterwaveController extends Controller
 
             $response_data = json_decode($response->getBody(), true);
             if ($response->getStatusCode() == 200) {
-                \Log::info("this is response");
-                \Log::info(json_encode( $response_data ));
                
                 if ($response_data['status'] == 'success') {
-                    \Log::info("this is payload response");
-                    \Log::info(json_encode( $response_data['data'] ));
                     $withdaw->status = 'pending';
                     $withdaw->reference_number = $response_data['data']['id'];
                     $withdaw->save();
                     $pushNotificationService = new \App\Http\Controllers\PushNotificationService();
-                    $pushNotificationService->sendPushNotification($user->device_token, $user->name, withdrawMessageNotification(), $withdaw->id, 'withdraw',$user->name,$user->id);
+                    $pushNotificationService->sendPushNotification($user->device_token, $user->name, $this->withdrawMessageNotification(), $withdaw->id, 'withdraw',$user->name,$user->id);
                 }
 
                 return  $response_data;
@@ -437,7 +433,7 @@ class FlutterwaveController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $userSubscriptions,
+            'data' => $userMessages,
         ]);
     }
 
