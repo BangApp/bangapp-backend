@@ -417,7 +417,7 @@ class FlutterwaveController extends Controller
         $userSubscriptions = \Illuminate\Support\Facades\DB::table('flutterwaves')
                                 ->join('users', 'flutterwaves.user_id', '=', 'users.id') // Assuming there's a `user_id` in `flutterwaves`
                                 ->select('amount','users.id as user_id','users.name as user_name','users.email as user_email')
-                                ->where('post_id', $user_id)
+                                ->where('post_id', $userId)
                                 ->where('type', 'subscription')
                                 ->get();
         return response()->json([
@@ -431,7 +431,7 @@ class FlutterwaveController extends Controller
         $userMessages = \Illuminate\Support\Facades\DB::table('flutterwaves')
                                 ->join('users', 'flutterwaves.user_id', '=', 'users.id') // Assuming there's a `user_id` in `flutterwaves`
                                 ->select('amount','users.id as user_id','users.name as user_name','users.email as user_email')
-                                ->where('post_id', $user_id)
+                                ->where('post_id', $userId)
                                 ->where('type', 'message')
                                 ->get();
 
