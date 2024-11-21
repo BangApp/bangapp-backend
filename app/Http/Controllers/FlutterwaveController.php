@@ -393,9 +393,10 @@ class FlutterwaveController extends Controller
                 'flutterwaves.type',
                 'posts.id as post_id',
                 'posts.body as post_title',
+                'posts.image as posts_image',
+                'posts.type as posts_type',
                 'users.id as user_id',
                 'users.name as user_name',
-                'users.email as user_email'
             )
             ->where('posts.user_id', $userId)
             ->where('flutterwaves.type', 'post')
