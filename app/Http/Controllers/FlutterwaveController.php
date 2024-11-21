@@ -374,6 +374,74 @@ class FlutterwaveController extends Controller
         return 'Withdrawals status checked and updated.';
     }
 
+    public function getUserWithdrawals($userId)
+    {
+        $withdrawals = Withdrawal::with('user')
+            ->where('user_id', $userId)
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $withdrawals,
+        ]);
+    }
+
+   public function getUserPayedPosts($userId)
+    {
+        // Fetch posts paid for by the user, including user and post details
+        $userPayedPosts = \Illuminate\Support\Facades\DB::table('flutterwaves')
+            ->join('posts', 'flutterwaves.post_id', '=', 'posts.id')
+            ->join('users', 'flutterwaves.user_id', '=', 'users.id') // Assuming there's a `user_id` in `flutterwaves`
+            ->select(
+                'flutterwaves.amount',
+                'flutterwaves.type',
+                'posts.id as post_id',
+                'posts.body as post_title',
+                'users.id as user_id',
+                'users.name as user_name',
+                'users.email as user_email'
+            )
+            ->where('posts.user_id', $userId)
+            ->where('flutterwaves.type', 'post')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $userPayedPosts,
+        ]);
+    }
+
+
+    public function getUserSubscriptions($userId)
+    {
+        $userSubscriptions = \Illuminate\Support\Facades\DB::table('flutterwaves')
+                                ->join('users', 'flutterwaves.user_id', '=', 'users.id') // Assuming there's a `user_id` in `flutterwaves`
+                                ->select('amount','users.id as user_id','users.name as user_name','users.email as user_email')
+                                ->where('post_id', $user_id)
+                                ->where('type', 'subscription')
+                                ->get();
+        return response()->json([
+            'success' => true,
+            'data' => $userSubscriptions,
+        ]);
+    }
+
+    public function getUserMessages($userId)
+    {
+        $userMessages = \Illuminate\Support\Facades\DB::table('flutterwaves')
+                                ->join('users', 'flutterwaves.user_id', '=', 'users.id') // Assuming there's a `user_id` in `flutterwaves`
+                                ->select('amount','users.id as user_id','users.name as user_name','users.email as user_email')
+                                ->where('post_id', $user_id)
+                                ->where('type', 'message')
+                                ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $userSubscriptions,
+        ]);
+    }
+
+
 
 
 

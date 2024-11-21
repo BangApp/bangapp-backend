@@ -233,6 +233,11 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/getFlutterWaveInsights/{userId}', [FlutterwaveController::class, 'getUserInsights']);
     Route::get('/users/search', 'App\Http\Controllers\UserController@search');
     Route::get('/users/getMyInfo', 'App\Http\Controllers\UserController@getMyInfo');
+    Route::get('/user/{userId}/withdrawals', [FlutterwaveController::class, 'getUserWithdrawals']);
+    Route::get('/user/{userId}/payed-posts', [FlutterwaveController::class, 'getUserPayedPosts']);
+    Route::get('/user/{userId}/payed-messages', [FlutterwaveController::class, 'getUserMessages']);
+    Route::get('/user/{userId}/payed-subscriptions', [FlutterwaveController::class, 'getUserSubscriptions']);
+
     Route::get('/bang-updatesnew', function (\Illuminate\Http\Request $request) {
         $appUrl = "https://bangapp.pro/BangAppBackend/";
         $page = $request->query('_page', 1);
