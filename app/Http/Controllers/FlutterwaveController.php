@@ -80,8 +80,7 @@ class FlutterwaveController extends Controller
             'tx_ref' => $transref,
             'currency' => 'TZS',
             'redirect_url' => 'https://google.com',
-            // 'phone_number' => $phone_number,
-            'phone_number' => '0747151897',
+            'phone_number' => $phone_number,
             'fullname' => $user->name,
             'meta' => [
                 "postId" => $postId,
