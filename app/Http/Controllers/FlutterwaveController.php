@@ -202,6 +202,9 @@ class FlutterwaveController extends Controller
                 return  $response_data;
                 
             } else {
+                $withdaw->status = 'fail';
+                    $withdaw->reference_number = $response_data['data']['id'];
+                    $withdaw->save();
                 return response()->json([
                     'status' => 'fail',
                     'message' => $response_data['message'] ?? 'Unknown error'
