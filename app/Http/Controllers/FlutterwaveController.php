@@ -190,22 +190,21 @@ class FlutterwaveController extends Controller
 
             $response_data = json_decode($response->getBody(), true);
             if ($response->getStatusCode() == 200) {
-                \Log::info("this is response");
-                \Log::info(json_encode( $response_data ));
                
                 if ($response_data['status'] == 'success') {
-                    \Log::info("this is payload response");
-                    \Log::info(json_encode( $response_data['data'] ));
                     $withdaw->status = 'pending';
                     $withdaw->reference_number = $response_data['data']['id'];
                     $withdaw->save();
                     $pushNotificationService = new \App\Http\Controllers\PushNotificationService();
-                    $pushNotificationService->sendPushNotification($user->device_token, $user->name, withdrawMessageNotification(), $withdaw->id, 'withdraw',$user->name,$user->id);
+                    $pushNotificationService->sendPushNotification($user->device_token, $user->name, $this->withdrawMessageNotification(), $withdaw->id, 'withdraw',$user->name,$user->id);
                 }
 
                 return  $response_data;
                 
             } else {
+                $withdaw->status = 'fail';
+                    $withdaw->reference_number = $response_data['data']['id'];
+                    $withdaw->save();
                 return response()->json([
                     'status' => 'fail',
                     'message' => $response_data['message'] ?? 'Unknown error'
@@ -397,9 +396,10 @@ class FlutterwaveController extends Controller
                 'flutterwaves.type',
                 'posts.id as post_id',
                 'posts.body as post_title',
+                'posts.image as posts_image',
+                'posts.type as posts_type',
                 'users.id as user_id',
                 'users.name as user_name',
-                'users.email as user_email'
             )
             ->where('posts.user_id', $userId)
             ->where('flutterwaves.type', 'post')
