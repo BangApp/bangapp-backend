@@ -437,7 +437,7 @@ class FlutterwaveController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $userSubscriptions,
+            'data' => $userMessages,
         ]);
     }
 
