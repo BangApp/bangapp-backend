@@ -76,7 +76,7 @@ class FlutterwaveController extends Controller
 
         $data = [
             'amount' =>  $amount,
-            'email' => $user->email,
+            'email' => "support@bangapp.pro",
             'tx_ref' => $transref,
             'currency' => 'TZS',
             'redirect_url' => 'https://google.com',
@@ -88,7 +88,7 @@ class FlutterwaveController extends Controller
                 "type" => $type
             ],
             'customer' => [
-                'email' => $user->email,
+                'email' => "support@bangapp.pro",
                 'phonenumber' => $phone_number,
                 'name' => $user->name, 
             ]
