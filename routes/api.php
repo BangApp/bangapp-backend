@@ -2290,7 +2290,7 @@ Route::get('/getDeletedPosts/{userId}', function ($userId) {
     }
     $deletedPosts = DeletedPost::where('user_id', $userId)->get();
 
-    return response()->json(['success' => true, 'data' => $savedPosts], 200);
+    return response()->json(['success' => true, 'data' => $deletedPosts], 200);
 });
 
 
