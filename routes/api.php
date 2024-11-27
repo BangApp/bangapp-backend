@@ -2284,7 +2284,6 @@ Route::get('/getSavedPosts/{userId}', function ($userId) {
 
 Route::get('/getDeletedPosts/{userId}', function ($userId) {
     $appUrl = "https://bangapp.pro/BangAppBackend/";
-
     if (!is_numeric($userId)) {
         return response()->json(['success' => false, 'message' => 'Invalid user ID.'], 400);
     }
@@ -2292,14 +2291,13 @@ Route::get('/getDeletedPosts/{userId}', function ($userId) {
     // Transform the data to modify the image URL
     $deletedPosts->transform(function ($post) use ($appUrl) {
     if ($post->type === 'image' && $post->image) {
-        $post->image = $appUrl . 'storage/app/' . $post->image;
+        $post->image = $appUrl . 'storage/app/' . str_replace('images/', 'recycle_bin/', $post->image);
     }
     if ($post->challenge_img) {
-        $post->challenge_img = $appUrl . 'storage/app/' . $post->challenge_img;
+        $post->challenge_img = $appUrl . 'storage/app/' .str_replace('images/', 'recycle_bin/', $post->challenge_img);
     }
     return $post;
-});
-
+    });
     return response()->json(['success' => true, 'data' => $deletedPosts], 200);
 });
 
