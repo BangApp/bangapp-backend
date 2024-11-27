@@ -2233,7 +2233,6 @@ Route::get('/getSavedPosts/{userId}', function ($userId) {
     // Transform the posts
     $savedPosts->transform(function ($savedPost) use ($appUrl, $userId) {
         $post = $savedPost->post;
-
         if ($post) {
             if ($post->type === 'image') {
                 $post->image ? $post->image = $appUrl . 'storage/app/' . $post->image : $post->image = null;
@@ -2245,7 +2244,6 @@ Route::get('/getSavedPosts/{userId}', function ($userId) {
             foreach ($post->challenges as $challenge) {
                 $challenge->challenge_img ? $challenge->challenge_img = $appUrl . 'storage/app/' . $challenge->challenge_img : $challenge->challenge_img = null;
             }
-
             // // Handle like status
             // $post->isLikedA = false;
             // $post->isLikedB = false;
