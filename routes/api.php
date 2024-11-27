@@ -2246,33 +2246,33 @@ Route::get('/getSavedPosts/{userId}', function ($userId) {
                 $challenge->challenge_img ? $challenge->challenge_img = $appUrl . 'storage/app/' . $challenge->challenge_img : $challenge->challenge_img = null;
             }
 
-            // Handle like status
-            $post->isLikedA = false;
-            $post->isLikedB = false;
-            $post->isLiked = false;
+            // // Handle like status
+            // $post->isLikedA = false;
+            // $post->isLikedB = false;
+            // $post->isLiked = false;
 
-            $likeType = Post::getLikeTypeForUser($userId, $post->id);
-            if ($likeType == "A") {
-                $post->isLikedA = true;
-                $post->isLiked = true;
-            } elseif ($likeType == "B") {
-                $post->isLikedB = true;
-            }
+            // $likeType = Post::getLikeTypeForUser($userId, $post->id);
+            // if ($likeType == "A") {
+            //     $post->isLikedA = true;
+            //     $post->isLiked = true;
+            // } elseif ($likeType == "B") {
+            //     $post->isLikedB = true;
+            // }
 
-            // Retrieve like counts
-            $likeCountA = 0;
-            $likeCountB = 0;
-            if ($post->likes->isNotEmpty()) {
-                foreach ($post->likes as $like) {
-                    if ($like->like_type === 'A') {
-                        $likeCountA = $like->like_count;
-                    } elseif ($like->like_type === 'B') {
-                        $likeCountB = $like->like_count;
-                    }
-                }
-            }
-            $post->like_count_A = $likeCountA;
-            $post->like_count_B = $likeCountB;
+            // // Retrieve like counts
+            // $likeCountA = 0;
+            // $likeCountB = 0;
+            // if ($post->likes->isNotEmpty()) {
+            //     foreach ($post->likes as $like) {
+            //         if ($like->like_type === 'A') {
+            //             $likeCountA = $like->like_count;
+            //         } elseif ($like->like_type === 'B') {
+            //             $likeCountB = $like->like_count;
+            //         }
+            //     }
+            // }
+            // $post->like_count_A = $likeCountA;
+            // $post->like_count_B = $likeCountB;
         }
 
         return $savedPost;
@@ -2280,6 +2280,20 @@ Route::get('/getSavedPosts/{userId}', function ($userId) {
 
     return response()->json(['success' => true, 'data' => $savedPosts], 200);
 });
+
+
+Route::get('/getDeletedPosts/{userId}', function ($userId) {
+    $appUrl = "https://bangapp.pro/BangAppBackend/";
+
+    if (!is_numeric($userId)) {
+        return response()->json(['success' => false, 'message' => 'Invalid user ID.'], 400);
+    }
+    $deletedPosts = DeletedPost::where('user_id', $userId)->get();
+
+    return response()->json(['success' => true, 'data' => $savedPosts], 200);
+});
+
+
 
 
 Route::post('/uploadFile', function(Request $request){
