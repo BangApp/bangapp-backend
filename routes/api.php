@@ -2211,16 +2211,76 @@ Route::post('/savePost', function(Request $request){
     return response()->json(['responseCode'=>'success','success' => true,'data' => $savedPost], 201);
 });
 
-Route::get('/getSavedPosts/{userId}',function($userId){
+Route::get('/getSavedPosts/{userId}', function ($userId) {
+    $appUrl = "https://bangapp.pro/BangAppBackend/";
+
     if (!is_numeric($userId)) {
-        return response()->json(['success' => false,'message' => 'Invalid user ID.'], 400);
+        return response()->json(['success' => false, 'message' => 'Invalid user ID.'], 400);
     }
+
     $savedPosts = SavedPost::where('user_id', $userId)
-        ->with('post')
+        ->with('post.challenges', 'post.likes') // Eager load related data for optimization
         ->get();
-    if ($savedPosts->isEmpty()) {return response()->json(['success' => true,'data' => [],'message' => 'No saved posts found for this user.',], 200);}
-    return response()->json(['success' => true,'data' => $savedPosts,], 200);
+
+    if ($savedPosts->isEmpty()) {
+        return response()->json([
+            'success' => true,
+            'data' => [],
+            'message' => 'No saved posts found for this user.',
+        ], 200);
+    }
+
+    // Transform the posts
+    $savedPosts->transform(function ($savedPost) use ($appUrl, $userId) {
+        $post = $savedPost->post;
+
+        if ($post) {
+            if ($post->type === 'image') {
+                $post->image ? $post->image = $appUrl . 'storage/app/' . $post->image : $post->image = null;
+                $post->challenge_img ? $post->challenge_img = $appUrl . 'storage/app/' . $post->challenge_img : $post->challenge_img = null;
+            }
+            if ($post->type === 'video') {
+                $post->image = $post->image; // Assuming video image doesn't need modification
+            }
+            foreach ($post->challenges as $challenge) {
+                $challenge->challenge_img ? $challenge->challenge_img = $appUrl . 'storage/app/' . $challenge->challenge_img : $challenge->challenge_img = null;
+            }
+
+            // Handle like status
+            $post->isLikedA = false;
+            $post->isLikedB = false;
+            $post->isLiked = false;
+
+            $likeType = Post::getLikeTypeForUser($userId, $post->id);
+            if ($likeType == "A") {
+                $post->isLikedA = true;
+                $post->isLiked = true;
+            } elseif ($likeType == "B") {
+                $post->isLikedB = true;
+            }
+
+            // Retrieve like counts
+            $likeCountA = 0;
+            $likeCountB = 0;
+            if ($post->likes->isNotEmpty()) {
+                foreach ($post->likes as $like) {
+                    if ($like->like_type === 'A') {
+                        $likeCountA = $like->like_count;
+                    } elseif ($like->like_type === 'B') {
+                        $likeCountB = $like->like_count;
+                    }
+                }
+            }
+            $post->like_count_A = $likeCountA;
+            $post->like_count_B = $likeCountB;
+        }
+
+        return $savedPost;
+    });
+
+    return response()->json(['success' => true, 'data' => $savedPosts], 200);
 });
+
 
 Route::post('/uploadFile', function(Request $request){
     $request->validate([
