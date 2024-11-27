@@ -47,6 +47,7 @@ class FlutterwaveController extends Controller
     public function makePayment($postId, $userId, $type, $amount, $phone_number)
     {
         $user = \App\User::find($userId);
+        $post = \App\Post::find($postId);
         $flutterwaveSecretKey = env('FLUTTERWAVE_SECRET_KEY');
         $url = env('FLUTTERWAVE_URL_PAY');
 
@@ -75,7 +76,7 @@ class FlutterwaveController extends Controller
 
 
         $data = [
-            'amount' =>  $amount,
+            'amount' =>  $amount ?? $post->price,
             'email' => "support@bangapp.pro",
             'tx_ref' => $transref,
             'currency' => 'TZS',

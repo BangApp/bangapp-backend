@@ -1937,14 +1937,14 @@ Route::post('/updateLastSeen', function(Request $request){
         $user = User::find($request->user_id);
         $user->last_seen = now();
         if( $user->save()){
-            return response()->json(['message' => 'Last seen updated successfully'],200);
+            return response()->json(['message' => 'Last seen updated successfully', 'laseSeen'=> $user->last_seen], 200);
         }
         else{
-            return response()->json(['message' => 'Last seen Not updated'], 400);
+            return response()->json(['message' => 'Last seen Not updated', 'laseSeen'=> $user->last_seen], 400);
         }
     }
     else{
-        return response()->json(['message' => 'User id empty'], 400);
+        return response()->json(['message' => 'User id empty', 'laseSeen'=> $user->last_seen], 400);
     }
     
 });
@@ -1954,10 +1954,10 @@ Route::post('/updateOnlineStatus', function(Request $request){
     $user->isOnline = $request->isOnline;
     $user->last_seen = now();
     if( $user->save()){
-        return response()->json(['message'=> 'Online status updated successfully'],200);
+        return response()->json(['message'=> 'Online status updated successfully', 'status'=>$user->isOnline],200);
     }
     else{
-        return response()->json(['message'=> 'Online status not updated']);
+        return response()->json(['message'=> 'Online status not updated', 'status'=>$user->isOnline]);
     }
 });
 
