@@ -1780,7 +1780,7 @@ Route::middleware('auth:api')->group(function () {
     });
 
     Route::get('/getNotificationCount/{user_id}', function ($user_id) {
-        $notificationCount = Notification::where('is_read', 0)->where('reference_id', $user_id)->count();
+        $notificationCount = Notification::where('is_read', 1)->where('reference_id', $user_id)->count();
         return response()->json(['notification_count' => $notificationCount]);
     });
 
@@ -2038,7 +2038,7 @@ Route::post('/acceptFriendship', function(Request $request) {
         $sender = User::find($friendRequest->sender_id);
         $receiver = User::find($friendRequest->receiver_id);
         $pushNotificationService->sendPushNotification($sender->device_token,$receiver->name,friendAcceptMessage($receiver->name),$friendRequestId,'friend',$sender->name,$sender->id);
-        saveNotification($sender->id,friendAcceptMessage($receiver->name),'friend',$receiver->id,$friendRequestId);
+        saveNotification($sender->id,friendAcceptMessage($receiver->name),'friend',$sender->id,$friendRequestId);
         return response()->json(['responseCode'=>'success','message' => 'Friend request accepted successfully'], 200);
 
     }
