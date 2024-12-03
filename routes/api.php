@@ -1780,7 +1780,7 @@ Route::middleware('auth:api')->group(function () {
     });
 
     Route::get('/getNotificationCount/{user_id}', function ($user_id) {
-        $notificationCount = Notification::where('is_read', 1)->where('reference_id', $user_id)->count();
+        $notificationCount = Notification::where('is_read', false)->where('reference_id', $user_id)->count();
         return response()->json(['notification_count' => $notificationCount]);
     });
 
