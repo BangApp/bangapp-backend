@@ -2140,7 +2140,6 @@ Route::get('/getBlockedUsers/{userId}', function($user_id) {
 Route::post('/deleteFriendship', function(Request $request) {
     $user_id = $request->input('user_id');
     $friend_id = $request->input('friend_id');
-    // Find the friendship in both directions (user -> friend or friend -> user)
     $friendship = Friends::where(function($query) use ($user_id, $friend_id) {
                             $query->where('user_id', $user_id)
                                   ->where('friend_id', $friend_id);
@@ -2153,9 +2152,7 @@ Route::post('/deleteFriendship', function(Request $request) {
     if (!$friendship) {
         return response()->json(['responseCode' => 'fail', 'message' => 'Friendship not found'], 404);
     }
-    // Delete the friendship
     $friendship->delete();
-
     return response()->json([
         'responseCode' => 'success',
         'message' => 'Friendship deleted successfully'
