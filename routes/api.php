@@ -512,8 +512,16 @@ Route::middleware('auth:api')->group(function () {
         return response()->json($user);
     })->middleware('jwt.auth');
 
+    // Route::get('/comments', function (Post $post) {
+    //     $comments = $post->comments()->with([
+    //         'user' => function ($query) {
+    //             $query->select('id', 'name', 'image');
+    //         },
+    //     ])->paginate(10);
+    //     return response(['data' => $comments, 'message' => 'success'], 200);
+    // });
 
-    Route::get('/comments', 'Api\CommentsController@comments');
+    Route::get('/comments/{post}', 'Api\CommentsController@comments');
 
 
     /**
