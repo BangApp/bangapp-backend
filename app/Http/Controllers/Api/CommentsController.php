@@ -13,6 +13,7 @@ use App\BattleCommentReplies;
 use App\RepliesToCommentReplies;
 use App\RepliesToBattleCommentReplies;
 use App\bangUpdateComment;
+use App\BattleComment;
 use App\CommentReplies;
 use Illuminate\Http\Request;
 
@@ -200,6 +201,73 @@ class CommentsController extends Controller
         ])->load(['user:id,name,image']);
         return response(['data' => $comment, 'message' => 'success'], 200);
     }
+
+
+    function deleteComment($commentId) {
+        $comment = Comment::find($commentId);
+        if ($comment) {
+            deleteNoticiation($comment->post_id);
+            $comment->commentReplies()->delete();
+            $comment->delete();
+            return response()->json(['message' => 'Comment deleted']);
+        } else {
+            return response()->json(['message' => 'Notification not found'], 404);
+        }
+    }
+
+    function deleteUpdateComment($updateCommentId) {
+        $updateComment = bangUpdateComment::find($updateCommentId);
+        if ($updateComment) {
+            $updateComment->commentReplies()->delete();
+            $updateComment->delete();
+            return response()->json(['message' => 'Comment deleted'],200);
+        } else {
+            return response()->json(['message' => 'Notification not found'], 404);
+        }
+    }
+
+    function deleteBattleComment($battleComment) {
+        $battleComment = BattleComment::find($battleComment);
+
+        if ($battleComment) {
+            $battleComment->commentReplies()->delete();
+            $battleComment->delete();
+            return response()->json(['message' => 'Comment deleted'],200);
+        } else {
+            return response()->json(['message' => 'battle Comment not found'], 404);
+        }
+    }
+
+
+    function postBattleComment(request $request, Post $post) {
+        $request->validate([
+            'body' => 'string|min:3|max:6000',
+        ]);
+        $comment = BattleComment::create([
+            'user_id' => $request->user_id,
+            'battles_id' => $request->post_id,
+            'body' => $request->body,
+        ]);
+        $comment = BattleComment::with([
+            'user' => function ($query) {
+                $query->select('id', 'name', 'image');
+            },
+        ])->findOrFail($comment->id);
+        // $post->user->notify(new CommentedOnYourPost($post, auth()->user()));
+        return response(['data' => $comment, 'message' => 'success'], 200);
+    }
+
+
+    function bangBattleComment($id) {
+        $comments = BattleComment::where('battles_id', $id)->with([
+            'user' => function ($query) {
+                $query->select('id', 'name', 'image');
+            },
+        ])->get();
+        return response()->json(['comments' => $comments]);
+    }
+
+
 
 
 
