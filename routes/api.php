@@ -512,25 +512,8 @@ Route::middleware('auth:api')->group(function () {
         return response()->json($user);
     })->middleware('jwt.auth');
 
-    // Route::get('/comments', function (Post $post) {
-    //     $comments = $post->comments()->with([
-    //         'user' => function ($query) {
-    //             $query->select('id', 'name', 'image');
-    //         },
-    //     ])->paginate(10);
-    //     return response(['data' => $comments, 'message' => 'success'], 200);
-    // });
 
     Route::get('/comments/{post}', 'Api\CommentsController@comments');
-
-
-    /**
-     *
-     * This route returns all the bang inspirations with their profile url, video url and thumbnail.
-     * The urls are formatted with the app url and returned as a json response.
-     *
-     */
-
 
     Route::get('/get/bangInspirations', function () {
         $appUrl = "https://bangapp.pro/BangAppBackend/";
@@ -1045,42 +1028,6 @@ Route::middleware('auth:api')->group(function () {
         return response(['data' => $posts, 'message' => 'success'], 200);
     });
 
-    // Route::get('/getComments/{id}', function ($id) {
-    //     $comments = Comment::where('post_id', $id)->with([
-    //         'user' => function ($query) {
-    //             $query->select('id', 'name', 'image');
-    //         },
-    //     ])->orderBy('created_at', 'asc')->get(); // Corrected 'orderBy' here
-    //     return response()->json(['comments' => $comments]);
-    // });
-
-    // Route::get('/getCommentsReplies/{id}', function ($id) {
-    //     $commentsReplies = CommentReplies::where('comment_id', $id)->with([
-    //         'user' => function ($query) {
-    //             $query->select('id', 'name', 'image');
-    //         },
-    //     ])->orderBy('created_at', 'asc')->get(); // Corrected 'orderBy' here
-    //     return response()->json(['commentsReplies' => $commentsReplies]);
-    // });
-
-    // Route::get('/getBattleCommentsReplies/{id}', function ($id) {
-    //     $commentsReplies = BattleCommentReplies::where('comment_id', $id)->with([
-    //         'user' => function ($query) {
-    //             $query->select('id', 'name', 'image');
-    //         },
-    //     ])->orderBy('created_at', 'asc')->get(); // Corrected 'orderBy' here
-    //     return response()->json(['commentsReplies' => $commentsReplies]);
-    // });
-
-    // Route::get('/getUpdateCommentsReplies/{id}', function ($id) {
-    //     $commentsReplies = UpdateCommentReplies::where('comment_id', $id)->with([
-    //         'user' => function ($query) {
-    //             $query->select('id', 'name', 'image');
-    //         },
-    //     ])->orderBy('created_at', 'asc')->get(); // Corrected 'orderBy' here
-    //     return response()->json(['commentsReplies' => $commentsReplies]);
-    // });
-
     Route::get('/getComments/{id}', 'Api\CommentsController@getComments');
 
     Route::get('/getCommentsReplies/{id}', 'Api\CommentsController@getCommentsReplies');
@@ -1180,16 +1127,8 @@ Route::middleware('auth:api')->group(function () {
     });
 
 
+    Route::get('/bangUpdateComment/{id}', 'Api\CommentsController@bangUpdateComment');
 
-
-    Route::get('/bangUpdateComment/{id}', function ($id) {
-        $comments = bangUpdateComment::where('post_id', $id)->with([
-            'user' => function ($query) {
-                $query->select('id', 'name', 'image');
-            },
-        ])->orderBy('created_at', 'asc')->get();
-        return response()->json(['comments' => $comments]);
-    });
 
     // Route::post('/postComment', function (request $request, Post $post) {
     //     $request->validate([
@@ -1211,133 +1150,150 @@ Route::middleware('auth:api')->group(function () {
     //     return response(['data' => $comment, 'message' => 'success'], 200);
     // });
 
-    Route::post('/postComment', function (request $request, Post $post) {
-        $request->validate([
-            'body' => 'string|max:6000',
-        ]);
-        $post = Post::find($request->post_id);
-        $user = User::find($request->user_id);
-        $comment = Comment::create([
-            'user_id' => $request->user_id,
-            'post_id' => $request->post_id,
-            'body' => $request->body,
-        ]);
-        $comment = Comment::with([
-            'user' => function ($query) {
-                $query->select('id', 'name', 'image');
-            },
-        ])->findOrFail($comment->id);
-        if ($post->user->id <> $request->user_id) {
-            $pushNotificationService = new PushNotificationService();
-            $pushNotificationService->sendPushNotification($post->user->device_token, $user->name, commentMessage(), $request->post_id, 'comment',$comment->user->name,$comment->user->id);
-            saveNotification($request->user_id, commentMessage(), 'comment', $post->user->id, $request->post_id);
-        }
-        return response(['data' => $comment, 'message' => 'success'], 200);
-    });
+    // Route::post('/postComment', function (request $request, Post $post) {
+    //     $request->validate([
+    //         'body' => 'string|max:6000',
+    //     ]);
+    //     $post = Post::find($request->post_id);
+    //     $user = User::find($request->user_id);
+    //     $comment = Comment::create([
+    //         'user_id' => $request->user_id,
+    //         'post_id' => $request->post_id,
+    //         'body' => $request->body,
+    //     ]);
+    //     $comment = Comment::with([
+    //         'user' => function ($query) {
+    //             $query->select('id', 'name', 'image');
+    //         },
+    //     ])->findOrFail($comment->id);
+    //     if ($post->user->id <> $request->user_id) {
+    //         $pushNotificationService = new PushNotificationService();
+    //         $pushNotificationService->sendPushNotification($post->user->device_token, $user->name, commentMessage(), $request->post_id, 'comment',$comment->user->name,$comment->user->id);
+    //         saveNotification($request->user_id, commentMessage(), 'comment', $post->user->id, $request->post_id);
+    //     }
+    //     return response(['data' => $comment, 'message' => 'success'], 200);
+    // });
 
-    Route::post('/postCommentReply', function (request $request, Post $post) {
-        $request->validate([
-            'body' => 'string|max:6000',
-        ]);
-        $post = Post::find($request->post_id);
-        $user = User::find($request->user_id);
-        $commentUser = Comment::find($request->comment_id);
+    // Route::post('/postCommentReply', function (request $request, Post $post) {
+    //     $request->validate([
+    //         'body' => 'string|max:6000',
+    //     ]);
+    //     $post = Post::find($request->post_id);
+    //     $user = User::find($request->user_id);
+    //     $commentUser = Comment::find($request->comment_id);
 
-        $comment = CommentReplies::create([
-            'user_id' => $request->user_id,
-            'comment_id' => $request->comment_id,
-            'body' => $request->body,
-        ])->load(['user:id,name,image']);
+    //     $comment = CommentReplies::create([
+    //         'user_id' => $request->user_id,
+    //         'comment_id' => $request->comment_id,
+    //         'body' => $request->body,
+    //     ])->load(['user:id,name,image']);
 
-        if ($commentUser->user->id <> $request->user_id) {
-            $pushNotificationService = new PushNotificationService();
-            $pushNotificationService->sendPushNotification($commentUser->user->device_token, $comment->user->name, commentReplyMessage(), $request->post_id, 'comment',$comment->user->name,$comment->user->id);
-            saveNotification($request->user_id, commentReplyMessage(), 'commentReply', $post->user->id, $request->post_id,);
-         }
-        return response(['data' => $comment, 'message' => 'success'], 200);
-    });
+    //     if ($commentUser->user->id <> $request->user_id) {
+    //         $pushNotificationService = new PushNotificationService();
+    //         $pushNotificationService->sendPushNotification($commentUser->user->device_token, $comment->user->name, commentReplyMessage(), $request->post_id, 'comment',$comment->user->name,$comment->user->id);
+    //         saveNotification($request->user_id, commentReplyMessage(), 'commentReply', $post->user->id, $request->post_id,);
+    //      }
+    //     return response(['data' => $comment, 'message' => 'success'], 200);
+    // });
 
-    Route::post('/postReplyToCommentReply', function (request $request, Post $post){
-        $request->validate([
-            'body' => 'string|max:6000',
-        ]);
-        $post = Post::find($request->post_id);
-        $user = User::find($request->user_id);
-        $commentUser = CommentReplies::find($request->comment_id);
-        $comment = RepliesToCommentReplies::create([
-            'user_id' => $request->user_id,
-            'comment_id' => $request->comment_id,
-            'body' => $request->body,
-        ])->load(['user:id,name,image']);
-        if ($commentUser->user->id <> $request->user_id) {
-            $pushNotificationService = new PushNotificationService();
-            $pushNotificationService->sendPushNotification($commentUser->user->device_token, $comment->user->name, commentReplyMessage(), $request->post_id, 'comment',$comment->user->name,$comment->user->id);
-            saveNotification($request->user_id, commentReplyMessage(), 'commentReply', $post->user->id, $request->post_id,);
-        }
-        return response(['data' => $comment, 'message' => 'success'], 200);
-    });
+    // Route::post('/postReplyToCommentReply', function (request $request, Post $post){
+    //     $request->validate([
+    //         'body' => 'string|max:6000',
+    //     ]);
+    //     $post = Post::find($request->post_id);
+    //     $user = User::find($request->user_id);
+    //     $commentUser = CommentReplies::find($request->comment_id);
+    //     $comment = RepliesToCommentReplies::create([
+    //         'user_id' => $request->user_id,
+    //         'comment_id' => $request->comment_id,
+    //         'body' => $request->body,
+    //     ])->load(['user:id,name,image']);
+    //     if ($commentUser->user->id <> $request->user_id) {
+    //         $pushNotificationService = new PushNotificationService();
+    //         $pushNotificationService->sendPushNotification($commentUser->user->device_token, $comment->user->name, commentReplyMessage(), $request->post_id, 'comment',$comment->user->name,$comment->user->id);
+    //         saveNotification($request->user_id, commentReplyMessage(), 'commentReply', $post->user->id, $request->post_id,);
+    //     }
+    //     return response(['data' => $comment, 'message' => 'success'], 200);
+    // });
 
-    Route::post('/postUpdateCommentReply', function (Request $request, Post $post) {
-        $request->validate([
-            'body' => 'string|max:6000',
-        ]);
-        $updateComment = UpdateCommentReplies::create([
-            'user_id' => $request->user_id,
-            'comment_id' => $request->comment_id,
-            'body' => $request->body,
-        ])->load(['user:id,name,image']);
-        return response(['data' => $updateComment, 'message' => 'success'], 200);
-    });
+    // Route::post('/postUpdateCommentReply', function (Request $request, Post $post) {
+    //     $request->validate([
+    //         'body' => 'string|max:6000',
+    //     ]);
+    //     $updateComment = UpdateCommentReplies::create([
+    //         'user_id' => $request->user_id,
+    //         'comment_id' => $request->comment_id,
+    //         'body' => $request->body,
+    //     ])->load(['user:id,name,image']);
+    //     return response(['data' => $updateComment, 'message' => 'success'], 200);
+    // });
 
-    Route::post('/postReplyUpdateCommentReply', function (request $request, Post $post){
-        $request->validate([
-            'body' => 'string|max:6000',
-        ]);
-        $updateComment = RepliesToBangUpdateCommentReplies::create([
-            'user_id' => $request->user_id,
-            'comment_id' => $request->comment_id,
-            'body' => $request->body,
-        ])->load(['user:id,name,image']);
-        return response(['data' => $updateComment, 'message' => 'success'], 200);
-    });
+    // Route::post('/postReplyUpdateCommentReply', function (request $request, Post $post){
+    //     $request->validate([
+    //         'body' => 'string|max:6000',
+    //     ]);
+    //     $updateComment = RepliesToBangUpdateCommentReplies::create([
+    //         'user_id' => $request->user_id,
+    //         'comment_id' => $request->comment_id,
+    //         'body' => $request->body,
+    //     ])->load(['user:id,name,image']);
+    //     return response(['data' => $updateComment, 'message' => 'success'], 200);
+    // });
 
-    Route::post('/postBattleCommentReply', function (request $request, Post $post) {
-        $request->validate([
-            'body' => 'string|max:6000',
-        ]);
+    // Route::post('/postBattleCommentReply', function (request $request, Post $post) {
+    //     $request->validate([
+    //         'body' => 'string|max:6000',
+    //     ]);
 
-        $battleComment = BattleCommentReplies::create([
-            'user_id' => $request->user_id,
-            'comment_id' => $request->comment_id,
-            'body' => $request->body,
-        ])->load(['user:id,name,image']);
+    //     $battleComment = BattleCommentReplies::create([
+    //         'user_id' => $request->user_id,
+    //         'comment_id' => $request->comment_id,
+    //         'body' => $request->body,
+    //     ])->load(['user:id,name,image']);
 
-        return response(['data' => $battleComment, 'message' => 'success'], 200);
-    });
+    //     return response(['data' => $battleComment, 'message' => 'success'], 200);
+    // });
 
-    Route::post('/postReplyBattleCommentReply', function(Request $request, Post $post){
-        $request->validate([
-            'body' => 'string|max:6000',
-        ]);
-        $battleComment = RepliesToBattleCommentReplies::create([
-            'user_id' => $request->user_id,
-            'comment_id' => $request->comment_id,
-            'body' => $request->body,
-        ])->load(['user:id,name,image']);
-        return response(['data' => $battleComment, 'message' => 'success'], 200);
-    });
+    // Route::post('/postReplyBattleCommentReply', function(Request $request, Post $post){
+    //     $request->validate([
+    //         'body' => 'string|max:6000',
+    //     ]);
+    //     $battleComment = RepliesToBattleCommentReplies::create([
+    //         'user_id' => $request->user_id,
+    //         'comment_id' => $request->comment_id,
+    //         'body' => $request->body,
+    //     ])->load(['user:id,name,image']);
+    //     return response(['data' => $battleComment, 'message' => 'success'], 200);
+    // });
 
-    Route::post('/postUpdateComment', function (request $request, Post $post) {
-        $request->validate([
-            'body' => 'string|max:6000',
-        ]);
-        $comment = bangUpdateComment::create([
-            'user_id' => $request->user_id,
-            'post_id' => $request->post_id,
-            'body' => $request->body,
-        ])->load(['user:id,name,image']);
-        return response(['data' => $comment, 'message' => 'success'], 200);
-    });
+    // Route::post('/postUpdateComment', function (request $request, Post $post) {
+    //     $request->validate([
+    //         'body' => 'string|max:6000',
+    //     ]);
+    //     $comment = bangUpdateComment::create([
+    //         'user_id' => $request->user_id,
+    //         'post_id' => $request->post_id,
+    //         'body' => $request->body,
+    //     ])->load(['user:id,name,image']);
+    //     return response(['data' => $comment, 'message' => 'success'], 200);
+    // });
+
+    Route::post('/postComment', 'Api\CommentsController@postComment');
+
+    Route::post('/postCommentReply', 'Api\CommentsController@postCommentReply');
+
+    Route::post('/postReplyToCommentReply', 'Api\CommentsController@postReplyToCommentReply');
+
+    Route::post('/postUpdateCommentReply', 'Api\CommentsController@postUpdateCommentReply');
+
+    Route::post('/postReplyUpdateCommentReply', 'Api\CommentsController@postReplyUpdateCommentReply');
+
+    Route::post('/postBattleCommentReply', 'Api\CommentsController@postBattleCommentReply');
+
+    Route::post('/postReplyBattleCommentReply', 'Api\CommentsController@postReplyBattleCommentReply');
+
+    Route::post('/postUpdateComment', 'Api\CommentsController@postUpdateComment');
+
 
     Route::post('/acceptChallenge', function (request $request) {
         $challenge = Challenge::find($request->post_id);
