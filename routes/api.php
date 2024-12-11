@@ -1045,41 +1045,49 @@ Route::middleware('auth:api')->group(function () {
         return response(['data' => $posts, 'message' => 'success'], 200);
     });
 
-    Route::get('/getComments/{id}', function ($id) {
-        $comments = Comment::where('post_id', $id)->with([
-            'user' => function ($query) {
-                $query->select('id', 'name', 'image');
-            },
-        ])->orderBy('created_at', 'asc')->get(); // Corrected 'orderBy' here
-        return response()->json(['comments' => $comments]);
-    });
+    // Route::get('/getComments/{id}', function ($id) {
+    //     $comments = Comment::where('post_id', $id)->with([
+    //         'user' => function ($query) {
+    //             $query->select('id', 'name', 'image');
+    //         },
+    //     ])->orderBy('created_at', 'asc')->get(); // Corrected 'orderBy' here
+    //     return response()->json(['comments' => $comments]);
+    // });
 
-    Route::get('/getCommentsReplies/{id}', function ($id) {
-        $commentsReplies = CommentReplies::where('comment_id', $id)->with([
-            'user' => function ($query) {
-                $query->select('id', 'name', 'image');
-            },
-        ])->orderBy('created_at', 'asc')->get(); // Corrected 'orderBy' here
-        return response()->json(['commentsReplies' => $commentsReplies]);
-    });
+    // Route::get('/getCommentsReplies/{id}', function ($id) {
+    //     $commentsReplies = CommentReplies::where('comment_id', $id)->with([
+    //         'user' => function ($query) {
+    //             $query->select('id', 'name', 'image');
+    //         },
+    //     ])->orderBy('created_at', 'asc')->get(); // Corrected 'orderBy' here
+    //     return response()->json(['commentsReplies' => $commentsReplies]);
+    // });
 
-    Route::get('/getBattleCommentsReplies/{id}', function ($id) {
-        $commentsReplies = BattleCommentReplies::where('comment_id', $id)->with([
-            'user' => function ($query) {
-                $query->select('id', 'name', 'image');
-            },
-        ])->orderBy('created_at', 'asc')->get(); // Corrected 'orderBy' here
-        return response()->json(['commentsReplies' => $commentsReplies]);
-    });
+    // Route::get('/getBattleCommentsReplies/{id}', function ($id) {
+    //     $commentsReplies = BattleCommentReplies::where('comment_id', $id)->with([
+    //         'user' => function ($query) {
+    //             $query->select('id', 'name', 'image');
+    //         },
+    //     ])->orderBy('created_at', 'asc')->get(); // Corrected 'orderBy' here
+    //     return response()->json(['commentsReplies' => $commentsReplies]);
+    // });
 
-    Route::get('/getUpdateCommentsReplies/{id}', function ($id) {
-        $commentsReplies = UpdateCommentReplies::where('comment_id', $id)->with([
-            'user' => function ($query) {
-                $query->select('id', 'name', 'image');
-            },
-        ])->orderBy('created_at', 'asc')->get(); // Corrected 'orderBy' here
-        return response()->json(['commentsReplies' => $commentsReplies]);
-    });
+    // Route::get('/getUpdateCommentsReplies/{id}', function ($id) {
+    //     $commentsReplies = UpdateCommentReplies::where('comment_id', $id)->with([
+    //         'user' => function ($query) {
+    //             $query->select('id', 'name', 'image');
+    //         },
+    //     ])->orderBy('created_at', 'asc')->get(); // Corrected 'orderBy' here
+    //     return response()->json(['commentsReplies' => $commentsReplies]);
+    // });
+
+    Route::get('/getComments/{id}', 'Api\CommentsController@getComments');
+
+    Route::get('/getCommentsReplies/{id}', 'Api\CommentsController@getCommentsReplies');
+
+    Route::get('/getBattleCommentsReplies/{id}', 'Api\CommentsController@getBattleCommentsReplies');
+
+    Route::get('/getUpdateCommentsReplies/{id}', 'Api\CommentsController@getUpdateCommentsReplies');
 
 
     Route::get('/getPostInfo/{post_id}/{user_id}', function ($post_id, $user_id) {
