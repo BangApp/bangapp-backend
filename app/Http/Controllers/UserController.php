@@ -131,10 +131,8 @@ class UserController extends Controller
             // Fetch all users sorted by name
             $users = User::orderBy('name')->get();
             
-           
             // Use binary search to find the user by keyword
             $user = $this->binarySearch($users, $keyword);
-     dd($user);
             // If the user is found, prepare the response data
             if ($user) {
                 $results[] = [
