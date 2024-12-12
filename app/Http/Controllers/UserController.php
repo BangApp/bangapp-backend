@@ -128,36 +128,63 @@ class UserController extends Controller
         $results = [];
     
         if ($keyword) {
-            // Ensure the keyword is at least 4 characters for partial match
-            if (strlen($keyword) >= 4) {
-                // Fetch all users sorted by name
-                $users = User::orderBy('name')->get();
-                
-                // Use binary search to find the users by keyword
-                $matchedUsers = $this->binarySearch($users, $keyword);
+            // Fetch all users sorted by name
+            $users = User::orderBy('name')->get();
     
-                // If matched users are found, prepare the response data
-                foreach ($matchedUsers as $user) {
-                    $results[] = [
-                        'id' => $user->id,
-                        'name' => $user->name,
-                        'profileUrl' => 'https://bangapp.pro/BangAppBackend/storage/app/'.$user->image,
-                        'bio' => $user->body,
-                        'postCount' => $user->posts->count(),
-                        'occupation' => $user->occupation,
-                        'friendsCount' => $user->friendsCount,
-                        'isHavingFiles' => $user->isHavingFiles,
-                        'isHavingBangUpdate' => $user->isHavingBangUpdate,
-                        'subscriptionCount' => $user->subscriptionCount,
-                    ];
-                }
-            } else {
-                // If the keyword is less than 4 characters, return no results
-                return response()->json($results);
+            // Use linear search to find users whose names match the keyword
+            $matchedUsers = $this->linearSearch($users, $keyword);
+    
+            // Prepare results
+            foreach ($matchedUsers as $user) {
+                $results[] = [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'profileUrl' => 'https://bangapp.pro/BangAppBackend/storage/app/'.$user->image,
+                    'bio' => $user->body,
+                    'postCount' => $user->posts->count(),
+                    'occupation' => $user->occupation,
+                    'friendsCount' => $user->friendsCount,
+                    'isHavingFiles' => $user->isHavingFiles,
+                    'isHavingBangUpdate' => $user->isHavingBangUpdate,
+                    'subscriptionCount' => $user->subscriptionCount,
+                ];
             }
         }
     
         return response()->json($results);
+    }
+    
+    private function linearSearch($users, $keyword)
+    {
+        $matchedUsers = [];
+        $normalizedKeyword = strtolower($keyword);
+    
+        // Iterate through each user and check for a match
+        foreach ($users as $user) {
+            $userName = strtolower($user->name);
+    
+            // If the name contains the keyword (even partially), add it to results
+            if (strpos($userName, $normalizedKeyword) !== false) {
+                $matchedUsers[] = $user;
+            }
+        }
+    
+        // Sort matched users: exact matches will be placed first
+        usort($matchedUsers, function($a, $b) use ($normalizedKeyword) {
+            $aName = strtolower($a->name);
+            $bName = strtolower($b->name);
+    
+            // Prioritize exact matches
+            if (strpos($aName, $normalizedKeyword) === 0 && strpos($bName, $normalizedKeyword) !== 0) {
+                return -1; // $a should come before $b
+            }
+            if (strpos($bName, $normalizedKeyword) === 0 && strpos($aName, $normalizedKeyword) !== 0) {
+                return 1; // $b should come before $a
+            }
+            return 0; // Keep order the same if both are exact or neither are exact
+        });
+    
+        return $matchedUsers;
     }
     
     function binarySearch($users, $keyword) {
@@ -165,35 +192,38 @@ class UserController extends Controller
         $high = count($users) - 1;
         $matchedUsers = [];
     
-        // Ensure the keyword is at least 4 characters long for partial match
-        if (strlen($keyword) < 4) {
-            return $matchedUsers;  // Return an empty array if keyword is too short for a meaningful search
+        // Normalize the keyword to lowercase for case-insensitive comparison
+        $normalizedKeyword = strtolower($keyword);
+    
+        // Ensure the keyword has at least 2 characters for meaningful search
+        if (strlen($normalizedKeyword) < 2) {
+            return $matchedUsers;  // Return an empty array if the keyword is too short
         }
     
         while ($low <= $high) {
             $mid = intdiv($low + $high, 2);  // Find the middle index
-        
-            // Normalize both the user's name and the keyword to lowercase for case-insensitive comparison
+    
+            // Normalize the user's name for comparison
             $userName = strtolower($users[$mid]->name);
-            $normalizedKeyword = strtolower($keyword);
-            
-            // Check if the middle user's name contains at least a 4-letter substring match with the keyword
-            if (strpos($userName, $normalizedKeyword) !== false && strlen($normalizedKeyword) >= 4) {
-                // If a match is found, add to matched users
+    
+            // If the middle user's name contains the keyword, add to matched users
+            if (strpos($userName, $normalizedKeyword) !== false) {
                 $matchedUsers[] = $users[$mid];
             }
     
-            // Check if the current user's name is lexicographically smaller than the keyword
+            // Adjust the search bounds based on lexicographical comparison
             if ($userName > $normalizedKeyword) {
                 $high = $mid - 1;  // Search the left half
             } else {
                 $low = $mid + 1;  // Search the right half
             }
         }
-        
+    
         // Return the array of users that match the keyword
         return $matchedUsers;
     }
+    
+    
     
 
     public function getMyInfo(Request $request)
