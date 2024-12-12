@@ -233,6 +233,22 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/getFlutterWaveInsights/{userId}', [FlutterwaveController::class, 'getUserInsights']);
     Route::get('/users/search', 'App\Http\Controllers\UserController@search');
     Route::get('/users/getMyInfo', 'App\Http\Controllers\UserController@getMyInfo');
+    Route::get('/getComments/{id}', 'Api\CommentsController@getComments');
+    Route::get('/getCommentsReplies/{id}', 'Api\CommentsController@getCommentsReplies');
+    Route::get('/getBattleCommentsReplies/{id}', 'Api\CommentsController@getBattleCommentsReplies');
+    Route::get('/getUpdateCommentsReplies/{id}', 'Api\CommentsController@getUpdateCommentsReplies');
+    Route::get('/bangUpdateComment/{id}', 'Api\CommentsController@bangUpdateComment');
+    Route::post('/postComment', 'Api\CommentsController@postComment');
+    Route::post('/postCommentReply', 'Api\CommentsController@postCommentReply');
+    Route::post('/postReplyToCommentReply', 'Api\CommentsController@postReplyToCommentReply');
+    Route::post('/postUpdateCommentReply', 'Api\CommentsController@postUpdateCommentReply');
+    Route::post('/postReplyUpdateCommentReply', 'Api\CommentsController@postReplyUpdateCommentReply');
+    Route::post('/postBattleCommentReply', 'Api\CommentsController@postBattleCommentReply');
+    Route::post('/postReplyBattleCommentReply', 'Api\CommentsController@postReplyBattleCommentReply');
+    Route::post('/postUpdateComment', 'Api\CommentsController@postUpdateComment');
+    Route::get('/deleteComment/{commentId}', 'Api\CommentsController@deleteComment');
+    Route::get('/deleteUpdateComment/{updateCommentId}', 'Api\CommentsController@deleteUpdateComment');
+    Route::get('/deleteBattleComment/{battleComment}', 'Api\CommentsController@deleteBattleComment');
     Route::get('/user/{userId}/withdrawals', [FlutterwaveController::class, 'getUserWithdrawals']);
     Route::get('/user/{userId}/payed-posts', [FlutterwaveController::class, 'getUserPayedPosts']);
     Route::get('/user/{userId}/payed-messages', [FlutterwaveController::class, 'getUserMessages']);
@@ -1028,13 +1044,6 @@ Route::middleware('auth:api')->group(function () {
         return response(['data' => $posts, 'message' => 'success'], 200);
     });
 
-    Route::get('/getComments/{id}', 'Api\CommentsController@getComments');
-
-    Route::get('/getCommentsReplies/{id}', 'Api\CommentsController@getCommentsReplies');
-
-    Route::get('/getBattleCommentsReplies/{id}', 'Api\CommentsController@getBattleCommentsReplies');
-
-    Route::get('/getUpdateCommentsReplies/{id}', 'Api\CommentsController@getUpdateCommentsReplies');
 
 
     Route::get('/getPostInfo/{post_id}/{user_id}', function ($post_id, $user_id) {
@@ -1126,23 +1135,7 @@ Route::middleware('auth:api')->group(function () {
         return response()->json($bangUpdate);
     });
 
-    Route::get('/bangUpdateComment/{id}', 'Api\CommentsController@bangUpdateComment');
 
-    Route::post('/postComment', 'Api\CommentsController@postComment');
-
-    Route::post('/postCommentReply', 'Api\CommentsController@postCommentReply');
-
-    Route::post('/postReplyToCommentReply', 'Api\CommentsController@postReplyToCommentReply');
-
-    Route::post('/postUpdateCommentReply', 'Api\CommentsController@postUpdateCommentReply');
-
-    Route::post('/postReplyUpdateCommentReply', 'Api\CommentsController@postReplyUpdateCommentReply');
-
-    Route::post('/postBattleCommentReply', 'Api\CommentsController@postBattleCommentReply');
-
-    Route::post('/postReplyBattleCommentReply', 'Api\CommentsController@postReplyBattleCommentReply');
-
-    Route::post('/postUpdateComment', 'Api\CommentsController@postUpdateComment');
 
 
     Route::post('/acceptChallenge', function (request $request) {
@@ -1184,11 +1177,6 @@ Route::middleware('auth:api')->group(function () {
         }
     });
 
-    Route::get('/deleteComment/{commentId}', 'Api\CommentsController@deleteComment');
-
-    Route::get('/deleteUpdateComment/{updateCommentId}', 'Api\CommentsController@deleteUpdateComment');
-
-    Route::get('/deleteBattleComment/{battleComment}', 'Api\CommentsController@deleteBattleComment');
 
     Route::post('/setUserProfile', function (request $request) {
         $user = User::findOrFail($request->user_id);

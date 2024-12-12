@@ -42,62 +42,68 @@ class UserController extends Controller
     private function searchFromUserTrie(string $keyword)
     {
         $keyword = strtolower($keyword); // Convert the keyword to lowercase
-    	$appUrl = "https://bangapp.pro/BangAppBackend/";
+        $appUrl = "https://bangapp.pro/BangAppBackend/";
         $uniqueUserIds = [];
         $len = strlen($keyword);
+        
         for ($i = 1; $i <= $len; $i++) {
             $substr = substr($keyword, 0, $i);
             $users = $this->retrieveUsersFromSubstring($substr);
-
-            // Add unique user IDs to the result set
+    
+            // Log the substrings and user names for debugging
+            \Log::info("Searching for substring: $substr");
+    
             foreach ($users as $user) {
+                \Log::info("User name: " . $user['name']);
                 $id = $user['id'];
                 if (!in_array($id, $uniqueUserIds)) {
                     $uniqueUserIds[] = $id;
                 }
             }
-    }
-
-    $results = [];
-    foreach ($uniqueUserIds as $id) {
-        $user = User::find($id);
-        if ($user) {
-            $results[] = [
-                'id' => $user->id,
-                'name' => $user->name,
-                'profileUrl' => $appUrl.'storage/app/'.$user->image,
-                'bio' => $user->body,
-                'postCount' => $user->posts->count(),
-                'occupation' => $user->occupation,
-                'friendsCount' => $user->friendsCount,
-                'isHavingFiles' => $user->isHavingFiles,
-                'isHavingBangUpdate' => $user->isHavingBangUpdate,
-                'subscriptionCount' => $user->subscriptionCount,
-            ];
         }
+    
+        $results = [];
+        foreach ($uniqueUserIds as $id) {
+            $user = User::find($id);
+            if ($user) {
+                $results[] = [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'profileUrl' => $appUrl.'storage/app/'.$user->image,
+                    'bio' => $user->body,
+                    'postCount' => $user->posts->count(),
+                    'occupation' => $user->occupation,
+                    'friendsCount' => $user->friendsCount,
+                    'isHavingFiles' => $user->isHavingFiles,
+                    'isHavingBangUpdate' => $user->isHavingBangUpdate,
+                    'subscriptionCount' => $user->subscriptionCount,
+                ];
+            }
+        }
+    
+        return $results;
     }
-
-    return $results;
-    }
+    
 
     private function retrieveUsersFromSubstring(string $substr)
     {
         $results = [];
         $userIds = [];
-
+    
         // Get users based on the Trie-like structure for the given substring
         $this->collectUserIds($this->userTrie, $userIds, $substr);
-
+    
+        // Filter users to ensure that the substr matches the beginning of their name
         foreach ($userIds as $id) {
             $user = User::find($id);
-            if ($user) {
+            if ($user && strpos(strtolower($user->name), strtolower($substr)) === 0) {
                 $results[] = [
                     'id' => $user->id,
                     'name' => $user->name,
                 ];
             }
         }
-
+    
         return $results;
     }
 
@@ -119,15 +125,61 @@ class UserController extends Controller
     public function search(Request $request)
     {
         $keyword = $request->input('keyword');
-        $viewer_id = $request->input('viewerId');
         $results = [];
-
+    
         if ($keyword) {
-            $results = $this->searchFromUserTrie($keyword);
+            // Fetch all users sorted by name
+            $users = User::orderBy('name')->get();
+            
+           
+            // Use binary search to find the user by keyword
+            $user = $this->binarySearch($users, $keyword);
+     dd($user);
+            // If the user is found, prepare the response data
+            if ($user) {
+                $results[] = [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'profileUrl' => 'https://bangapp.pro/BangAppBackend/storage/app/'.$user->image,
+                    'bio' => $user->body,
+                    'postCount' => $user->posts->count(),
+                    'occupation' => $user->occupation,
+                    'friendsCount' => $user->friendsCount,
+                    'isHavingFiles' => $user->isHavingFiles,
+                    'isHavingBangUpdate' => $user->isHavingBangUpdate,
+                    'subscriptionCount' => $user->subscriptionCount,
+                ];
+            }
         }
-
+    
         return response()->json($results);
     }
+
+    function binarySearch($users, $keyword) {
+        $low = 0;
+        $high = count($users) - 1;
+    
+        while ($low <= $high) {
+            $mid = intdiv($low + $high, 2);  // Find the middle index
+    
+            // Compare the middle user's name with the keyword
+            if (strtolower($users[$mid]->name) === strtolower($keyword)) {
+                return $users[$mid];  // Return the user if found
+            }
+    
+            // If the keyword is lexicographically smaller, search the left half
+            if (strtolower($users[$mid]->name) > strtolower($keyword)) {
+                $high = $mid - 1;
+            } else {
+                // Otherwise, search the right half
+                $low = $mid + 1;
+            }
+        }
+    
+        // Return null if the keyword is not found
+        return null;
+    }
+
 
     public function getMyInfo(Request $request)
     {
