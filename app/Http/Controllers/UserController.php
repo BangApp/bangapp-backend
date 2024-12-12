@@ -128,56 +128,73 @@ class UserController extends Controller
         $results = [];
     
         if ($keyword) {
-            // Fetch all users sorted by name
-            $users = User::orderBy('name')->get();
-            
-            // Use binary search to find the user by keyword
-            $user = $this->binarySearch($users, $keyword);
-            // If the user is found, prepare the response data
-            if ($user) {
-                $results[] = [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'profileUrl' => 'https://bangapp.pro/BangAppBackend/storage/app/'.$user->image,
-                    'bio' => $user->body,
-                    'postCount' => $user->posts->count(),
-                    'occupation' => $user->occupation,
-                    'friendsCount' => $user->friendsCount,
-                    'isHavingFiles' => $user->isHavingFiles,
-                    'isHavingBangUpdate' => $user->isHavingBangUpdate,
-                    'subscriptionCount' => $user->subscriptionCount,
-                ];
+            // Ensure the keyword is at least 4 characters for partial match
+            if (strlen($keyword) >= 4) {
+                // Fetch all users sorted by name
+                $users = User::orderBy('name')->get();
+                
+                // Use binary search to find the users by keyword
+                $matchedUsers = $this->binarySearch($users, $keyword);
+    
+                // If matched users are found, prepare the response data
+                foreach ($matchedUsers as $user) {
+                    $results[] = [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'profileUrl' => 'https://bangapp.pro/BangAppBackend/storage/app/'.$user->image,
+                        'bio' => $user->body,
+                        'postCount' => $user->posts->count(),
+                        'occupation' => $user->occupation,
+                        'friendsCount' => $user->friendsCount,
+                        'isHavingFiles' => $user->isHavingFiles,
+                        'isHavingBangUpdate' => $user->isHavingBangUpdate,
+                        'subscriptionCount' => $user->subscriptionCount,
+                    ];
+                }
+            } else {
+                // If the keyword is less than 4 characters, return no results
+                return response()->json($results);
             }
         }
     
         return response()->json($results);
     }
-
+    
     function binarySearch($users, $keyword) {
         $low = 0;
         $high = count($users) - 1;
+        $matchedUsers = [];
+    
+        // Ensure the keyword is at least 4 characters long for partial match
+        if (strlen($keyword) < 4) {
+            return $matchedUsers;  // Return an empty array if keyword is too short for a meaningful search
+        }
     
         while ($low <= $high) {
             $mid = intdiv($low + $high, 2);  // Find the middle index
-    
-            // Compare the middle user's name with the keyword
-            if (strtolower($users[$mid]->name) === strtolower($keyword)) {
-                return $users[$mid];  // Return the user if found
+        
+            // Normalize both the user's name and the keyword to lowercase for case-insensitive comparison
+            $userName = strtolower($users[$mid]->name);
+            $normalizedKeyword = strtolower($keyword);
+            
+            // Check if the middle user's name contains at least a 4-letter substring match with the keyword
+            if (strpos($userName, $normalizedKeyword) !== false && strlen($normalizedKeyword) >= 4) {
+                // If a match is found, add to matched users
+                $matchedUsers[] = $users[$mid];
             }
     
-            // If the keyword is lexicographically smaller, search the left half
-            if (strtolower($users[$mid]->name) > strtolower($keyword)) {
-                $high = $mid - 1;
+            // Check if the current user's name is lexicographically smaller than the keyword
+            if ($userName > $normalizedKeyword) {
+                $high = $mid - 1;  // Search the left half
             } else {
-                // Otherwise, search the right half
-                $low = $mid + 1;
+                $low = $mid + 1;  // Search the right half
             }
         }
-    
-        // Return null if the keyword is not found
-        return null;
+        
+        // Return the array of users that match the keyword
+        return $matchedUsers;
     }
-
+    
 
     public function getMyInfo(Request $request)
     {
