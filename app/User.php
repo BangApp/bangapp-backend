@@ -163,6 +163,7 @@ class User extends Authenticatable implements JWTSubject
         return \DB::table('flutterwaves')
             ->where('post_id', $this->id)
             ->where('type', 'subscription')
+            ->where('created_at', '>=', Carbon::now()->subDays(30)) // Filter last 30 days
             ->count();
     }
 
