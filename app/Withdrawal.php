@@ -19,7 +19,12 @@ class Withdrawal extends Model
 
     public function getCreatedAtAttribute($value)
     {
-        return Carbon::parse($value)->diffForHumans(); 
+        return Carbon::parse($value)->diffForHumans();
+    }
+
+    public function getUserNameAttribute($value)
+    {
+        return $this->user()->first()?->name;
     }
 
     public function getUpdatedAtAttribute($value)

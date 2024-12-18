@@ -1,14 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Flutterwave;
 use GuzzleHttp\Client;
-use Illuminate\Support\Facades\DB;
 
-namespace App\Http\Controllers;
-use App\Withdrawal;
-use GuzzleHttp\Client;
-use Illuminate\Http\Request;
 
 class FlutterwaveController extends Controller
 {
@@ -91,7 +85,7 @@ class FlutterwaveController extends Controller
             'customer' => [
                 'email' => "support@bangapp.pro",
                 'phonenumber' => $phone_number,
-                'name' => $user->name, 
+                'name' => $user->name,
             ]
         ];
 
@@ -165,7 +159,7 @@ class FlutterwaveController extends Controller
         $withdaw->destination = $accountNumber;
         $withdaw->channel = $this->checkProvider($accountNumber);
         $withdaw->save();
-        
+
         $payload = [
             'account_number' => '+255' . ltrim($accountNumber, '0'),
             'account_bank' =>  $this->checkProvider($accountNumber),
@@ -191,7 +185,7 @@ class FlutterwaveController extends Controller
 
             $response_data = json_decode($response->getBody(), true);
             if ($response->getStatusCode() == 200) {
-               
+
                 if ($response_data['status'] == 'success') {
                     $withdaw->status = 'pending';
                     $withdaw->reference_number = $response_data['data']['id'];
@@ -201,7 +195,7 @@ class FlutterwaveController extends Controller
                 }
 
                 return  $response_data;
-                
+
             } else {
                 $withdaw->status = 'fail';
                     $withdaw->reference_number = $response_data['data']['id'];
@@ -330,7 +324,7 @@ class FlutterwaveController extends Controller
             case 'value':
                 # code...
                 break;
-            
+
             default:
                 # code...
                 break;
@@ -341,7 +335,7 @@ class FlutterwaveController extends Controller
     public function getTransactionStatus($transId)
     {
         $flutterwaveSecretKey = env('FLUTTERWAVE_SECRET_KEY');
-        $url = env('FLUTTERWAVE_URL'); 
+        $url = env('FLUTTERWAVE_URL');
         $client = new Client();
         // Define the headers
         $headers = [
@@ -350,7 +344,7 @@ class FlutterwaveController extends Controller
         ];
         $finalUrl = rtrim($url, '/') . '/' . $transId;
         $response = $client->get($finalUrl, [
-            'headers' => $headers, 
+            'headers' => $headers,
         ]);
         return $response;
     }
@@ -367,7 +361,7 @@ class FlutterwaveController extends Controller
 
             if ($responseData['status'] == 'success' && $responseData['data']['status'] == 'SUCCESSFUL') {
                 $withdrawal->status = 'complete';
-                $withdrawal->fee = $responseData['data']['fee']; 
+                $withdrawal->fee = $responseData['data']['fee'];
                 $withdrawal->save();
             }
         }
@@ -441,9 +435,6 @@ class FlutterwaveController extends Controller
             'data' => $userMessages,
         ]);
     }
-
-
-
 
 
 }

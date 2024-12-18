@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DepositController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\WithdrawController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Image;
@@ -2174,7 +2176,8 @@ Route::group(['prefix' => 'v2'], function () {
 
     Route::group(['middleware' => ['auth:api']], function () {
         Route::get('/users', [UserController::class, 'index']);
-        Route::get('/deposits', [UserController::class, 'index']);
+        Route::get('/deposit', [DepositController::class, 'index']);
+        Route::get('/withdraw', [WithdrawController::class, 'index']);
 
         Route::group(['prefix' => 'dashboard'], function () {
             Route::get('/stats', [DashboardController::class, 'stats']);
