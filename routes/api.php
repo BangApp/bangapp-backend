@@ -1,4 +1,7 @@
 <?php
+
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Image;
@@ -627,7 +630,7 @@ Route::middleware('auth:api')->group(function () {
         //                 $query->select('*')->where('confirmed', 1);
         //             }
         //         ])->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
-            
+
         // }
 
         $posts->getCollection()->transform(function ($post) use ($appUrl, $user_id) {
@@ -1695,7 +1698,7 @@ Route::post('/updateLastSeen', function(Request $request){
     else{
         return response()->json(['message' => 'User id empty', 'laseSeen'=> $user->last_seen], 400);
     }
-    
+
 });
 
 Route::post('/updateOnlineStatus', function(Request $request){
@@ -1738,7 +1741,7 @@ Route::post('/getSuggestedFriends', function(Request $request){
 
 
 Route::post('/requestFriendship', function(Request $request) {
-    $userId = $request->input('user_id'); 
+    $userId = $request->input('user_id');
     $friendId = $request->input('friend_id');
     $user = User::find($userId);
     $friend = User::find($friendId);
@@ -1825,7 +1828,7 @@ Route::post('/declineFriendship', function(Request $request) {
 
 
 Route::post('/cancelFriendshipRequest', function(Request $request) {
-    $userId = $request->input('user_id'); 
+    $userId = $request->input('user_id');
     $friendId = $request->input('friend_id');
     $user = User::find($userId);
     $friend = User::find($friendId);
@@ -2076,7 +2079,7 @@ Route::post('/uploadFile', function(Request $request){
 
 
 Route::get('/getFileUploads/{userId}/{perPage}', function($userId, $perPage) {
-    $baseUrl = 'https://bangapp.pro/BangAppBackend/storage/app/'; 
+    $baseUrl = 'https://bangapp.pro/BangAppBackend/storage/app/';
     $files = FilePost::where('user_id', $userId)->paginate($perPage);
 
     if ($files->isEmpty()) {
@@ -2144,7 +2147,6 @@ Route::group(['prefix' => 'v1'], function () {
 
 
 Route::any('/associateOneSignalPlayerId', [ChatController::class, 'associateOneSignalPlayerId']);
-
 Route::get('/getAllConversations', [ChatController::class, 'getAllConversations']);
 Route::get('/getChatMessages', [ChatController::class, 'getMessages']);
 Route::post('/sendMessage', [ChatController::class, 'sendMessage']);
@@ -2159,3 +2161,25 @@ Route::post('/sendImageMessage', [ChatController::class, 'storeImageMessage']);
 Route::post('/sendImageMessage', [ChatController::class, 'storeImageMessage']);
 Route::post('/sendVideoMessage', [ChatController::class, 'storeVideoMessage']);
 Route::get('/getTotalUnreadMessages', [ChatController::class, 'getTotalUnreadMessages']);
+
+Route::group(['prefix' => 'v2'], function () {
+
+    Route::post('/register', 'Api\AuthenticationController@register');
+
+    Route::post('/registerGoogleUser', 'Api\AuthenticationController@registerGoogleUser');
+
+    Route::get('/users/getCurrentUser', 'Api\AuthenticationController@getCurrentUser');
+
+    Route::post('/login', 'Api\AuthenticationController@login')->name('login');
+
+    Route::group(['middleware' => ['auth:api']], function () {
+        Route::get('/users', [UserController::class, 'index']);
+        Route::get('/deposits', [UserController::class, 'index']);
+
+        Route::group(['prefix' => 'dashboard'], function () {
+            Route::get('/stats', [DashboardController::class, 'stats']);
+        });
+    });
+
+});
+

@@ -1,0 +1,2 @@
+Flutterwave this is the deposit table
+withdraws this is the withdraw table

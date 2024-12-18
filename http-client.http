@@ -1,0 +1,27 @@
+###
+POST {{base_url}}/login
+Content-Type: application/json
+
+{
+    "email": "mohammed@gmail.com",
+    "password": "123456"
+}
+> {%
+    const token = response.body.token;
+    if (token) {
+        client.global.set("token", token); // Save the token globally
+    } else {
+        client.log("Token not found in the login response.");
+        throw new Error("Token not found in the login response.");
+    } %}
+
+###
+GET {{base_url}}/users
+Authorization: Bearer {{token}}
+
+###
+GET {{base_url}}/dashboard/user-stats
+Authorization: Bearer {{token}}
+
+
+

@@ -16,7 +16,7 @@ class AuthenticationController extends Controller
 {
     function baseUrl()
     {
-        return env('APP_URL') ;
+        return env('APP_URL');
     }
 
     public function register(Request $request)
@@ -26,19 +26,19 @@ class AuthenticationController extends Controller
             'email' => [
                 'required',
                 function ($attribute, $value, $fail) {
-                        $exists = \App\User::where(function ($query) use ($value) {
-                            $query->where('email', $value);
-                        })->exists();
-                        if ($exists) {
-                            $fail('The ' . $attribute . ' has already been taken.');
-                        }
+                    $exists = \App\User::where(function ($query) use ($value) {
+                        $query->where('email', $value);
+                    })->exists();
+                    if ($exists) {
+                        $fail('The ' . $attribute . ' has already been taken.');
                     }
+                }
             ],
             'password' => ['required', 'string', 'min:6', 'max:30'],
             'phone_number' => [
                 'required',
-                function ($attribute, $value, $fail){
-                    $exists = \App\User::where(function ($query) use ($value ){
+                function ($attribute, $value, $fail) {
+                    $exists = \App\User::where(function ($query) use ($value) {
                         $query->where('phone_number', $value);
                     })->exists();
                     if ($exists) {
@@ -49,8 +49,7 @@ class AuthenticationController extends Controller
         ]);
         if ($validator->fails()) {
             return response(['errors' => $validator->errors()], 422);
-        }
-        else {
+        } else {
             $validatedData = $validator->validated();
             $validatedData['password'] = bcrypt($request->password);
             $validatedData['role_id'] = 3;
@@ -61,11 +60,12 @@ class AuthenticationController extends Controller
                 $user->hobbies()->attach($randomHobbyIds);
             }
             $token = JWTAuth::attempt(['email' => $request->email, 'password' => $request->password]);
-            return response(['name'=>$user->name,'access_token'=>$token,'id'=>$user->id,'email'=>$user->email,'image'=>env('APP_URL').'storage/app/'.$user->image]);
+            return response(['name' => $user->name, 'access_token' => $token, 'id' => $user->id, 'email' => $user->email, 'image' => env('APP_URL') . 'storage/app/' . $user->image]);
         }
     }
 
-    public function registerGoogleUser(Request $request) {
+    public function registerGoogleUser(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'user_email' => 'required|email|unique:users,email',
         ]);
@@ -73,18 +73,18 @@ class AuthenticationController extends Controller
             return response()->json(['errors' => $validator->errors()], 400);
         }
         $user = User::create([
-            'email'=> $request->user_email,
+            'email' => $request->user_email,
             'phone_number' => $request->phone_number,
             'country_code' => $request->country_code,
-            'image'=> $request->user_picture,
+            'image' => $request->user_picture,
             'name' => $request->user_name,
-            'role_id'=>3,
+            'role_id' => 3,
             'password' => bcrypt($request->uid)
         ]);
 
         if ($user->wasRecentlyCreated) {
             $token = JWTAuth::attempt(['email' => $user->email, 'password' => $request->uid]);
-            return response(['name'=>$user->name,'access_token'=>$token,'id'=>$user->id,'email'=>$user->email,'image'=>$user->image]);
+            return response(['name' => $user->name, 'access_token' => $token, 'id' => $user->id, 'email' => $user->email, 'image' => $user->image]);
         } else {
             return response()->json(['message' => 'Failed to create user'], 400);
         }
@@ -131,17 +131,17 @@ class AuthenticationController extends Controller
 
 
     public function login(Request $request)
-    {    
-       $validator = Validator::make($request->all(), [
+    {
+        $validator = Validator::make($request->all(), [
             'email' => 'required',
             'password' => 'required',
         ]);
         if ($validator->fails()) {
-            return response()->json(['error' => 'invalid_credentials'], 401);
+            return response()->json(['error' => 'provide all the data'], 401);
         }
         $credentials = $request->only('email', 'password');
 
-        if (! $token = JWTAuth::attempt($credentials)) {
+        if (!$token = JWTAuth::attempt($credentials)) {
             return response()->json(['error' => 'invalid_credentials'], 401);
         }
         // Get the authenticated user from the JWT token
@@ -150,7 +150,7 @@ class AuthenticationController extends Controller
         return response()->json([
             'token' => $token,
             'user_id' => $user->id,
-            'user_image' => env('APP_URL').'storage/app/'.$user->image,
+            'user_image' => env('APP_URL') . 'storage/app/' . $user->image,
             'name' => $user->name,
             'role' => $user->role ? $user->role->name : 'user',
             'phone_number' => $user->phone_number,
@@ -161,7 +161,7 @@ class AuthenticationController extends Controller
             'is_having_bang_update' => $user->isHavingBangUpdate,
             'occupation' => $user->occupation,
             'country_code' => $user->isHavingBangUpdate,
-]);
+        ]);
     }
 
     public function user(User $user)
