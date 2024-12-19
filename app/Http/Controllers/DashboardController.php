@@ -26,40 +26,6 @@ class DashboardController extends Controller
         ]);
     }
 
-//    public function revenue_trend()
-//    {
-//        // Simulate data for 12 months
-//        $months = [
-//            "January" => 1, "February" => 2, "March" => 3, "April" => 4, "May" => 5, "June" => 6,
-//            "July" => 7, "August" => 8, "September" => 9, "October" => 10, "November" => 11, "December" => 12
-//        ];
-//
-//        $year = now()->year; // Get the current year
-//
-//        $monthlyData = collect($months)->map(function ($monthNumber, $monthName) use ($year) {
-//            $totalDeposits = Flutterwave::whereYear('created_at', $year)
-//                ->whereMonth('created_at', $monthNumber)
-//                ->sum('amount');
-//
-//            $totalWithdrawals = Withdrawal::whereYear('created_at', $year)
-//                ->whereMonth('created_at', $monthNumber)
-//                ->sum('amount');
-//
-//            $totalProfit = ($totalDeposits * 30) / 100; // 30% profit
-//
-//            return [
-//                'month' => $monthName,
-//                'totalRevenue' => $totalDeposits,
-//                'platformShare' => $totalProfit,
-//                'celebrityShare' => $totalDeposits - $totalProfit,
-//            ];
-//        });
-//
-//        return response()->json($monthlyData);
-//    }
-
-
-
     public function revenue_trend(Request $request)
     {
         // Simulate data for 12 months
