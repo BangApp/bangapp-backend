@@ -20,8 +20,13 @@ GET {{base_url}}/users
 Authorization: Bearer {{token}}
 
 ###
-GET {{base_url}}/dashboard/user-stats
+GET {{base_url}}/dashboard/stats
 Authorization: Bearer {{token}}
+
+###
+GET {{base_url}}/dashboard/revenue-stats?half=secon
+Authorization: Bearer {{token}}
+
 
 
 

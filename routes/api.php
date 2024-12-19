@@ -2181,6 +2181,7 @@ Route::group(['prefix' => 'v2'], function () {
 
         Route::group(['prefix' => 'dashboard'], function () {
             Route::get('/stats', [DashboardController::class, 'stats']);
+            Route::get('/revenue-stats', [DashboardController::class, 'revenue_trend']);
         });
     });
 
