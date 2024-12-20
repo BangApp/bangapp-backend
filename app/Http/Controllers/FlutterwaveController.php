@@ -145,7 +145,7 @@ class FlutterwaveController extends Controller
         $amount = $request->input('amount');
         $user = \App\User::find($user_id);
         $client = new Client();
-        $accountNumber = $request->input('account_number') ?? $user->phone_number;
+        $accountNumber = $user->phone_number;
         // Define the headers
         $headers = [
             'Authorization' => "Bearer $flutterwaveSecretKey",
