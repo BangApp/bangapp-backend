@@ -138,15 +138,14 @@ class FlutterwaveController extends Controller
     {
         $flutterwaveSecretKey = env('FLUTTERWAVE_SECRET_KEY');
         $url = env('FLUTTERWAVE_URL');
-
         // Fetch data from the request
         // $accountBank = $request->input('account_bank');
-        $accountNumber = $request->input('account_number');
         $user_id = $request->input('user_id');
+        
         $amount = $request->input('amount');
         $user = \App\User::find($user_id);
         $client = new Client();
-
+        $accountNumber = $request->input('account_number') ?? $user->phone_number;
         // Define the headers
         $headers = [
             'Authorization' => "Bearer $flutterwaveSecretKey",
@@ -154,7 +153,7 @@ class FlutterwaveController extends Controller
         ];
 
         // Define the payload (body parameters)
-        $withdaw = new \App\Withdrawal();
+        $withdaw = new Withdrawal();
         $withdaw->amount = $amount;
         $withdaw->user_id = $user_id;
         $withdaw->destination = $accountNumber;
