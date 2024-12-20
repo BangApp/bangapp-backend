@@ -198,7 +198,7 @@ class CommentsController extends Controller
             'user_id' => $request->user_id,
             'post_id' => $request->post_id,
             'body' => $request->body,
-        ])->load(['user:id,name,image']);
+        ])->load(['user:id,name,image','commentReplies']);
         return response(['data' => $comment, 'message' => 'success'], 200);
     }
 
