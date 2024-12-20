@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 use GuzzleHttp\Client;
 use App\Withdrawal;
-
+use Illuminate\Http\Request;
 
 class FlutterwaveController extends Controller
 {
@@ -166,10 +166,10 @@ class FlutterwaveController extends Controller
             'amount' => $amount,
             'currency' => 'TZS',
             'narration' => 'Payment for goods',
-            'beneficiary_name' => 'Example User',
+            'beneficiary_name' => $user->name,
             'meta' => [
                 [
-                    'sender' => 'Sample User',
+                    'sender' => $user->name,
                     'sender_country' => 'TZ',
                     'sender_address' => 'Block-XM Kivukoni Road',
                 ]
