@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use GuzzleHttp\Client;
+use App\Withdrawal;
 
 
 class FlutterwaveController extends Controller
