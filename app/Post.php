@@ -107,12 +107,12 @@ class Post extends Model
     }
 
     public function payedCount(){
-        return $this->hasMany(azampay::class, 'post_id')->count();
+        return $this->hasMany(Flutterwave::class, 'post_id')->count();
     }
 
     public static function hasUserPaid($userId, $postId)
     {
-        return azampay::where('user_id', $userId)
+        return Flutterwave::where('user_id', $userId)
             ->where('post_id', $postId)
             ->where('type', 'post')
             ->exists();
