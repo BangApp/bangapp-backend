@@ -244,7 +244,7 @@ class User extends Authenticatable implements JWTSubject
 
     public static function hasUserPaid($userId, $viewerId)
     {
-        return azampay::where('user_id', $viewerId)
+        return Flutterwave::where('user_id', $viewerId)
             ->where('post_id', $userId)
             ->where('type', 'message')
             ->exists();
