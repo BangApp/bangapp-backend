@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use App\Flutterwave;
 use App\Subscription;
 use App\User;
-use App\friends;
-use App\FriendRequest;
 use App\Withdrawal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -32,6 +30,11 @@ class DashboardController extends Controller
             ->whereBetween(DB::raw('MONTH(created_at)'), $monthsRange)
             ->sum('amount');
 
+        $totalDepositsPass = Flutterwave::whereYear('created_at', $year)
+            ->whereBetween(DB::raw('MONTH(created_at)'), $monthsRange)
+            ->where('status', 'successful')
+            ->sum('amount');
+
         $totalWithdrawals = Withdrawal::whereYear('created_at', $year)
             ->whereBetween(DB::raw('MONTH(created_at)'), $monthsRange)
             ->sum('amount');
@@ -44,11 +47,11 @@ class DashboardController extends Controller
 
         // Return the stats with both name and count
         return response()->json([
-            ['name' => 'Total Users', 'count' => $totalUsers, 'is_not_money' => true],
-            ['name' => 'Total Deposits', 'count' => $totalDeposits],
-            ['name' => 'Total Withdrawals', 'count' => $totalWithdrawals],
-            ['name' => 'Total Withdrawal Fees', 'count' => $totalWithdrawalFee],
-            ['name' => 'Total Profit', 'count' => $totalProfit - $totalWithdrawalFee],
+            ['name' => 'Total Users', 'count' => $totalUsers, 'is_not_money' => true, 'fail_count' => $totalUsers,],
+            ['name' => 'Total Deposits', 'count' => $totalDeposits, 'fail_count' => $totalDeposits - $totalDepositsPass],
+            ['name' => 'Total Withdrawals', 'count' => $totalWithdrawals, 'fail_count' => $totalUsers],
+            ['name' => 'Total Withdrawal Fees', 'count' => $totalWithdrawalFee, 'fail_count' => $totalUsers],
+            ['name' => 'Total Profit', 'count' => $totalProfit - $totalWithdrawalFee, 'fail_count' => $totalUsers],
         ]);
     }
 
@@ -190,7 +193,4 @@ class DashboardController extends Controller
 
         return response()->json($leaderboardData);
     }
-
-
-
 }
