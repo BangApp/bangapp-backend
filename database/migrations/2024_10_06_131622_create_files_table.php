@@ -13,18 +13,20 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('files', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained('users');
-            $table->string('file_name');
-            $table->string('file_path');
-            $table->string('file_type');
-            $table->unsignedBigInteger('file_size');
-            $table->text('body')->nullable();
-            $table->boolean('pinned')->default(false); 
-            $table->decimal('price', 10, 2)->nullable();
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('files')) { // Check if the table exists
+            Schema::create('files', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('user_id')->constrained('users');
+                $table->string('file_name');
+                $table->string('file_path');
+                $table->string('file_type');
+                $table->unsignedBigInteger('file_size');
+                $table->text('body')->nullable();
+                $table->boolean('pinned')->default(false);
+                $table->decimal('price', 10, 2)->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     /**

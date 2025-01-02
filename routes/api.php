@@ -2078,8 +2078,6 @@ Route::post('/uploadFile', function(Request $request){
     return response()->json(['success' => true, 'data' => $file], 201);
 });
 
-
-
 Route::get('/getFileUploads/{userId}/{perPage}', function($userId, $perPage) {
     $baseUrl = 'https://bangapp.pro/BangAppBackend/storage/app/';
     $files = FilePost::where('user_id', $userId)->paginate($perPage);
