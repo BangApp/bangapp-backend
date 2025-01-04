@@ -605,7 +605,7 @@ Route::middleware('auth:api')->group(function () {
            // Optional: Reset the array keys to have a continuous sequence (if needed)
           // $uniqueArray = array_values($uniqueArray);
 
-           $posts = Post::unseenPosts($user_id)->where('type', 'image')
+           $posts = Post::unseenPosts($user_id)
                 ->whereNotIn('user_id', $uniqueArray)
                 ->with([
                     'likes' => function ($query) {
@@ -647,7 +647,7 @@ Route::middleware('auth:api')->group(function () {
                 list($post->width, $post->height) =  [300, 300];
             }
             if ($post->type === 'video') {
-                $post->image = $post->image;
+                $post->image = 'https://bangapp.pro/VideoStreaming/var/www/html/VideoStreaming/public/videos/'.$post->image;
                 list($post->width, $post->height) = [300, 300];
             }
             foreach ($post->challenges as $challenge) {
@@ -2174,6 +2174,7 @@ Route::group(['prefix' => 'v2'], function () {
 
     Route::group(['middleware' => ['auth:api']], function () {
         Route::get('/users', [UserController::class, 'index']);
+        Route::get('/users/{id}', [UserController::class, 'show']);
         Route::get('/deposit', [DepositController::class, 'index']);
         Route::get('/withdraw', [WithdrawController::class, 'index']);
 
