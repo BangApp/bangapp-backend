@@ -1015,7 +1015,7 @@ Route::middleware('auth:api')->group(function () {
             }
             if ($post->type === 'video') {
                 $post->image = 'https://bangapp.pro/VideoStreaming/var/www/html/VideoStreaming/public/videos/'.$post->image;
-                $post->thumbnail_url = 'https://bangapp.pro/VideoStreaming/'.$post->thumbnail_url
+                $post->thumbnail_url = 'https://bangapp.pro/VideoStreaming/'.$post->thumbnail_url;
                 list($post->width, $post->height) = [300, 300];
             }
             $post->isLikedA = false;
