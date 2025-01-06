@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Log;
 use Laravel\Passport\HasApiTokens;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
@@ -63,6 +64,28 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(BangUpdate::class);
     }
+
+    public function devices()
+    {
+        return $this->hasMany(UserDevice::class);
+    }
+
+    public function getDeviceNameAttribute()
+    {
+        $devices = $this->devices()->get(); // Explicitly fetch devices
+
+        if ($devices->isNotEmpty()) { // Check if the collection has any devices
+            return $devices
+                ->map(function ($device) {
+                    return "{$device->device_model} ({$device->unique_id})";
+                })
+                ->implode(', ');
+        }
+
+        // Return a default value if no devices exist
+        return '';
+    }
+
 
     public function comments()
     {
@@ -171,12 +194,12 @@ class User extends Authenticatable implements JWTSubject
     {
         return $value ?? '';
     }
-    
+
     public function getOccupationAttribute($value)
     {
         return $value ?? '';
     }
-    
+
 
     public function getPostCountAttribute()
     {

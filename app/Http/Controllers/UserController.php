@@ -30,9 +30,35 @@ class UserController extends Controller
                 'friendsCount' => $user->friendsCount,
                 'isHavingFiles' => $user->isHavingFiles,
                 'isHavingBangUpdate' => $user->isHavingBangUpdate,
+                'devices' => $user->device_name,
                 'subscriptionCount' => $user->subscriptionCount,
             ];
         }
+
+        return response()->json($results);
+    }
+
+    public function show($user_id)
+    {
+        // Fetch all users sorted by name
+        $user = User::find($user_id);
+
+        // Prepare results
+
+        $results = [
+            'id' => $user->id,
+            'name' => $user->name,
+            'profileUrl' => 'https://bangapp.pro/BangAppBackend/storage/app/' . $user->image,
+            'bio' => $user->body,
+            'postCount' => $user->posts->count(),
+            'occupation' => $user->occupation,
+            'friendsCount' => $user->friendsCount,
+            'isHavingFiles' => $user->isHavingFiles,
+            'isHavingBangUpdate' => $user->isHavingBangUpdate,
+            'devices' => $user->device_name,
+            'subscriptionCount' => $user->subscriptionCount,
+        ];
+
 
         return response()->json($results);
     }

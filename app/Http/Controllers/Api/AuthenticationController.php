@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Device;
+use App\Helpers\DeviceHelper;
 use App\Http\Controllers\Controller;
 use App\User;
 use App\Post;
 use App\UserDevice;
 use App\UserHobby;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Http\Request;
@@ -149,20 +152,23 @@ class AuthenticationController extends Controller
         $user = JWTAuth::user();
         // Return the token and user ID in the response
 
-        $deviceData = [
-            'user_id' => $user->id,
-            'device_type' => $request->header('Device-Type'), // e.g., Android, iOS
-            'device_token' => $request->header('Device-Token'),
-            'device_model' => $request->header('Device-Model'),
-            'unique_id' => $request->header('Unique-ID'),
-            'os_version' => $request->header('OS-Version'),
-        ];
+        if( $request->header('Unique-ID')){
+            $deviceData = [
+                'user_id' => $user->id,
+                'device_type' => $request->header('Device-Type'), // e.g., Android, iOS
+                'device_token' => $request->header('Device-Token'),
+                'device_model' => $request->header('Device-Model'),
+                'unique_id' => $request->header('Unique-ID'),
+                'os_version' => $request->header('OS-Version'),
+                'last_logged_in_at' => now()->toDateTimeString(), // Set the current timestamp
+            ];
 
-        // Update or create the device record
-        UserDevice::updateOrCreate(
-            ['user_id' => $user->id, 'device_token' => $deviceData['device_token']],
-            $deviceData
-        );
+            Log::info(['Informational message.' => $deviceData]);
+
+            $savedDevice = DeviceHelper::saveDeviceInfo($deviceData);
+        }
+
+
 
         return response()->json([
             'token' => $token,

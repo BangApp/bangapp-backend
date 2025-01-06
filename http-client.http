@@ -20,6 +20,11 @@ GET {{base_url}}/users
 Authorization: Bearer {{token}}
 
 ###
+GET {{base_url}}/users/13
+Authorization: Bearer {{token}}
+
+
+###
 GET {{base_url}}/dashboard/stats/year
 Authorization: Bearer {{token}}
 
