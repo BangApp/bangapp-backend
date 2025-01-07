@@ -1631,6 +1631,15 @@ Route::middleware('auth:api')->group(function () {
         return response()->json(['notification_count' => $notificationCount]);
     });
 
+    Route::get('/updateNotificationCount/{user_id}', function ($user_id) {
+        // Find all unread notifications for the user
+        $notifications = Notification::where('is_read', false)
+            ->where('reference_id', $user_id);
+
+        $notifications->update(['is_read' => true]);
+        return response()->json(['notification_count' => 0]);
+    });
+
     Route::get('/getPostLikes/{post_id}', function ($post_id) {
         $post = Post::findOrFail($post_id);
         $likes = $post->likess()->with('user:id,name,image')->get();

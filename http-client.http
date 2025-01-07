@@ -23,7 +23,6 @@ Authorization: Bearer {{token}}
 GET {{base_url}}/users/13
 Authorization: Bearer {{token}}
 
-
 ###
 GET {{base_url}}/dashboard/stats/year
 Authorization: Bearer {{token}}
@@ -36,6 +35,7 @@ Authorization: Bearer {{token}}
 GET {{base_url}}/dashboard/subscribe-stats
 Authorization: Bearer {{token}}
 
-
-
+###
+GET {{base_url}}/updateNotificationCount/502
+Authorization: Bearer {{token}}
 
