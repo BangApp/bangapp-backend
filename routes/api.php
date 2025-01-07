@@ -921,10 +921,10 @@ Route::middleware('auth:api')->group(function () {
             }
         } else {
             Log::info('naingia kwenye video');
-            $url = $post->image;
-            $parts = explode('/', $url);
-            $uid = $parts[count($parts) - 2]; // Get the second-to-last element
-            deleteVideoApi($uid);
+            $url = $post->image; // Your URL
+            $parts = explode('/', $url); // Split the URL by "/"
+            $id = $parts[0]; 
+            deleteVideoApi($id);
             Log::info('natoke kwenye video');
         }
         $post->delete();
@@ -1509,31 +1509,31 @@ Route::middleware('auth:api')->group(function () {
         }
     }}
     if (!function_exists('deleteVideoApi')) {
-    function deleteVideoApi($uid)
-    {
-        Log::info('uhakika naingia kwenye video');
-        Log::info($uid);
-        $apiUrl = "https://video.bangapp.pro/api/v1/delete-video";
-
-        $curl = curl_init();
-
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => $apiUrl,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_CUSTOMREQUEST => "POST",
-            CURLOPT_POSTFIELDS => json_encode(['uid' => $uid]), // Assuming you need to pass the ID in the request body
-            CURLOPT_HTTPHEADER => array(
-                'Content-Type: application/json',
-                // Add any other headers if required
-            ),
-        ));
-
-        $response = curl_exec($curl);
-
-        curl_close($curl);
-        Log::info(json_encode($response));
-        return $response;
-    }
+        function deleteVideoApi($uid)
+        {
+            Log::info('uhakika naingia kwenye kufuta video');
+            Log::info($uid);
+            
+            $apiUrl = "http://bangapp.pro:8081/api/videos/deleteVideo/$uid";
+            
+            $curl = curl_init();
+        
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => $apiUrl, // Pass the UID in the URL for GET request
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_CUSTOMREQUEST => "GET", // Change to GET
+                CURLOPT_HTTPHEADER => array(
+                    'Content-Type: application/json',
+                    // Add any other headers if required
+                ),
+            ));
+        
+            $response = curl_exec($curl);
+        
+            curl_close($curl);
+            Log::info(json_encode($response));
+            return $response;
+        }
 
         }
 
