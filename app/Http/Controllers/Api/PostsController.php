@@ -28,7 +28,7 @@ class PostsController extends Controller
         return response(['data' => $posts, 'message' => 'success'], 200);
     }
 
-    public function userPosts(User $user) 
+    public function userPosts(User $user)
     {
         $posts = Post::where('user_id', $user->id)->with([
             'user' => function ($query) {
@@ -137,4 +137,8 @@ class PostsController extends Controller
         $post->delete();
         return response(['data' => null, 'message' => 'success'], 200);
     }
+
+
+
+
 }
