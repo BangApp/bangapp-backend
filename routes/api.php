@@ -699,7 +699,8 @@ Route::middleware('auth:api')->group(function () {
         $videoBaseUrl = "https://bangapp.pro/VideoStreaming/";
 
         $pageNumber = $request->query('_page', 1);
-        $type = $request->query('type');
+        // $type = $request->query('type');
+        $type = 'image';
         $numberOfPostsPerRequest = $request->query('_limit', 10);
         $user_id = $request->input('user_id');
 
