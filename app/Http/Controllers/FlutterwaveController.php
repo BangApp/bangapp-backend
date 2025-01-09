@@ -127,7 +127,7 @@ class FlutterwaveController extends Controller
         $userId = $validated['user_id'];
         $type = $validated['type'];
         $amount = $validated['amount'];
-        $phone_number = $validated['phone_number'];
+        $phone_number = $this->formatPhoneNumber($validated['phone_number']);
 
         // Call the makePayment method
         return $this->makePayment($postId, $userId, $type, $amount, $phone_number);
@@ -434,6 +434,17 @@ class FlutterwaveController extends Controller
             'success' => true,
             'data' => $userMessages,
         ]);
+    }
+
+    function formatPhoneNumber($number) {
+        $number = preg_replace('/\D/', '', $number);
+        if (strlen($number) == 9 && $number[0] != '0') {
+            return '0' . $number;  
+        }
+        if (strlen($number) == 10 && $number[0] == '0') {
+            return $number;  
+        }
+        return $number;
     }
 
 

@@ -78,7 +78,6 @@ Route::post('imageAddServer', function (Request $request) {
             }
         }
     }
-
     return response()->json(['url' => asset($image->image)], 201);
 });
 
@@ -110,7 +109,6 @@ Route::post('/videoAddServer', function (Request $request) {
         $bangUpdate->thumbnail_url = $request->thumbnail_url;
         $bangUpdate->save();
     }
-
     return response()->json(['url' => $request->path], 201);
 });
 
