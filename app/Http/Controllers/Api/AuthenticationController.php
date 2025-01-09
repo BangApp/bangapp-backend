@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Device;
+use App\Helpers\DeviceHelper;
 use App\Http\Controllers\Controller;
 use App\User;
 use App\Post;
+use App\UserDevice;
 use App\UserHobby;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Http\Request;
@@ -147,6 +151,25 @@ class AuthenticationController extends Controller
         // Get the authenticated user from the JWT token
         $user = JWTAuth::user();
         // Return the token and user ID in the response
+
+        if( $request->header('Unique-ID')){
+            $deviceData = [
+                'user_id' => $user->id,
+                'device_type' => $request->header('Device-Type'), // e.g., Android, iOS
+                'device_token' => $request->header('Device-Token'),
+                'device_model' => $request->header('Device-Model'),
+                'unique_id' => $request->header('Unique-ID'),
+                'os_version' => $request->header('OS-Version'),
+                'last_logged_in_at' => now()->toDateTimeString(), // Set the current timestamp
+            ];
+
+            Log::info(['Informational message.' => $deviceData]);
+
+            $savedDevice = DeviceHelper::saveDeviceInfo($deviceData);
+        }
+
+
+
         return response()->json([
             'token' => $token,
             'user_id' => $user->id,

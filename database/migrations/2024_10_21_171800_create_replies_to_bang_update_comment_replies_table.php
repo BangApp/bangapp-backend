@@ -13,15 +13,17 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('replies_to_bang_update_comment_replies', function (Blueprint $table) {
-            $table->id();
-            $table->text('body')->nullable();
-            $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('comment_id');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('comment_id')->references('id')->on('battle_comment_replies')->onDelete('cascade');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('replies_to_bang_update_comment_replies')) { // Check if the table exists
+            Schema::create('replies_to_bang_update_comment_replies', function (Blueprint $table) {
+                $table->id();
+                $table->text('body')->nullable();
+                $table->unsignedBigInteger('user_id');
+                $table->unsignedBigInteger('comment_id');
+                $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+                $table->foreign('comment_id')->references('id')->on('battle_comment_replies')->onDelete('cascade');
+                $table->timestamps();
+            });
+        }
     }
 
     /**

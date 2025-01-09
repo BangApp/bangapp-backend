@@ -13,17 +13,19 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('withdrawals', function (Blueprint $table) {
-            $table->id();
-            $table->string('amount');
-            $table->string('fee');
-            $table->string('reference_number');
-            $table->string('destination');
-            $table->string('channel');
-            $table->enum('status', ['complete', 'fail', 'pending', 'canceled']);
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('withdrawals')) { // Check if the table exists
+            Schema::create('withdrawals', function (Blueprint $table) {
+                $table->id();
+                $table->string('amount');
+                $table->string('fee');
+                $table->string('reference_number');
+                $table->string('destination');
+                $table->string('channel');
+                $table->enum('status', ['complete', 'fail', 'pending', 'canceled']);
+                $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+                $table->timestamps();
+            });
+        }
     }
 
     /**

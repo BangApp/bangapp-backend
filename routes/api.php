@@ -572,130 +572,222 @@ Route::middleware('auth:api')->group(function () {
         }
     });
 
-   Route::get('/getPost', function (Request $request) {
+//   Route::get('/getPost', function (Request $request) {
+//        $appUrl = "https://bangapp.pro/BangAppBackend/";
+//
+//       $pageNumber = $request->query('_page', 1);
+//       $type = $request->query('type');
+//        $numberOfPostsPerRequest = $request->query('_limit', 10);
+//
+//        $user_id = $request->input('user_id');
+//
+//          $pinnedUserIds = User::where('subscribe', true)->pluck('id')->toArray();
+//
+//          $subscribeUserIds = azampay::where('type', 'message')->whereDate('created_at', '<=', now()->subDays(30))->where('user_id', $user_id)->pluck('post_id')->toArray();
+//
+//           $uniqueArray = array_diff($pinnedUserIds, $subscribeUserIds);
+//
+//           // Optional: Reset the array keys to have a continuous sequence (if needed)
+//          // $uniqueArray = array_values($uniqueArray);
+//
+//
+//
+//           $posts = Post::unseenPosts($user_id)
+//                ->whereNotIn('user_id', $uniqueArray)
+//                ->with([
+//                    'likes' => function ($query) {
+//                        $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
+//                            ->groupBy('post_id', 'like_type');
+//                    },
+//                    'challenges' => function ($query) {
+//                        $query->select('*')->where('confirmed', 1);
+//                    }
+//                ])
+//                ->latest()
+//                ->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
+//        // }
+//        // else{
+//        //     Log::info("naingia hapa" );
+//        //     Log::info($getUniqueValues);
+//        //     $posts = Post::unseenPosts($user_id)->latest()->where('type', 'image')->whereIn('user_id',$getUniqueValues)
+//        //         ->with([
+//        //             'likes' => function ($query) {
+//        //                 $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
+//        //                     ->groupBy('post_id', 'like_type');
+//        //             },
+//        //             'challenges' => function ($query) {
+//        //                 $query->select('*')->where('confirmed', 1);
+//        //             }
+//        //         ])->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
+//
+//        // }
+//
+//        $posts->getCollection()->transform(function ($post) use ($appUrl, $user_id) {
+//            $post->post_views_count = $post->pinned == 1 ?  $post->payedCount() : $post->postViews->count();
+//            // Update the 'pinned' attribute based on whether the user has paid or not
+//            if ($post->hasUserPaid($user_id,$post->id)) {
+//                $post->pinned = 0;
+//            }
+//            if ($post->type === 'image') {
+//                $post->image ? $post->image = $appUrl . 'storage/app/' . $post->image : $post->image = null;
+//                $post->challenge_img ? $post->challenge_img = $appUrl . 'storage/app/' . $post->challenge_img : $post->challenge_img = null;
+//                list($post->width, $post->height) =  [300, 300];
+//            }
+//            if ($post->type === 'video') {
+//                $post->image = 'https://bangapp.pro/VideoStreaming/var/www/html/VideoStreaming/public/videos/'.$post->image;
+//                $post->thumbnail_url = 'https://bangapp.pro/VideoStreaming/'.$post->thumbnail_url;
+//                list($post->width, $post->height) = [300, 300];
+//            }
+//            foreach ($post->challenges as $challenge) {
+//                $challenge->challenge_img ? $challenge->challenge_img = $appUrl . 'storage/app/' . $challenge->challenge_img : $challenge->challenge_img = null;
+//            }
+//            if ($post->challenges->isNotEmpty()) {
+//                $newChallenge = new Challenge([
+//                    'id' => $post->id, // replace with appropriate values
+//                    'post_id' => $post->id,
+//                    'user_id' => $post->user_id,
+//                    'challenge_img' => $post->image, // replace with appropriate values
+//                    'body' => $post->body, // replace with appropriate values
+//                    'type' => $post->type,
+//                    'confirmed' => 1,
+//                    'created_at' => $post->created_at,
+//                    'updated_at' => $post->updated_at,
+//                    // add other properties as needed
+//                ]);
+//                // Convert the challenges collection to an array, add the new challenge at the top, and reindex the array
+//                $challengesArray = $post->challenges->prepend($newChallenge)->values()->toArray();
+//                // Set the challenges property with the modified array
+//                $post->challenges = $challengesArray;
+//            }
+//            $post->isLikedA = false;
+//            $post->isLikedB = false;
+//            $post->isLiked = false;
+//            // Check if the user has liked the post and update isLikedA and isLikedB accordingly
+//            $likeType = Post::getLikeTypeForUser($user_id, $post->id);
+//            if ($likeType == "A") {
+//                $post->isLikedA = true;
+//                $post->isLiked = true;
+//            } elseif ($likeType == "B") {
+//                $post->isLikedB = true;
+//                //$post->isLiked = true;
+//            }
+//            // Retrieve the like counts for both A and B challenge images
+//            // $likeCount
+//            $likeCountA = 0;
+//            $likeCountB = 0;
+//            if ($post->likes->isNotEmpty()) {
+//                foreach ($post->likes as $like) {
+//                    if ($like->like_type === 'A') {
+//                        $likeCountA = $like->like_count;
+//                    } elseif ($like->like_type === 'B') {
+//                        $likeCountB = $like->like_count;
+//                    }
+//                }
+//            }
+//            $post->like_count_A = $likeCountA;
+//            $post->like_count_B = $likeCountB;
+//            return $post;
+//        });
+//
+//        return response(['data' => $posts, 'message' => 'success'], 200);
+//    });
+
+    Route::get('/getPost', function (Request $request) {
         $appUrl = "https://bangapp.pro/BangAppBackend/";
+        $videoBaseUrl = "https://bangapp.pro/VideoStreaming/";
 
         $pageNumber = $request->query('_page', 1);
+        // $type = $request->query('type');
+        $type = 'image';
         $numberOfPostsPerRequest = $request->query('_limit', 10);
-
         $user_id = $request->input('user_id');
 
-        //$getUniqueValues = getUniqueValues($user_id);
+        // Fetch pinned and subscribed user IDs
+        $pinnedUserIds = User::where('subscribe', true)->pluck('id')->toArray();
+        $subscribeUserIds = azampay::where('type', 'message')
+            ->whereDate('created_at', '<=', now()->subDays(30))
+            ->where('user_id', $user_id)
+            ->pluck('post_id')
+            ->toArray();
 
-        //if (empty($getUniqueValues)){
+        $uniqueArray = array_diff($pinnedUserIds, $subscribeUserIds);
 
-           $userHobbies = UserHobby::where('user_id', $user_id)->pluck('hobby_id')->toArray();
+        // Fetch posts with optional type filtering
+        $postsQuery = Post::unseenPosts($user_id)
+            ->whereNotIn('user_id', $uniqueArray)
+            ->with([
+                'likes' => function ($query) {
+                    $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
+                        ->groupBy('post_id', 'like_type');
+                },
+                'challenges' => function ($query) {
+                    $query->select('*')->where('confirmed', 1);
+                }
+            ])
+            ->latest();
 
-          $pinnedUserIds = User::where('subscribe', true)->pluck('id')->toArray();
+        if ($type) {
+            $postsQuery->where('type', $type);
+        }
 
-        //    $friendsPinned = friends::where('user_id', $user_id)
-        //    ->orWhere('friend_id', $user_id)
-        //    ->where('confirmed', 1)->join('users', function($join) {
-        //         $join->on('friends.friend_id', '=', 'users.id')
-        //              ->where('users.subscribe', 0);
-        //     })->pluck('user_id', 'friend_id')
-        //     ->toArray();
+        $posts = $postsQuery->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
 
-          $subscribeUserIds = azampay::where('type', 'message')->whereDate('created_at', '<=', now()->subDays(30))->where('user_id', $user_id)->pluck('post_id')->toArray();
+        // Transform posts
+        $posts->getCollection()->transform(function ($post) use ($appUrl, $videoBaseUrl, $user_id) {
+            $post->post_views_count = $post->pinned == 1 ? $post->payedCount() : $post->postViews->count();
 
-           $uniqueArray = array_diff($pinnedUserIds, $subscribeUserIds);
-
-           // Optional: Reset the array keys to have a continuous sequence (if needed)
-          // $uniqueArray = array_values($uniqueArray);
-
-           $posts = Post::unseenPosts($user_id)->where('type', 'image')
-                ->whereNotIn('user_id', $uniqueArray)
-                ->with([
-                    'likes' => function ($query) {
-                        $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
-                            ->groupBy('post_id', 'like_type');
-                    },
-                    'challenges' => function ($query) {
-                        $query->select('*')->where('confirmed', 1);
-                    }
-                ])
-                ->latest()
-                ->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
-        // }
-        // else{
-        //     Log::info("naingia hapa" );
-        //     Log::info($getUniqueValues);
-        //     $posts = Post::unseenPosts($user_id)->latest()->where('type', 'image')->whereIn('user_id',$getUniqueValues)
-        //         ->with([
-        //             'likes' => function ($query) {
-        //                 $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
-        //                     ->groupBy('post_id', 'like_type');
-        //             },
-        //             'challenges' => function ($query) {
-        //                 $query->select('*')->where('confirmed', 1);
-        //             }
-        //         ])->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
-
-        // }
-
-        $posts->getCollection()->transform(function ($post) use ($appUrl, $user_id) {
-            $post->post_views_count = $post->pinned == 1 ?  $post->payedCount() : $post->postViews->count();
-            // Update the 'pinned' attribute based on whether the user has paid or not
-            if ($post->hasUserPaid($user_id,$post->id)) {
+            // Update pinned status if the user has paid
+            if ($post->hasUserPaid($user_id, $post->id)) {
                 $post->pinned = 0;
             }
+
+            // Handle media links and dimensions
             if ($post->type === 'image') {
-                $post->image ? $post->image = $appUrl . 'storage/app/' . $post->image : $post->image = null;
-                $post->challenge_img ? $post->challenge_img = $appUrl . 'storage/app/' . $post->challenge_img : $post->challenge_img = null;
-                list($post->width, $post->height) =  [300, 300];
+                $post->image = $post->image ? $appUrl . 'storage/app/' . $post->image : null;
+                $post->challenge_img = $post->challenge_img ? $appUrl . 'storage/app/' . $post->challenge_img : null;
+            } elseif ($post->type === 'video') {
+                $post->image = $videoBaseUrl . 'public/videos/' . $post->image;
+                $post->thumbnail_url = $videoBaseUrl . $post->thumbnail_url;
             }
-            if ($post->type === 'video') {
-                $post->image = $post->image;
-                list($post->width, $post->height) = [300, 300];
-            }
+            list($post->width, $post->height) = [300, 300];
+
+            // Update challenge images
             foreach ($post->challenges as $challenge) {
-                $challenge->challenge_img ? $challenge->challenge_img = $appUrl . 'storage/app/' . $challenge->challenge_img : $challenge->challenge_img = null;
+                $challenge->challenge_img = $challenge->challenge_img ? $appUrl . 'storage/app/' . $challenge->challenge_img : null;
             }
+
+            // Add new challenge if challenges exist
             if ($post->challenges->isNotEmpty()) {
                 $newChallenge = new Challenge([
-                    'id' => $post->id, // replace with appropriate values
+                    'id' => $post->id,
                     'post_id' => $post->id,
                     'user_id' => $post->user_id,
-                    'challenge_img' => $post->image, // replace with appropriate values
-                    'body' => $post->body, // replace with appropriate values
+                    'challenge_img' => $post->image,
+                    'body' => $post->body,
                     'type' => $post->type,
                     'confirmed' => 1,
                     'created_at' => $post->created_at,
                     'updated_at' => $post->updated_at,
-                    // add other properties as needed
                 ]);
-                // Convert the challenges collection to an array, add the new challenge at the top, and reindex the array
-                $challengesArray = $post->challenges->prepend($newChallenge)->values()->toArray();
-                // Set the challenges property with the modified array
-                $post->challenges = $challengesArray;
+                $post->challenges = $post->challenges->prepend($newChallenge)->values()->toArray();
             }
-            $post->isLikedA = false;
-            $post->isLikedB = false;
-            $post->isLiked = false;
-            // Check if the user has liked the post and update isLikedA and isLikedB accordingly
+
+            // Update like status and counts
+            $post->isLikedA = $post->isLikedB = $post->isLiked = false;
             $likeType = Post::getLikeTypeForUser($user_id, $post->id);
-            if ($likeType == "A") {
-                $post->isLikedA = true;
-                $post->isLiked = true;
-            } elseif ($likeType == "B") {
+
+            if ($likeType === "A") {
+                $post->isLikedA = $post->isLiked = true;
+            } elseif ($likeType === "B") {
                 $post->isLikedB = true;
-                //$post->isLiked = true;
             }
-            // Retrieve the like counts for both A and B challenge images
-            // $likeCount
-            $likeCountA = 0;
-            $likeCountB = 0;
-            if ($post->likes->isNotEmpty()) {
-                foreach ($post->likes as $like) {
-                    if ($like->like_type === 'A') {
-                        $likeCountA = $like->like_count;
-                    } elseif ($like->like_type === 'B') {
-                        $likeCountB = $like->like_count;
-                    }
-                }
-            }
+
+            $likeCountA = $post->likes->where('like_type', 'A')->sum('like_count');
+            $likeCountB = $post->likes->where('like_type', 'B')->sum('like_count');
+
             $post->like_count_A = $likeCountA;
             $post->like_count_B = $likeCountB;
+
             return $post;
         });
 
@@ -703,7 +795,8 @@ Route::middleware('auth:api')->group(function () {
     });
 
 
-   Route::get('/getPostWithoutVideo', function (Request $request) {
+
+    Route::get('/getPostWithoutVideo', function (Request $request) {
         $appUrl = "https://bangapp.pro/BangAppBackend/";
 
         $pageNumber = $request->query('_page', 1);
@@ -827,10 +920,10 @@ Route::middleware('auth:api')->group(function () {
             }
         } else {
             Log::info('naingia kwenye video');
-            $url = $post->image;
-            $parts = explode('/', $url);
-            $uid = $parts[count($parts) - 2]; // Get the second-to-last element
-            deleteVideoApi($uid);
+            $url = $post->image; // Your URL
+            $parts = explode('/', $url); // Split the URL by "/"
+            $id = $parts[0]; 
+            deleteVideoApi($id);
             Log::info('natoke kwenye video');
         }
         $post->delete();
@@ -1011,7 +1104,8 @@ Route::middleware('auth:api')->group(function () {
                 list($post->width, $post->height) =  [300, 300];
             }
             if ($post->type === 'video') {
-                $post->image = $post->image;
+                $post->image = 'https://bangapp.pro/VideoStreaming/var/www/html/VideoStreaming/public/videos/'.$post->image;
+                $post->thumbnail_url = 'https://bangapp.pro/VideoStreaming/'.$post->thumbnail_url;
                 list($post->width, $post->height) = [300, 300];
             }
             $post->isLikedA = false;
@@ -1414,31 +1508,31 @@ Route::middleware('auth:api')->group(function () {
         }
     }}
     if (!function_exists('deleteVideoApi')) {
-    function deleteVideoApi($uid)
-    {
-        Log::info('uhakika naingia kwenye video');
-        Log::info($uid);
-        $apiUrl = "https://video.bangapp.pro/api/v1/delete-video";
-
-        $curl = curl_init();
-
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => $apiUrl,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_CUSTOMREQUEST => "POST",
-            CURLOPT_POSTFIELDS => json_encode(['uid' => $uid]), // Assuming you need to pass the ID in the request body
-            CURLOPT_HTTPHEADER => array(
-                'Content-Type: application/json',
-                // Add any other headers if required
-            ),
-        ));
-
-        $response = curl_exec($curl);
-
-        curl_close($curl);
-        Log::info(json_encode($response));
-        return $response;
-    }
+        function deleteVideoApi($uid)
+        {
+            Log::info('uhakika naingia kwenye kufuta video');
+            Log::info($uid);
+            
+            $apiUrl = "http://bangapp.pro:8081/api/videos/deleteVideo/$uid";
+            
+            $curl = curl_init();
+        
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => $apiUrl, // Pass the UID in the URL for GET request
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_CUSTOMREQUEST => "GET", // Change to GET
+                CURLOPT_HTTPHEADER => array(
+                    'Content-Type: application/json',
+                    // Add any other headers if required
+                ),
+            ));
+        
+            $response = curl_exec($curl);
+        
+            curl_close($curl);
+            Log::info(json_encode($response));
+            return $response;
+        }
 
         }
 
@@ -1534,6 +1628,15 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/getNotificationCount/{user_id}', function ($user_id) {
         $notificationCount = Notification::where('is_read', false)->where('reference_id', $user_id)->count();
         return response()->json(['notification_count' => $notificationCount]);
+    });
+
+    Route::get('/updateNotificationCount/{user_id}', function ($user_id) {
+        // Find all unread notifications for the user
+        $notifications = Notification::where('is_read', false)
+            ->where('reference_id', $user_id);
+
+        $notifications->update(['is_read' => true]);
+        return response()->json(['notification_count' => 0]);
     });
 
     Route::get('/getPostLikes/{post_id}', function ($post_id) {
@@ -2076,8 +2179,6 @@ Route::post('/uploadFile', function(Request $request){
     return response()->json(['success' => true, 'data' => $file], 201);
 });
 
-
-
 Route::get('/getFileUploads/{userId}/{perPage}', function($userId, $perPage) {
     $baseUrl = 'https://bangapp.pro/BangAppBackend/storage/app/';
     $files = FilePost::where('user_id', $userId)->paginate($perPage);
@@ -2174,6 +2275,7 @@ Route::group(['prefix' => 'v2'], function () {
 
     Route::group(['middleware' => ['auth:api']], function () {
         Route::get('/users', [UserController::class, 'index']);
+        Route::get('/users/{id}', [UserController::class, 'show']);
         Route::get('/deposit', [DepositController::class, 'index']);
         Route::get('/withdraw', [WithdrawController::class, 'index']);
 
