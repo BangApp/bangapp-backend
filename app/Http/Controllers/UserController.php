@@ -134,6 +134,15 @@ class UserController extends Controller
             return response()->json(['error' => 'User ID is missing in the request'], 400);
         }
         $user = User::find($user_id);
+
+        Log::info('getMyInfo request received', [
+            'user_id' => $user_id,
+            'viewer_id' => $viewer_id,
+        ]);
+
+
+
+
         if (!$user) {
             return response()->json(['error' => 'User not found'], 404);
         }
