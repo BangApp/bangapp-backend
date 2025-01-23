@@ -169,6 +169,11 @@ class UserController extends Controller
             ->exists();
         $user->isFriend = $isFriend;
         $user->isFriendRequest = $isFriendRequest;
+
+            // Fetch hobbies
+    $user->hobbies = UserHobby::where('user_id', $user_id)
+    ->pluck('hobby_id')
+    ->toArray();
         return response()->json($user, 200);
     }
 
