@@ -138,7 +138,7 @@ class UserController extends Controller
 
         Log::info('getMyInfo request received', [
             'user_id' => $user_id,
-            'viewer_id' => $viewer_id,
+            'user' => $user,
         ]);
 
 
