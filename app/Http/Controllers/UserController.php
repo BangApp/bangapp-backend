@@ -6,6 +6,7 @@ use App\User;
 use App\friends;
 use App\FriendRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
