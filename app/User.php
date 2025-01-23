@@ -31,9 +31,7 @@ class User extends Authenticatable implements JWTSubject
      *
      * @var array
      */
-    protected $fillable = [
-        'name', 'email', 'password','phone_number','date_of_birth','bio','image','device_token','public','price','subscribe','subscriptionPrice','country_code','occupation'
-    ];
+    protected $guaded = [];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -53,7 +51,7 @@ class User extends Authenticatable implements JWTSubject
         'email_verified_at' => 'datetime',
     ];
 
-    protected $appends = ['followerCount', 'followingCount', 'followingMe', 'followed','user_image_url','postCount','friendsCount','lastSeen','isHavingFiles','isHavingBangUpdate','bio','occupation','subscriptionCount'];
+    protected $appends = ['followerCount', 'followingCount', 'followingMe', 'followed','user_image_url','postCount','friendsCount','lastSeen','isHavingFiles','isHavingBangUpdate','subscriptionCount'];
 
     public function posts()
     {
