@@ -1274,7 +1274,7 @@ Route::middleware('auth:api')->group(function () {
         }
     });
 
-
+// a function used to update user profile information
     Route::post('/setUserProfile', function (request $request) {
         $user = User::findOrFail($request->user_id);
         if ($request->hasFile('image')) {
@@ -1366,7 +1366,7 @@ Route::middleware('auth:api')->group(function () {
         $notifications = Notification::where('reference_id', $user_id)
             ->with([
                 'user' => function ($query) {
-                    $query->select('id', 'name', 'image');
+                    $query->select('id', 'name', 'image', 'bio', 'occupation');
                 },
                 'post' => function ($query) {
                     $query->select('id', 'image', 'thumbnail_url');
