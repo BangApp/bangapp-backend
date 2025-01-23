@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\User;
 use App\friends;
+use App\UserHobby;
 use App\FriendRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
