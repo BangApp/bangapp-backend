@@ -142,9 +142,6 @@ class UserController extends Controller
             'user' => $user,
         ]);
 
-
-
-
         if (!$user) {
             return response()->json(['error' => 'User not found'], 404);
         }
@@ -173,7 +170,6 @@ class UserController extends Controller
 
             // Fetch hobbies
     $user->hobbies = UserHobby::where('user_id', $user_id)
-    ->pluck('hobby_id')
     ->toArray();
         return response()->json($user, 200);
     }
