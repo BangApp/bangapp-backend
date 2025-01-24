@@ -1147,9 +1147,7 @@ Route::middleware('auth:api')->group(function () {
         $appUrl = "https://bangapp.pro/BangAppBackend/";
 
         $posts = Post::where('id', $post_id)->with([
-            'user' => function ($query) {
-                $query->select('id', 'name', 'image');
-            },
+            'user',
             'likes' => function ($query) {
                 $query->select('post_id', 'like_type', DB::raw('count(*) as like_count'))
                     ->groupBy('post_id', 'like_type');
