@@ -169,10 +169,10 @@ class UserController extends Controller
         $user->isFriendRequest = $isFriendRequest;
 
             // Fetch hobbies
-    $user->hobbies = UserHobby::where('user_id', $user_id)
+    $user->hobb = UserHobby::where('user_id', $user_id)
     ->pluck('hobby_id')
     ->toArray();
-    // $user->hobbies = UserHobby::where('user_id', $user_id)->get();
+    $user->hobbies = UserHobby::where('user_id', $user_id)->get();
 
         return response()->json($user, 200);
     }
