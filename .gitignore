@@ -12,3 +12,7 @@ npm-debug.log
 yarn-error.log
 
 socket/node_modules
+bangapp.json
+bangappp.json
+notificationService/firebaseServiceAccountKey.json
+app/Http/Controllers/bangappp.json
