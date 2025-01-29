@@ -31,7 +31,7 @@ class User extends Authenticatable implements JWTSubject
      *
      * @var array
      */
-    protected $guaded = [];
+    protected $guarded = [];
 
     /**
      * The attributes that should be hidden for arrays.
