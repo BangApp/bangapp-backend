@@ -30,7 +30,7 @@ public function associateOneSignalPlayerId(Request $request)
     // Retrieve all conversations for the authenticated user
     public function getAllConversations(Request $request)
     {
-        $appUrl = "https://bangapp.pro/BangAppBackend/";
+        $appUrl = env('APP_URL', 'https://bangapp.pro/BangAppBackend');
         $user_id = $request->get('user_id');
         $user = User::find($user_id);
 
@@ -181,6 +181,7 @@ Log::info($request->all());
     $user2_id = $request->user2_id;
     $messageText = $request->message;
     $messageType = $request->message_type;
+    $appUrl = env('APP_URL', 'https://bangapp.pro/BangAppBackend');
 
     $conversation = Conversation::where(function ($query) use ($sender_id, $user2_id) {
         $query->where('user1_id', $sender_id)
@@ -201,7 +202,7 @@ Log::info($request->all());
 
     $message = new Message([
         'sender_id' => $sender_id,
-        'message' => "https://bangapp.pro/BangAppBackend/storage/app/public/".$attachmentPath,
+        'message' =>   $appUrl . "storage/app/public/".$attachmentPath,
         'message_type'=> 'image',
         'attachment'=> $attachmentPath,
 
@@ -249,7 +250,7 @@ Log::info($request->all());
 
     $message = new Message([
         'sender_id' => $sender_id,
-        'message' => "https://bangapp.pro/BangAppBackend/storage/app/public/".$attachmentPath,
+        'message' =>   $appUrl . "storage/app/public/".$attachmentPath,
         'message_type'=> 'video',
         'attachment'=> $attachmentPath,
 

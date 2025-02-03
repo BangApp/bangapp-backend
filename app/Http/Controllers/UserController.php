@@ -19,13 +19,15 @@ class UserController extends Controller
 
         // Fetch all users sorted by name
         $users = User::orderBy('name')->get();
+        $appUrl = env('APP_URL', 'https://bangapp.pro/BangAppBackend');
+
 
         // Prepare results
         foreach ($users as $user) {
             $results[] = [
                 'id' => $user->id,
                 'name' => $user->name,
-                'profileUrl' => 'https://bangapp.pro/BangAppBackend/storage/app/' . $user->image,
+                'profileUrl' =>  $appUrl . 'storage/app/' . $user->image,
                 'bio' => $user->body,
                 'postCount' => $user->posts->count(),
                 'occupation' => $user->occupation,
@@ -44,13 +46,14 @@ class UserController extends Controller
     {
         // Fetch all users sorted by name
         $user = User::find($user_id);
+        $appUrl = env('APP_URL', 'https://bangapp.pro/BangAppBackend');
 
         // Prepare results
 
         $results = [
             'id' => $user->id,
             'name' => $user->name,
-            'profileUrl' => 'https://bangapp.pro/BangAppBackend/storage/app/' . $user->image,
+            'profileUrl' =>  $appUrl . 'storage/app/' . $user->image,
             'bio' => $user->body,
             'postCount' => $user->posts->count(),
             'occupation' => $user->occupation,
@@ -83,7 +86,7 @@ class UserController extends Controller
                 $results[] = [
                     'id' => $user->id,
                     'name' => $user->name,
-                    'profileUrl' => 'https://bangapp.pro/BangAppBackend/storage/app/' . $user->image,
+                    'profileUrl' =>  $appUrl . 'storage/app/' . $user->image,
                     'bio' => $user->body,
                     'postCount' => $user->posts->count(),
                     'occupation' => $user->occupation,

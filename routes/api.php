@@ -81,6 +81,8 @@ Route::post('imageAddServer', function (Request $request) {
     return response()->json(['url' => asset($image->image)], 201);
 });
 
+
+
 Route::post('/videoAddServer', function (Request $request) {
     if($request->location == "post")
     {
@@ -258,7 +260,10 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/user/{userId}/payed-subscriptions', [FlutterwaveController::class, 'getUserSubscriptions']);
 
     Route::get('/bang-updatesnew', function (\Illuminate\Http\Request $request) {
-        $appUrl = "https://bangapp.pro/BangAppBackend/";
+        // $appUrl = "https://bangapp.pro/BangAppBackend/";
+
+        $appUrl = env('APP_URL', 'https://bangapp.pro/BangAppBackend');
+
         $page = $request->query('_page', 1);
         $limit = $request->query('_limit', 4);
         $bangUpdates = BangUpdate::all();
@@ -279,7 +284,7 @@ Route::middleware('auth:api')->group(function () {
     });
 
     Route::get('/bang-updates/{userId}/{per_page}/{page}', function ($userId,$per_page,$page) {
-        $appUrl = "https://bangapp.pro/BangAppBackend/";
+        $appUrl = env('APP_URL', 'https://bangapp.pro/BangAppBackend');
         $bangUpdates = BangUpdate::unseenPosts($userId)->where('type','image')->orderBy('created_at', 'desc')
             ->with([
                 'bang_update_likes' => function ($query) use ($userId) {
@@ -312,7 +317,7 @@ Route::middleware('auth:api')->group(function () {
     });
 
     Route::get('/user-bang-updates/', function (Request $request) {
-        $appUrl = "https://bangapp.pro/BangAppBackend/";
+        $appUrl = env('APP_URL', 'https://bangapp.pro/BangAppBackend');
         $pageNumber = $request->query('_page', 1);
         $numberOfPostsPerRequest = $request->query('_limit', 10);
 
@@ -506,7 +511,7 @@ Route::middleware('auth:api')->group(function () {
 
 
     Route::get('/getChallenge/{challengeId}', function ($challengeId) {
-        $appUrl = "https://bangapp.pro/BangAppBackend/";
+        $appUrl = env('APP_URL', 'https://bangapp.pro/BangAppBackend');
         // Retrieve the Challenge model instance by its ID
         $challenge = Challenge::where('id', $challengeId)->with([
             'user' => function ($query) {
@@ -535,7 +540,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/comments/{post}', 'Api\CommentsController@comments');
 
     Route::get('/get/bangInspirations', function () {
-        $appUrl = "https://bangapp.pro/BangAppBackend/";
+        $appUrl = env('APP_URL', 'https://bangapp.pro/BangAppBackend');
         $bangInspirations = bangInspiration::all();
         $formattedInspirations = $bangInspirations->map(function ($update) use ($appUrl) {
             $update->profile_url = $appUrl . 'storage/app/bangInspiration/' . $update->profile_url;
@@ -549,7 +554,7 @@ Route::middleware('auth:api')->group(function () {
 
 
     Route::get('/get/bangInspirations/{videoId}', function ($videoId) {
-        $appUrl = "https://bangapp.pro/BangAppBackend/";
+        $appUrl = env('APP_URL', 'https://bangapp.pro/BangAppBackend');
         // Retrieve the Video model instance by its ID
         $video = BangInspiration::where('id', $videoId)->first();
         if (!$video) {
@@ -693,8 +698,8 @@ Route::middleware('auth:api')->group(function () {
 //    });
 
     Route::get('/getPost', function (Request $request) {
-        $appUrl = "https://bangapp.pro/BangAppBackend/";
-        $videoBaseUrl = "https://bangapp.pro/VideoStreaming/";
+        $appUrl = env('APP_URL', 'https://bangapp.pro/BangAppBackend');
+        $videoBaseUrl = env('VIDEO_URL', 'https://bangapp.pro/VideoStreaming');
 
         $pageNumber = $request->query('_page', 1);
         // $type = $request->query('type');
@@ -797,7 +802,7 @@ Route::middleware('auth:api')->group(function () {
 
 
     Route::get('/getPostWithoutVideo', function (Request $request) {
-        $appUrl = "https://bangapp.pro/BangAppBackend/";
+        $appUrl = env('APP_URL', 'https://bangapp.pro/BangAppBackend');
 
         $pageNumber = $request->query('_page', 1);
         $numberOfPostsPerRequest = $request->query('_limit', 10);
@@ -902,7 +907,7 @@ Route::middleware('auth:api')->group(function () {
         unset($deletedPostData['id']);
         DeletedPost::create(['user_id' => $deletedPostData['user_id'], 'body' => $deletedPostData['user_id'], 'type' => $deletedPostData['type'], 'image' => $deletedPostData['image'], 'challenge_img' => $deletedPostData['challenge_img'], 'pinned' => $deletedPostData['pinned']]);
         // Move associated media files to the recycle bin in the storage folder
-        $appUrl = "https://bangapp.pro/BangAppBackend/";
+        $appUrl = env('APP_URL', 'https://bangapp.pro/BangAppBackend');
         $deletedFolder = 'recycle_bin';
         $deletedPath = storage_path('app/' . $deletedFolder);
         if ($post->type == 'image') {
@@ -1075,7 +1080,10 @@ Route::middleware('auth:api')->group(function () {
     });
 
     Route::get('/getMyPosts', function (Request $request) {
-        $appUrl = "https://bangapp.pro/BangAppBackend/";
+        $appUrl = env('APP_URL', 'https://bangapp.pro/BangAppBackend');
+        $videoBaseUrl = env('VIDEO_URL', 'https://bangapp.pro/VideoStreaming');
+        $videoFolderPath = env('VIDEO_FOLDER_PATH', 'https://bangapp.pro/VideoStreaming');
+
         // Get the _page and _limit parameters from the request query
         $pageNumber = $request->query('_page', 1);
         $numberOfPostsPerRequest = $request->query('_limit', 10);
@@ -1104,8 +1112,8 @@ Route::middleware('auth:api')->group(function () {
                 list($post->width, $post->height) =  [300, 300];
             }
             if ($post->type === 'video') {
-                $post->image = 'https://bangapp.pro/VideoStreaming/var/www/html/VideoStreaming/public/videos/'.$post->image;
-                $post->thumbnail_url = 'https://bangapp.pro/VideoStreaming/'.$post->thumbnail_url;
+                $post->image =  $videoBaseUrl . $videoFolderPath . $post->image;
+                $post->thumbnail_url = $appUrl . $post->thumbnail_url;
                 list($post->width, $post->height) = [300, 300];
             }
             $post->isLikedA = false;
@@ -1141,10 +1149,8 @@ Route::middleware('auth:api')->group(function () {
         return response(['data' => $posts, 'message' => 'success'], 200);
     });
 
-
-
     Route::get('/getPostInfo/{post_id}/{user_id}', function ($post_id, $user_id) {
-        $appUrl = "https://bangapp.pro/BangAppBackend/";
+        $appUrl = env('APP_URL', 'https://bangapp.pro/BangAppBackend');
 
         $posts = Post::where('id', $post_id)->with([
             'user',
@@ -1200,7 +1206,7 @@ Route::middleware('auth:api')->group(function () {
     });
 
     Route::get('/getUpdateInfo/{post_id}/{user_id}', function ($post_id, $user_id) {
-        $appUrl = "https://bangapp.pro/BangAppBackend/";
+        $appUrl = env('APP_URL', 'https://bangapp.pro/BangAppBackend');
         $bangUpdate = BangUpdate::where('id', $post_id)
             ->with([
                 'bang_update_likes' => function ($query) use ($user_id) {
@@ -1310,8 +1316,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/bangBattleComment/{id}', 'Api\CommentsController@bangBattleComment');
 
     Route::get('/getBangBattle/{user_id}', function ($user_id) {
-
-        $appUrl = "https://bangapp.pro/BangAppBackend/";
+        $appUrl = env('APP_URL', 'https://bangapp.pro/BangAppBackend');
         $battles = BangBattle::with([
             'likes' => function ($query) {
                 $query->select('battle_id', 'like_type', DB::raw('count(*) as like_count'))
@@ -2072,7 +2077,7 @@ Route::post('/savePost', function(Request $request){
 });
 
 Route::get('/getSavedPosts/{userId}', function ($userId) {
-    $appUrl = "https://bangapp.pro/BangAppBackend/";
+    $appUrl = env('APP_URL', 'https://bangapp.pro/BangAppBackend');
 
     if (!is_numeric($userId)) {
         return response()->json(['success' => false, 'message' => 'Invalid user ID.'], 400);
@@ -2141,7 +2146,7 @@ Route::get('/getSavedPosts/{userId}', function ($userId) {
 
 
 Route::get('/getDeletedPosts/{userId}', function ($userId) {
-    $appUrl = "https://bangapp.pro/BangAppBackend/";
+    $appUrl = env('APP_URL', 'https://bangapp.pro/BangAppBackend');
     if (!is_numeric($userId)) {
         return response()->json(['success' => false, 'message' => 'Invalid user ID.'], 400);
     }

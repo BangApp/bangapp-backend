@@ -31,7 +31,7 @@ class Comment extends Model
 
     public function getUserImageUrlAttribute()
     {
-        $appUrl = "https://bangapp.pro/BangAppBackend/";
+        $appUrl = env('APP_URL', 'https://bangapp.pro/BangAppBackend');
         return $appUrl .'storage/app/'.$this->user->image;
     }
 

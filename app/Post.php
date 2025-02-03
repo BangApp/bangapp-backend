@@ -120,7 +120,7 @@ class Post extends Model
     
     public function getUserImageUrlAttribute()
     {
-        $appUrl = "https://bangapp.pro/BangAppBackend/";
+        $appUrl = env('APP_URL', 'https://bangapp.pro/BangAppBackend');
 
         // Check if the user relationship exists and is not null
         if ($this->user && $this->user->image !== null) {
