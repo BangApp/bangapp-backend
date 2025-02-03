@@ -22,7 +22,7 @@ class Notification extends Model
     public function getUserImageUrlAttribute()
     {
         $appUrl = env('APP_URL', 'https://bangapp.pro/BangAppBackend');
-        return $appUrl .'storage/app/'.$this->user->image;
+        return $appUrl .'storage/'.$this->user->image;
     }
 
     public function post()
@@ -35,7 +35,7 @@ class Notification extends Model
         $appUrl = env('APP_URL', 'https://bangapp.pro/BangAppBackend');
         if($this->post)
         {
-            return $appUrl .'storage/app/'.$this->post->image;
+            return $appUrl .'storage/'.$this->post->image;
         }
         return '';
     }

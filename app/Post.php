@@ -129,12 +129,12 @@ class Post extends Model
                 return $this->user->image; // Return the image URL as it is
             } else {
                 // If not, append the appUrl to the image URL
-                return $appUrl . 'storage/app/' . $this->user->image;
+                return $appUrl . 'storage/' . $this->user->image;
             }
         }
 
         // If user or image is null, return a default image URL
-        return "https://bangapp.pro/BangAppBackend/storage/app/bang_logo.jpg";
+        return $appUrl . "storage/bang_logo.jpg";
     }
 
 

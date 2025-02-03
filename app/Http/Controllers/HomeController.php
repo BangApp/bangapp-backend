@@ -51,7 +51,7 @@ class HomeController extends Controller
         // Generate a unique filename
         $filename = uniqid() . '.' . $file->getClientOriginalExtension();
 
-        // Store the file locally in the storage/app/public directory
+        // Store the file locally in the storage/public directory
         $file->storeAs('bangUpdates', $filename);
 
         $bangUpdate = new BangUpdate();
@@ -87,7 +87,7 @@ class HomeController extends Controller
 
         $thumbnailPath = 'bangInspiration/thumb/' . $thumbnailName;
         $outputVideo = 'bangInspiration/compressed_videos/' . $filename;
-        // Store the video locally in the storage/app/public directory
+        // Store the video locally in the storage/public directory
         $video->storeAs('bangInspiration', $filename);
         $thumbnail->storeAs('bangInspiration/thumb', $thumbnailName);
 

@@ -268,7 +268,7 @@ Route::middleware('auth:api')->group(function () {
         $limit = $request->query('_limit', 4);
         $bangUpdates = BangUpdate::all();
         $formattedUpdates = $bangUpdates->getCollection()->map(function ($update) use ($appUrl) {
-            $update->filename = $appUrl . 'storage/app/bangUpdates/' . $update->filename;
+            $update->filename = $appUrl . 'storage/bangUpdates/' . $update->filename;
             return $update;
         });
         $paginatedResponse = [
@@ -303,7 +303,7 @@ Route::middleware('auth:api')->group(function () {
 
         $formattedUpdates = $bangUpdates->map(function ($update) use ($appUrl, $userId) {
             if($update->type=="image"){
-                $update->filename = $appUrl . 'storage/app/bangUpdates/' . $update->filename;
+                $update->filename = $appUrl . 'storage/bangUpdates/' . $update->filename;
             }
 
         $update->isLiked = DB::table('bang_update_likes')
@@ -340,7 +340,7 @@ Route::middleware('auth:api')->group(function () {
         $formattedUpdates = $bangUpdates->map(function ($update) use ($appUrl, $userId) {
 
             if ($update->type == "image") {
-                $update->filename = $appUrl . 'storage/app/bangUpdates/' . $update->filename;
+                $update->filename = $appUrl . 'storage/bangUpdates/' . $update->filename;
             }
 
             $update->isLiked = $update->bang_update_likes->isNotEmpty(); // Check if there are likes
@@ -522,7 +522,7 @@ Route::middleware('auth:api')->group(function () {
             return response(['message' => 'Challenge not found'], 404);
         }
         // Perform the necessary transformations
-        $challenge->challenge_img = $challenge->challenge_img ? $appUrl . 'storage/app/' . $challenge->challenge_img : null;
+        $challenge->challenge_img = $challenge->challenge_img ? $appUrl . 'storage/' . $challenge->challenge_img : null;
         if ($challenge->type === 'image' && isset($challenge->challenge_img)) {
             list($challenge->width, $challenge->height) = getimagesize($challenge->challenge_img);
         }
@@ -543,9 +543,9 @@ Route::middleware('auth:api')->group(function () {
         $appUrl = env('APP_URL', 'https://bangapp.pro/BangAppBackend');
         $bangInspirations = bangInspiration::all();
         $formattedInspirations = $bangInspirations->map(function ($update) use ($appUrl) {
-            $update->profile_url = $appUrl . 'storage/app/bangInspiration/' . $update->profile_url;
-            $update->video_url = $appUrl . 'storage/app/bangInspiration/' . $update->video_url;
-            $update->thumbnail = $appUrl . 'storage/app/bangInspiration/thumb/' . $update->thumbnail;
+            $update->profile_url = $appUrl . 'storage/bangInspiration/' . $update->profile_url;
+            $update->video_url = $appUrl . 'storage/bangInspiration/' . $update->video_url;
+            $update->thumbnail = $appUrl . 'storage/bangInspiration/thumb/' . $update->thumbnail;
             return $update;
         });
 
@@ -562,8 +562,8 @@ Route::middleware('auth:api')->group(function () {
         }
 
         // Perform the necessary transformations
-        $video->video_url = $video->video_url ? $appUrl . 'storage/app/bangInspiration/' . $video->video_url : null;
-        $video->thumbnail = $video->thumbnail ? $appUrl . 'storage/app/bangInspiration/thumb/' . $video->thumbnail : null;
+        $video->video_url = $video->video_url ? $appUrl . 'storage/bangInspiration/' . $video->video_url : null;
+        $video->thumbnail = $video->thumbnail ? $appUrl . 'storage/bangInspiration/thumb/' . $video->thumbnail : null;
         return response()->json($video);
     });
 
@@ -634,8 +634,8 @@ Route::middleware('auth:api')->group(function () {
 //                $post->pinned = 0;
 //            }
 //            if ($post->type === 'image') {
-//                $post->image ? $post->image = $appUrl . 'storage/app/' . $post->image : $post->image = null;
-//                $post->challenge_img ? $post->challenge_img = $appUrl . 'storage/app/' . $post->challenge_img : $post->challenge_img = null;
+//                $post->image ? $post->image = $appUrl . 'storage/' . $post->image : $post->image = null;
+//                $post->challenge_img ? $post->challenge_img = $appUrl . 'storage/' . $post->challenge_img : $post->challenge_img = null;
 //                list($post->width, $post->height) =  [300, 300];
 //            }
 //            if ($post->type === 'video') {
@@ -644,7 +644,7 @@ Route::middleware('auth:api')->group(function () {
 //                list($post->width, $post->height) = [300, 300];
 //            }
 //            foreach ($post->challenges as $challenge) {
-//                $challenge->challenge_img ? $challenge->challenge_img = $appUrl . 'storage/app/' . $challenge->challenge_img : $challenge->challenge_img = null;
+//                $challenge->challenge_img ? $challenge->challenge_img = $appUrl . 'storage/' . $challenge->challenge_img : $challenge->challenge_img = null;
 //            }
 //            if ($post->challenges->isNotEmpty()) {
 //                $newChallenge = new Challenge([
@@ -748,8 +748,8 @@ Route::middleware('auth:api')->group(function () {
 
             // Handle media links and dimensions
             if ($post->type === 'image') {
-                $post->image = $post->image ? $appUrl . 'storage/app/' . $post->image : null;
-                $post->challenge_img = $post->challenge_img ? $appUrl . 'storage/app/' . $post->challenge_img : null;
+                $post->image = $post->image ? $appUrl . 'storage/' . $post->image : null;
+                $post->challenge_img = $post->challenge_img ? $appUrl . 'storage/' . $post->challenge_img : null;
             } elseif ($post->type === 'video') {
                 $post->image = $videoBaseUrl . 'public/videos/' . $post->image;
                 $post->thumbnail_url = $videoBaseUrl . $post->thumbnail_url;
@@ -758,7 +758,7 @@ Route::middleware('auth:api')->group(function () {
 
             // Update challenge images
             foreach ($post->challenges as $challenge) {
-                $challenge->challenge_img = $challenge->challenge_img ? $appUrl . 'storage/app/' . $challenge->challenge_img : null;
+                $challenge->challenge_img = $challenge->challenge_img ? $appUrl . 'storage/' . $challenge->challenge_img : null;
             }
 
             // Add new challenge if challenges exist
@@ -828,8 +828,8 @@ Route::middleware('auth:api')->group(function () {
                 $post->pinned = 0;
             }
             if ($post->type === 'image') {
-                $post->image ? $post->image = $appUrl . 'storage/app/' . $post->image : $post->image = null;
-                $post->challenge_img ? $post->challenge_img = $appUrl . 'storage/app/' . $post->challenge_img : $post->challenge_img = null;
+                $post->image ? $post->image = $appUrl . 'storage/' . $post->image : $post->image = null;
+                $post->challenge_img ? $post->challenge_img = $appUrl . 'storage/' . $post->challenge_img : $post->challenge_img = null;
                 list($post->width, $post->height) =  [300, 300];
             }
             if ($post->type === 'video') {
@@ -837,7 +837,7 @@ Route::middleware('auth:api')->group(function () {
                 list($post->width, $post->height) = [300, 300];
             }
             foreach ($post->challenges as $challenge) {
-                $challenge->challenge_img ? $challenge->challenge_img = $appUrl . 'storage/app/' . $challenge->challenge_img : $challenge->challenge_img = null;
+                $challenge->challenge_img ? $challenge->challenge_img = $appUrl . 'storage/' . $challenge->challenge_img : $challenge->challenge_img = null;
             }
             if ($post->challenges->isNotEmpty()) {
                 // Create a new Challenge object to add at the top of the challenges array
@@ -912,13 +912,13 @@ Route::middleware('auth:api')->group(function () {
         $deletedPath = storage_path('app/' . $deletedFolder);
         if ($post->type == 'image') {
             if ($post->image) {
-                $imagePath = Str::replaceFirst($appUrl . 'storage/app/', '', $post->image);
+                $imagePath = Str::replaceFirst($appUrl . 'storage/', '', $post->image);
                 $deletedImageName = basename($imagePath);
                 $deletedImagePath = $deletedPath . '/' . $deletedImageName;
                 File::move(storage_path('app/' . $imagePath), $deletedImagePath);
             }
             if ($post->challenge_img) {
-                $challengeImagePath = Str::replaceFirst($appUrl . 'storage/app/', '', $post->challenge_img);
+                $challengeImagePath = Str::replaceFirst($appUrl . 'storage/', '', $post->challenge_img);
                 $deletedChallengeImageName = basename($challengeImagePath);
                 $deletedChallengeImagePath = $deletedPath . '/' . $deletedChallengeImageName;
                 File::move(storage_path('app/' . $challengeImagePath), $deletedChallengeImagePath);
@@ -1099,7 +1099,7 @@ Route::middleware('auth:api')->group(function () {
             },
         ])->paginate($numberOfPostsPerRequest, ['*'], '_page', $pageNumber);
 
-        $posts->getCollection()->transform(function ($post) use ($appUrl, $user_id, $viewerId) {
+        $posts->getCollection()->transform(function ($post) use ($appUrl, $user_id, $viewerId, $videoBaseUrl, $videoFolderPath) {
             // Update the 'pinned' attribute based on whether the user has paid or not
             if ($post->hasUserPaid($viewerId,$post->id)) {
                 $post->pinned = 0;
@@ -1107,8 +1107,8 @@ Route::middleware('auth:api')->group(function () {
 
             $post->post_views_count = $post->pinned == 1 ?  $post->payedCount() : $post->postViews->count();
              if ($post->type === 'image') {
-                $post->image ? $post->image = $appUrl . 'storage/app/' . $post->image : $post->image = null;
-                $post->challenge_img ? $post->challenge_img = $appUrl . 'storage/app/' . $post->challenge_img : $post->challenge_img = null;
+                $post->image ? $post->image = $appUrl . 'storage/' . $post->image : $post->image = null;
+                $post->challenge_img ? $post->challenge_img = $appUrl . 'storage/' . $post->challenge_img : $post->challenge_img = null;
                 list($post->width, $post->height) =  [300, 300];
             }
             if ($post->type === 'video') {
@@ -1163,8 +1163,8 @@ Route::middleware('auth:api')->group(function () {
         $posts->transform(function ($post) use ($appUrl, $user_id) {
             $post->post_views_count = $post->pinned == 1 ?  $post->payedCount() : $post->postViews->count();
             if ($post->type === 'image') {
-                $post->image ? $post->image = $appUrl . 'storage/app/' . $post->image : $post->image = null;
-                $post->challenge_img ? $post->challenge_img = $appUrl . 'storage/app/' . $post->challenge_img : $post->challenge_img = null;
+                $post->image ? $post->image = $appUrl . 'storage/' . $post->image : $post->image = null;
+                $post->challenge_img ? $post->challenge_img = $appUrl . 'storage/' . $post->challenge_img : $post->challenge_img = null;
                 list($post->width, $post->height) =  [300, 300];
             }
             if ($post->type === 'video') {
@@ -1227,7 +1227,7 @@ Route::middleware('auth:api')->group(function () {
             return response()->json(['message' => 'Update not found'], 404);
         }
         if ($bangUpdate->type == "image") {
-            $bangUpdate->filename = $appUrl . 'storage/app/bangUpdates/' . $bangUpdate->filename;
+            $bangUpdate->filename = $appUrl . 'storage/bangUpdates/' . $bangUpdate->filename;
         }
         $bangUpdate->isLiked = DB::table('bang_update_likes')
             ->where('user_id', $user_id)
@@ -1325,10 +1325,10 @@ Route::middleware('auth:api')->group(function () {
         ])->get();
 
         $battles->transform(function ($battle) use ($appUrl, $user_id) {
-            $battle->battle1 ? $battle->battle1 = $appUrl . 'storage/app/' . $battle->battle1 : $battle->battle1 = null;
-            $battle->battle2 ? $battle->battle2 = $appUrl . 'storage/app/' . $battle->battle2 : $battle->battle2 = null;
-            $battle->cover_image ? $battle->cover_image = $appUrl . 'storage/app/' . $battle->cover_image : $battle->cover_image = null;
-            $battle->cover_image2 ? $battle->cover_image2 = $appUrl . 'storage/app/' . $battle->cover_image2 : $battle->cover_image2 = null;
+            $battle->battle1 ? $battle->battle1 = $appUrl . 'storage/' . $battle->battle1 : $battle->battle1 = null;
+            $battle->battle2 ? $battle->battle2 = $appUrl . 'storage/' . $battle->battle2 : $battle->battle2 = null;
+            $battle->cover_image ? $battle->cover_image = $appUrl . 'storage/' . $battle->cover_image : $battle->cover_image = null;
+            $battle->cover_image2 ? $battle->cover_image2 = $appUrl . 'storage/' . $battle->cover_image2 : $battle->cover_image2 = null;
             $battle->isLikedA = false;
             $battle->isLikedB = false;
             $battle->isLiked = false;
@@ -2100,14 +2100,14 @@ Route::get('/getSavedPosts/{userId}', function ($userId) {
         $post = $savedPost->post;
         if ($post) {
             if ($post->type === 'image') {
-                $post->image ? $post->image = $appUrl . 'storage/app/' . $post->image : $post->image = null;
-                $post->challenge_img ? $post->challenge_img = $appUrl . 'storage/app/' . $post->challenge_img : $post->challenge_img = null;
+                $post->image ? $post->image = $appUrl . 'storage/' . $post->image : $post->image = null;
+                $post->challenge_img ? $post->challenge_img = $appUrl . 'storage/' . $post->challenge_img : $post->challenge_img = null;
             }
             if ($post->type === 'video') {
                 $post->image = $post->image; // Assuming video image doesn't need modification
             }
             foreach ($post->challenges as $challenge) {
-                $challenge->challenge_img ? $challenge->challenge_img = $appUrl . 'storage/app/' . $challenge->challenge_img : $challenge->challenge_img = null;
+                $challenge->challenge_img ? $challenge->challenge_img = $appUrl . 'storage/' . $challenge->challenge_img : $challenge->challenge_img = null;
             }
             // // Handle like status
             // $post->isLikedA = false;
@@ -2154,10 +2154,10 @@ Route::get('/getDeletedPosts/{userId}', function ($userId) {
     // Transform the data to modify the image URL
     $deletedPosts->transform(function ($post) use ($appUrl) {
     if ($post->type === 'image' && $post->image) {
-        $post->image = $appUrl . 'storage/app/' . str_replace('images/', 'recycle_bin/', $post->image);
+        $post->image = $appUrl . 'storage/' . str_replace('images/', 'recycle_bin/', $post->image);
     }
     if ($post->challenge_img) {
-        $post->challenge_img = $appUrl . 'storage/app/' .str_replace('images/', 'recycle_bin/', $post->challenge_img);
+        $post->challenge_img = $appUrl . 'storage/' .str_replace('images/', 'recycle_bin/', $post->challenge_img);
     }
     return $post;
     });
@@ -2183,7 +2183,7 @@ Route::post('/uploadFile', function(Request $request){
 });
 
 Route::get('/getFileUploads/{userId}/{perPage}', function($userId, $perPage) {
-    $baseUrl = 'https://bangapp.pro/BangAppBackend/storage/app/';
+    $baseUrl = 'https://bangapp.pro/BangAppBackend/storage/';
     $files = FilePost::where('user_id', $userId)->paginate($perPage);
 
     if ($files->isEmpty()) {

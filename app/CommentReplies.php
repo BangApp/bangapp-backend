@@ -27,7 +27,7 @@ class CommentReplies extends Model
 
     public function getUserImageUrlAttribute() {
         $appUrl = env('APP_URL', 'https://bangapp.pro/BangAppBackend');
-        return $appUrl .'storage/app/'.$this->user->image;
+        return $appUrl .'storage/'.$this->user->image;
     }
 
 }

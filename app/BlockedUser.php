@@ -22,7 +22,7 @@ class BlockedUser extends Model
     {
         $appUrl = env('APP_URL', 'https://bangapp.pro/BangAppBackend');
         if ($this->user) {
-            return $appUrl . 'storage/app/' . $this->user->image;
+            return $appUrl . 'storage/' . $this->user->image;
         }
         return ''; // or return a default image URL if you have one
     }

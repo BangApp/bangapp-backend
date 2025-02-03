@@ -54,7 +54,7 @@ public function associateOneSignalPlayerId(Request $request)
                 'sender_id' => $user_id,
                 'sender_name' => $user->name ,
                 'lastMessage' => $lastMessage ? $lastMessage->message : '',
-                'image' => $appUrl.'storage/app/'.$receiver->image,
+                'image' => $appUrl.'storage/'.$receiver->image,
                 'time' => $lastMessage ? $lastMessage->created_at->diffForHumans() : '',
                 'unreadCount' => $unreadCount, // Include count of unread messages
                 //'isActive' => $receiver->hasActiveSubscription($user_id),
@@ -202,7 +202,7 @@ Log::info($request->all());
 
     $message = new Message([
         'sender_id' => $sender_id,
-        'message' =>   $appUrl . "storage/app/public/".$attachmentPath,
+        'message' =>   $appUrl . "storage/public/".$attachmentPath,
         'message_type'=> 'image',
         'attachment'=> $attachmentPath,
 
@@ -250,7 +250,7 @@ Log::info($request->all());
 
     $message = new Message([
         'sender_id' => $sender_id,
-        'message' =>   $appUrl . "storage/app/public/".$attachmentPath,
+        'message' =>   $appUrl . "storage/public/".$attachmentPath,
         'message_type'=> 'video',
         'attachment'=> $attachmentPath,
 

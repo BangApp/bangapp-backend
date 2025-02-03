@@ -27,7 +27,7 @@ class UserController extends Controller
             $results[] = [
                 'id' => $user->id,
                 'name' => $user->name,
-                'profileUrl' =>  $appUrl . 'storage/app/' . $user->image,
+                'profileUrl' =>  $appUrl . 'storage/' . $user->image,
                 'bio' => $user->body,
                 'postCount' => $user->posts->count(),
                 'occupation' => $user->occupation,
@@ -53,7 +53,7 @@ class UserController extends Controller
         $results = [
             'id' => $user->id,
             'name' => $user->name,
-            'profileUrl' =>  $appUrl . 'storage/app/' . $user->image,
+            'profileUrl' =>  $appUrl . 'storage/' . $user->image,
             'bio' => $user->body,
             'postCount' => $user->posts->count(),
             'occupation' => $user->occupation,
@@ -86,7 +86,7 @@ class UserController extends Controller
                 $results[] = [
                     'id' => $user->id,
                     'name' => $user->name,
-                    'profileUrl' =>  $appUrl . 'storage/app/' . $user->image,
+                    'profileUrl' =>  $appUrl . 'storage/' . $user->image,
                     'bio' => $user->body,
                     'postCount' => $user->posts->count(),
                     'occupation' => $user->occupation,
